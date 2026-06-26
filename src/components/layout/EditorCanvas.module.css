@@ -1,0 +1,283 @@
+.wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-canvas, #f0f0f0);
+  /* subtle dot grid */
+  background-image: radial-gradient(circle, var(--border-muted) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ── Canvas scroll area ───────────────────── */
+.canvas {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+}
+
+/* ── Scene outer (zoom wrapper) ───────────── */
+.sceneOuter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+
+/* ── Inspect Frame ────────────────────────── */
+.inspectFrame {
+  position: relative;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.deviceLabel {
+  position: absolute;
+  top: -26px;
+  left: 0;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.inspectImageWrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+}
+
+.inspectImageWrap img {
+  display: block;
+}
+
+/* Guide overlays */
+.guideGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(0, 120, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 120, 255, 0.07) 1px, transparent 1px);
+  background-size: 8px 8px;
+  pointer-events: none;
+}
+
+.guideCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.guideCenter::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(0, 120, 255, 0.35);
+}
+
+.guideCenter::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 120, 255, 0.2);
+}
+
+.guideMargin {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 80, 80, 0.4);
+  pointer-events: none;
+}
+
+.guideMarginL { left: 16px; }
+.guideMarginR { right: 16px; }
+
+.guideSafe {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 160, 0, 0.5);
+  pointer-events: none;
+}
+
+.guideSafeTop    { top: 44px; }
+.guideSafeBottom { bottom: 34px; }
+
+.sizeBadge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* ── Mockup Scene ─────────────────────────── */
+.mockupScene {
+  padding: 48px 64px;
+  background: linear-gradient(135deg, #e8eaf6 0%, #ede7f6 50%, #fce4ec 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 300px;
+}
+
+.mockupFrame {
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #fff;
+}
+
+.mockupImage {
+  display: block;
+  max-width: 400px;
+  max-height: 600px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ── Export Scene ─────────────────────────── */
+.exportScene {
+  position: relative;
+  padding: 32px;
+  background: var(--bg-base);
+  border: 2px dashed var(--border-strong);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.exportImage {
+  display: block;
+  max-width: 480px;
+  max-height: 640px;
+  width: auto;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: var(--shadow-md);
+}
+
+.exportBadge {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+}
+
+/* ── Empty State ──────────────────────────── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-tertiary);
+  user-select: none;
+  pointer-events: none;
+}
+
+.emptyIcon { opacity: 0.4; }
+
+.emptyTitle {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+}
+
+.emptyDesc {
+  font-size: var(--text-sm);
+}
+
+/* ── Zoom Bar ─────────────────────────────── */
+.zoomBar {
+  position: absolute;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px 12px;
+  height: 36px;
+}
+
+.zoomBtn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--ease-fast);
+}
+
+.zoomBtn:hover:not(:disabled) {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+}
+
+.zoomBtn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.zoomVal {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  min-width: 40px;
+  text-align: center;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+}
+
+.zoomVal:hover { background: var(--bg-muted); }
+
+.zoomDivider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-muted);
+  margin: 0 4px;
+}
+
+.deviceInfo {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}

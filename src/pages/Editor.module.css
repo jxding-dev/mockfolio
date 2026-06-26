@@ -180,14 +180,50 @@
 }
 
 /* ══════════════════════════════════════════════
-   WORKSPACE
+   WORKSPACE (3-panel editor)
 ══════════════════════════════════════════════ */
 .workspace {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - var(--header-h));
+  height: 100vh;
+  overflow: hidden;
   background: var(--bg-subtle);
+}
+
+/* 3-panel body */
+.wsBody {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Inline error banner (inside workspace) */
+.errorBannerInline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  background: var(--error-subtle);
+  border-bottom: 1px solid rgba(239,68,68,0.2);
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--error);
+  flex-shrink: 0;
+}
+
+.errorBannerInline button {
+  color: var(--error);
+  opacity: 0.6;
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+/* Responsive: collapse side panels on mobile */
+@media (max-width: 768px) {
+  .wsBody { flex-direction: column; }
 }
 
 /* ── Top Bar ──────────────────────────────── */
