@@ -1,0 +1,52 @@
+import type { Plan } from '../types';
+
+export const PLANS: Plan[] = [
+  {
+    id: 'free',
+    name: 'Free',
+    price: '₩0',
+    description: '개인 포트폴리오 작업에 필요한 핵심 기능',
+    available: true,
+    features: [
+      '이미지 1장 작업',
+      '기본 디바이스 프리셋 8종',
+      '반응형 검수 (Inspect Mode)',
+      'Before / After 비교',
+      '기본 목업 프레임 6종',
+      'PNG Export 1× / 2×',
+      '로컬 처리 (서버 업로드 없음)',
+    ],
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: '₩9,900 / mo',
+    description: '프리랜서와 디자이너를 위한 고급 기능',
+    available: false,
+    features: [
+      '멀티 이미지 프로젝트',
+      '커스텀 목업 저장',
+      'PNG Export 3× / 4×',
+      '브랜드 키트 (색상, 폰트)',
+      '워터마크 제거 옵션',
+      '프로젝트 히스토리',
+      'PDF 리포트 Export',
+    ],
+  },
+  {
+    id: 'studio',
+    name: 'Studio',
+    price: '₩29,900 / mo',
+    description: '팀과 에이전시를 위한 협업 솔루션',
+    available: false,
+    features: [
+      'Pro 모든 기능 포함',
+      '팀 멤버 초대 및 공유',
+      '클라우드 저장 (50GB)',
+      '클라이언트 리뷰 링크',
+      '브랜드 템플릿 관리',
+      '우선 지원',
+      '커스텀 도메인 리뷰 페이지',
+    ],
+  },
+];
