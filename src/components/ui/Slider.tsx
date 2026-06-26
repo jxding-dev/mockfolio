@@ -11,12 +11,13 @@ interface Props {
 }
 
 export function Slider({ label, value, min, max, step = 1, unit = '', onChange }: Props) {
-  const pct = ((value - min) / (max - min)) * 100;
+  const safeValue = Math.min(max, Math.max(min, Number.isFinite(value) ? value : min));
+  const pct = ((safeValue - min) / (max - min)) * 100;
   return (
     <div className={styles.row}>
       <div className={styles.header}>
         <span className={styles.label}>{label}</span>
-        <span className={styles.val}>{value}{unit}</span>
+        <span className={styles.val}>{safeValue}{unit}</span>
       </div>
       <div className={styles.track}>
         <div className={styles.fill} style={{ width: `${pct}%` }} />
@@ -24,7 +25,8 @@ export function Slider({ label, value, min, max, step = 1, unit = '', onChange }
           type="range"
           className={styles.input}
           min={min} max={max} step={step}
-          value={value}
+          value={safeValue}
+          aria-label={label}
           onChange={(e) => onChange(Number(e.target.value))}
         />
       </div>

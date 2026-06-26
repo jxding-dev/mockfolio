@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from './Button';
 import styles from './Modal.module.css';
@@ -12,11 +12,42 @@ interface Props {
 }
 
 export function Modal({ open, onClose, title, children, width = 480 }: Props) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const titleId = useId();
+
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus(), 0);
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener('keydown', handler);
+      returnFocusRef.current?.focus();
+    };
   }, [open, onClose]);
 
   if (!open) return null;
@@ -29,11 +60,13 @@ export function Modal({ open, onClose, title, children, width = 480 }: Props) {
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal
+        aria-labelledby={title ? titleId : undefined}
+        ref={dialogRef}
       >
         {title && (
           <div className={styles.header}>
-            <h2 className={styles.title}>{title}</h2>
-            <Button variant="ghost" size="sm" onClick={onClose} aria-label="닫기">
+            <h2 id={titleId} className={styles.title}>{title}</h2>
+            <Button ref={closeButtonRef} type="button" variant="ghost" size="sm" onClick={onClose} aria-label="닫기">
               ✕
             </Button>
           </div>

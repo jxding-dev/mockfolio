@@ -6,6 +6,7 @@ interface Props {
   before: UploadedImage | null;
   after: UploadedImage | null;
   orientation?: 'horizontal' | 'vertical';
+  autoSlide?: boolean;
 }
 
 /**
@@ -13,7 +14,7 @@ interface Props {
  * horizontal = divider moves left↔right (default)
  * vertical   = divider moves top↕bottom
  */
-export function CompareSlider({ before, after, orientation = 'horizontal' }: Props) {
+export function CompareSlider({ before, after, orientation = 'horizontal', autoSlide = false }: Props) {
   const [pos, setPos] = useState(50); // percent
   const [dragging, setDragging] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -49,6 +50,23 @@ export function CompareSlider({ before, after, orientation = 'horizontal' }: Pro
       window.removeEventListener('touchend', onUp);
     };
   }, [dragging, updateFromPoint]);
+
+  useEffect(() => {
+    if (!autoSlide || !before || !after) return;
+    let frameId = 0;
+    let startTime: number | null = null;
+    const duration = 3200;
+    setPos(0);
+
+    const animate = (time: number) => {
+      if (startTime === null) startTime = time;
+      const progress = ((time - startTime) % duration) / duration;
+      setPos(progress * 100);
+      frameId = requestAnimationFrame(animate);
+    };
+    frameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameId);
+  }, [autoSlide, before, after]);
 
   if (!before || !after) {
     return (

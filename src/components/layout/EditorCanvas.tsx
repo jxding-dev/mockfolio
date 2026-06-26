@@ -5,6 +5,9 @@ import { DEVICE_PRESETS } from '../../data/devices';
 import { getBackground } from '../../data/backgrounds';
 import { DeviceFrame } from '../mockup/DeviceFrame';
 import { CompareSlider } from '../mockup/CompareSlider';
+import { MockupComposer } from '../mockup/MockupComposer';
+import { UrlPreview } from '../inspector/UrlPreview';
+import type { MockupAsset } from '../../data/mockups';
 import styles from './EditorCanvas.module.css';
 
 interface GuideOptions {
@@ -42,6 +45,15 @@ interface Props {
   beforeImage?: UploadedImage | null;
   afterImage?: UploadedImage | null;
   compareOrientation?: 'horizontal' | 'vertical';
+  autoSlide?: boolean;
+  inspectSource?: 'image' | 'url';
+  previewUrl?: string;
+  previewWidth?: number;
+  previewHeight?: number;
+  urlRefreshKey?: number;
+  selectedMockup?: MockupAsset | null;
+  compositeTransform?: { x: number; y: number; scale: number; rotation: number };
+  onCompositePositionChange?: (x: number, y: number) => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -74,6 +86,15 @@ export function EditorCanvas({
   beforeImage = null,
   afterImage = null,
   compareOrientation = 'horizontal',
+  autoSlide = false,
+  inspectSource = 'image',
+  previewUrl = '',
+  previewWidth = 390,
+  previewHeight = 844,
+  urlRefreshKey = 0,
+  selectedMockup = null,
+  compositeTransform = { x: 0, y: 0, scale: 1, rotation: 0 },
+  onCompositePositionChange,
 }: Props) {
   const [zoom, setZoom] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -104,8 +125,12 @@ export function EditorCanvas({
         {isCompare ? (
           <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
             <div ref={exportRef as React.RefObject<HTMLDivElement>}>
-              <CompareSlider before={beforeImage} after={afterImage} orientation={compareOrientation} />
+              <CompareSlider before={beforeImage} after={afterImage} orientation={compareOrientation} autoSlide={autoSlide} />
             </div>
+          </div>
+        ) : activeMode === 'inspect' && inspectSource === 'url' && previewUrl ? (
+          <div className={styles.sceneOuter}>
+            <UrlPreview url={previewUrl} width={previewWidth} height={previewHeight} refreshKey={urlRefreshKey} />
           </div>
         ) : image ? (
           <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
@@ -132,6 +157,9 @@ export function EditorCanvas({
               mockupTextPosition={mockupTextPosition}
               showMockupDate={showMockupDate}
               mockupTextColor={mockupTextColor}
+              selectedMockup={selectedMockup}
+              compositeTransform={compositeTransform}
+              onCompositePositionChange={onCompositePositionChange}
             />
           </div>
         ) : (
@@ -167,6 +195,7 @@ function CanvasContent({
   shadowIntensity, frameCornerRadius, mockupScale, mockupOffsetX, mockupOffsetY, exportRef, transparentBg,
   frameId, frameColor, bgStyle,
   mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
+  selectedMockup, compositeTransform, onCompositePositionChange,
 }: {
   image: UploadedImage;
   device: DevicePreset;
@@ -190,6 +219,9 @@ function CanvasContent({
   mockupTextPosition: 'top' | 'bottom' | 'none';
   showMockupDate: boolean;
   mockupTextColor: string;
+  selectedMockup: MockupAsset | null;
+  compositeTransform: { x: number; y: number; scale: number; rotation: number };
+  onCompositePositionChange?: (x: number, y: number) => void;
 }) {
   if (activeMode === 'inspect' || activeMode === 'compare') {
     return (
@@ -204,6 +236,9 @@ function CanvasContent({
   }
 
   if (activeMode === 'mockup') {
+    if (selectedMockup) {
+      return <MockupComposer image={image} mockup={selectedMockup} transform={compositeTransform} onPositionChange={onCompositePositionChange ?? (() => {})} />;
+    }
     return (
       <MockupView
         image={image}
@@ -228,6 +263,9 @@ function CanvasContent({
   }
 
   if (activeMode === 'export') {
+    if (selectedMockup) {
+      return <MockupComposer image={image} mockup={selectedMockup} transform={compositeTransform} onPositionChange={onCompositePositionChange ?? (() => {})} />;
+    }
     return (
       <ExportView
         image={image}

@@ -1,9 +1,12 @@
 import { useState, useRef, useCallback } from 'react';
-import type { AppMode, UploadedImage, FrameId, FrameColor, BgStyle } from '../types';
-import { DEVICE_PRESETS } from '../data/devices';
+import type { UploadedImage } from '../types';
+import { DEFAULT_EDITOR_SETTINGS, normalizeEditorSettings, type EditorSettings } from '../data/editorSettings';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useMockupAssets } from '../hooks/useMockupAssets';
 import { exportPng } from '../utils/exportPng';
+import { exportComparisonGif, exportMockupComposite } from '../utils/mediaExport';
+import { normalizePreviewUrl, openPreviewWindow } from '../utils/urlPreview';
 import { EditorTopBar } from '../components/layout/EditorTopBar';
 import { EditorLeftPanel } from '../components/layout/EditorLeftPanel';
 import { EditorRightPanel } from '../components/layout/EditorRightPanel';
@@ -44,7 +47,12 @@ function UploadZone({ onUpload, error, onError, onClearError }: {
           onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
           onClick={() => inputRef.current?.click()}
           role="button" tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              inputRef.current?.click();
+            }
+          }}
           aria-label="이미지 업로드"
         >
           <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp"
@@ -68,7 +76,7 @@ function UploadZone({ onUpload, error, onError, onClearError }: {
         </div>
 
         {error && (
-          <div className={styles.errorBanner}>
+          <div className={styles.errorBanner} role="alert">
             <span>⚠️ {error}</span>
             <button onClick={onClearError} aria-label="닫기">✕</button>
           </div>
@@ -88,69 +96,6 @@ function UploadZone({ onUpload, error, onError, onClearError }: {
   );
 }
 
-/* ─── Persisted editor settings ──────────────────────── */
-interface EditorSettings {
-  projectName: string;
-  activeMode: AppMode;
-  selectedDeviceId: string;
-  // Inspect
-  fitMode: 'fit' | 'fill' | 'original';
-  inspectOrientation: 'portrait' | 'landscape';
-  showGuides: boolean;
-  showGrid: boolean;
-  showCenter: boolean;
-  showMargins: boolean;
-  // Mockup
-  frameId: FrameId;
-  frameColor: FrameColor;
-  bgStyle: BgStyle;
-  shadowIntensity: number;
-  frameCornerRadius: number;
-  mockupScale: number;
-  mockupOffsetX: number;
-  mockupOffsetY: number;
-  mockupTitle: string;
-  mockupSubtitle: string;
-  mockupTags: string;
-  mockupTextPosition: 'top' | 'bottom' | 'none';
-  showMockupDate: boolean;
-  mockupTextColor: string;
-  // Compare
-  compareOrientation: 'horizontal' | 'vertical';
-  // Export
-  exportScale: number;
-  transparentBg: boolean;
-}
-
-const DEFAULT_SETTINGS: EditorSettings = {
-  projectName: '내 프로젝트',
-  activeMode: 'inspect',
-  selectedDeviceId: DEVICE_PRESETS[1].id,
-  fitMode: 'fit',
-  inspectOrientation: 'portrait',
-  showGuides: false,
-  showGrid: false,
-  showCenter: false,
-  showMargins: false,
-  frameId: 'browser',
-  frameColor: 'light',
-  bgStyle: 'soft-gradient',
-  shadowIntensity: 60,
-  frameCornerRadius: 8,
-  mockupScale: 1,
-  mockupOffsetX: 0,
-  mockupOffsetY: 0,
-  mockupTitle: '',
-  mockupSubtitle: '',
-  mockupTags: '',
-  mockupTextPosition: 'none',
-  showMockupDate: false,
-  mockupTextColor: '#1A1D24',
-  compareOrientation: 'horizontal',
-  exportScale: 2,
-  transparentBg: false,
-};
-
 /* ─── Workspace (3-panel editor) ─────────────────────── */
 function Workspace({ image, onImageRemove, onImageChange }: {
   image: UploadedImage;
@@ -158,7 +103,7 @@ function Workspace({ image, onImageRemove, onImageChange }: {
   onImageChange: (img: UploadedImage) => void;
 }) {
   // All lightweight UI settings persist to localStorage (images stay in-memory).
-  const [settings, setSettings] = useLocalStorage<EditorSettings>('mf_settings', DEFAULT_SETTINGS);
+  const [settings, setSettings] = useLocalStorage<EditorSettings>('mf_settings', DEFAULT_EDITOR_SETTINGS, normalizeEditorSettings);
   const patch = useCallback(
     <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) =>
       setSettings((s) => ({ ...s, [key]: value })),
@@ -168,10 +113,12 @@ function Workspace({ image, onImageRemove, onImageChange }: {
   const {
     projectName, activeMode, selectedDeviceId,
     fitMode, inspectOrientation, showGuides, showGrid, showCenter, showMargins,
+    inspectSource, urlInput, previewUrl, previewWidth, previewHeight,
     frameId, frameColor, bgStyle, shadowIntensity, frameCornerRadius,
     mockupScale, mockupOffsetX, mockupOffsetY,
     mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
     compareOrientation, exportScale, transparentBg,
+    selectedMockupId, compositeX, compositeY, compositeScale, compositeRotation,
   } = settings;
 
   // Transient (not persisted): images + UI status
@@ -180,10 +127,65 @@ function Workspace({ image, onImageRemove, onImageChange }: {
   const [afterImage, setAfterImage]   = useState<UploadedImage | null>(null);
   const [exportLoading, setExportLoading] = useState(false);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
+  const [urlRefreshKey, setUrlRefreshKey] = useState(0);
+  const [autoSlide, setAutoSlide] = useState(false);
+  const [gifLoading, setGifLoading] = useState(false);
+  const [gifMessage, setGifMessage] = useState<string | null>(null);
+  const { assets: mockupAssets, loading: mockupsLoading } = useMockupAssets();
 
   const exportRef = useRef<HTMLDivElement | null>(null);
+  const selectedMockup = mockupAssets.find((asset) => asset.id === selectedMockupId) ?? null;
+
+  const handlePreviewUrl = useCallback(() => {
+    const normalized = normalizePreviewUrl(urlInput);
+    if (!normalized) {
+      setError('http 또는 https URL을 입력해주세요.');
+      return;
+    }
+    patch('previewUrl', normalized);
+    patch('inspectSource', 'url');
+    setUrlRefreshKey((key) => key + 1);
+    setError(null);
+  }, [patch, urlInput]);
+
+  const handleCompositeExport = useCallback(async () => {
+    if (!selectedMockup || !image) return;
+    setExportLoading(true);
+    setExportMessage(null);
+    try {
+      await exportMockupComposite(image.dataUrl, selectedMockup.src, {
+        x: compositeX,
+        y: compositeY,
+        scale: compositeScale,
+        rotation: compositeRotation,
+      }, projectName);
+      setExportMessage('합성된 PNG 파일을 저장했습니다.');
+    } catch {
+      setExportMessage('목업 PNG를 저장하지 못했습니다. 목업 파일을 확인해주세요.');
+    } finally {
+      setExportLoading(false);
+    }
+  }, [compositeRotation, compositeScale, compositeX, compositeY, image, projectName, selectedMockup]);
+
+  const handleGifExport = useCallback(async () => {
+    if (!beforeImage || !afterImage) return;
+    setGifLoading(true);
+    setGifMessage(null);
+    try {
+      await exportComparisonGif(beforeImage.dataUrl, afterImage.dataUrl, projectName);
+      setGifMessage('GIF 파일을 저장했습니다.');
+    } catch {
+      setGifMessage('GIF를 생성하지 못했습니다. 이미지를 다시 확인해주세요.');
+    } finally {
+      setGifLoading(false);
+    }
+  }, [afterImage, beforeImage, projectName]);
 
   const handleExport = useCallback(async () => {
+    if (selectedMockup) {
+      await handleCompositeExport();
+      return;
+    }
     if (!exportRef.current) return;
     setExportLoading(true);
     setExportMessage(null);
@@ -195,7 +197,7 @@ function Workspace({ image, onImageRemove, onImageChange }: {
     } finally {
       setExportLoading(false);
     }
-  }, [exportScale, projectName]);
+  }, [exportScale, handleCompositeExport, projectName, selectedMockup]);
 
   return (
     <div className={styles.workspace}>
@@ -210,7 +212,7 @@ function Workspace({ image, onImageRemove, onImageChange }: {
 
       {/* Error banner */}
       {error && (
-        <div className={styles.errorBannerInline}>
+        <div className={styles.errorBannerInline} role="alert">
           <span>⚠️ {error}</span>
           <button onClick={() => setError(null)} aria-label="닫기">✕</button>
         </div>
@@ -232,6 +234,20 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           onAfterChange={setAfterImage}
           onBeforeRemove={() => setBeforeImage(null)}
           onAfterRemove={() => setAfterImage(null)}
+          inspectSource={inspectSource}
+          onInspectSourceChange={(value) => patch('inspectSource', value)}
+          urlInput={urlInput}
+          onUrlInputChange={(value) => patch('urlInput', value)}
+          previewWidth={previewWidth}
+          previewHeight={previewHeight}
+          onPreviewSizeChange={(width, height) => {
+            patch('previewWidth', Math.max(240, Math.min(1920, Number.isFinite(width) ? width : previewWidth)));
+            patch('previewHeight', Math.max(240, Math.min(1920, Number.isFinite(height) ? height : previewHeight)));
+          }}
+          onPreviewUrl={handlePreviewUrl}
+          onPreviewRefresh={() => setUrlRefreshKey((key) => key + 1)}
+          onOpenPreview={() => previewUrl && openPreviewWindow(previewUrl)}
+          previewReady={Boolean(previewUrl)}
         />
 
         <EditorCanvas
@@ -260,6 +276,15 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           beforeImage={beforeImage}
           afterImage={afterImage}
           compareOrientation={compareOrientation}
+          inspectSource={inspectSource}
+          previewUrl={previewUrl}
+          previewWidth={previewWidth}
+          previewHeight={previewHeight}
+          urlRefreshKey={urlRefreshKey}
+          selectedMockup={selectedMockup}
+          compositeTransform={{ x: compositeX, y: compositeY, scale: compositeScale, rotation: compositeRotation }}
+          onCompositePositionChange={(x, y) => { patch('compositeX', x); patch('compositeY', y); }}
+          autoSlide={autoSlide}
         />
 
         <EditorRightPanel
@@ -314,6 +339,29 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           onExport={handleExport}
           exportLoading={exportLoading}
           exportMessage={exportMessage}
+          mockupAssets={mockupAssets}
+          mockupsLoading={mockupsLoading}
+          selectedMockupId={selectedMockupId}
+          onSelectedMockupChange={(id) => patch('selectedMockupId', id)}
+          compositeX={compositeX}
+          compositeY={compositeY}
+          compositeScale={compositeScale}
+          compositeRotation={compositeRotation}
+          onCompositeXChange={(value) => patch('compositeX', value)}
+          onCompositeYChange={(value) => patch('compositeY', value)}
+          onCompositeScaleChange={(value) => patch('compositeScale', value)}
+          onCompositeRotationChange={(value) => patch('compositeRotation', value)}
+          onCompositeReset={() => {
+            patch('compositeX', 0); patch('compositeY', 0); patch('compositeScale', 1); patch('compositeRotation', 0);
+          }}
+          onCompositeExport={handleCompositeExport}
+          autoSlide={autoSlide}
+          onAutoSlideChange={setAutoSlide}
+          onGifExport={handleGifExport}
+          gifLoading={gifLoading}
+          gifMessage={gifMessage}
+          beforeImage={beforeImage}
+          afterImage={afterImage}
         />
       </div>
     </div>

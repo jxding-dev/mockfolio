@@ -5,6 +5,7 @@ import { BACKGROUNDS } from '../../data/backgrounds';
 import { Slider } from '../ui/Slider';
 import { Toggle } from '../ui/Toggle';
 import { Button } from '../ui/Button';
+import type { MockupAsset } from '../../data/mockups';
 import styles from './EditorRightPanel.module.css';
 
 interface Props {
@@ -59,10 +60,31 @@ interface Props {
   onCompareOrientationChange?: (v: 'horizontal' | 'vertical') => void;
   // Export props
   exportScale?: number;
-  onExportScaleChange?: (v: number) => void;
+  onExportScaleChange?: (v: 1 | 2) => void;
   transparentBg?: boolean;
   onTransparentBgChange?: (v: boolean) => void;
   exportMessage?: string | null;
+  mockupAssets?: MockupAsset[];
+  mockupsLoading?: boolean;
+  selectedMockupId?: string;
+  onSelectedMockupChange?: (id: string) => void;
+  compositeX?: number;
+  compositeY?: number;
+  compositeScale?: number;
+  compositeRotation?: number;
+  onCompositeXChange?: (value: number) => void;
+  onCompositeYChange?: (value: number) => void;
+  onCompositeScaleChange?: (value: number) => void;
+  onCompositeRotationChange?: (value: number) => void;
+  onCompositeReset?: () => void;
+  onCompositeExport?: () => void;
+  autoSlide?: boolean;
+  onAutoSlideChange?: (value: boolean) => void;
+  onGifExport?: () => void;
+  gifLoading?: boolean;
+  gifMessage?: string | null;
+  beforeImage?: UploadedImage | null;
+  afterImage?: UploadedImage | null;
 }
 
 export function EditorRightPanel({
@@ -90,12 +112,16 @@ export function EditorRightPanel({
   exportScale = 2, onExportScaleChange,
   transparentBg = false, onTransparentBgChange,
   exportMessage,
+  mockupAssets = [], mockupsLoading = false, selectedMockupId = '', onSelectedMockupChange,
+  compositeX = 0, compositeY = 0, compositeScale = 1, compositeRotation = 0,
+  onCompositeXChange, onCompositeYChange, onCompositeScaleChange, onCompositeRotationChange, onCompositeReset, onCompositeExport,
+  autoSlide = false, onAutoSlideChange, onGifExport, gifLoading = false, gifMessage, beforeImage = null, afterImage = null,
 }: Props) {
   return (
     <aside className={styles.panel}>
       {activeMode === 'inspect'  && <InspectProps {...{ showGuides, showGrid, showCenter, showMargins, onGuidesChange, onGridChange, onCenterChange, onMarginsChange, fitMode, onFitModeChange, inspectOrientation, onInspectOrientationChange }} />}
-      {activeMode === 'mockup'   && <MockupProps  {...{ frameId, onFrameChange, frameColor, onFrameColorChange, bgStyle, onBgStyleChange, shadowIntensity, onShadowChange, frameCornerRadius, onCornerRadiusChange, mockupScale, onMockupScaleChange, mockupOffsetX, onMockupOffsetXChange, mockupOffsetY, onMockupOffsetYChange, mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange, mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange, showMockupDate, onShowMockupDateChange, mockupTextColor, onMockupTextColorChange }} />}
-      {activeMode === 'compare'  && <CompareProps {...{ compareOrientation, onCompareOrientationChange }} />}
+      {activeMode === 'mockup'   && <MockupProps  {...{ image, frameId, onFrameChange, frameColor, onFrameColorChange, bgStyle, onBgStyleChange, shadowIntensity, onShadowChange, frameCornerRadius, onCornerRadiusChange, mockupScale, onMockupScaleChange, mockupOffsetX, onMockupOffsetXChange, mockupOffsetY, onMockupOffsetYChange, mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange, mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange, showMockupDate, onShowMockupDateChange, mockupTextColor, onMockupTextColorChange, mockupAssets, mockupsLoading, selectedMockupId, onSelectedMockupChange, compositeX, compositeY, compositeScale, compositeRotation, onCompositeXChange, onCompositeYChange, onCompositeScaleChange, onCompositeRotationChange, onCompositeReset, onCompositeExport }} />}
+      {activeMode === 'compare'  && <CompareProps {...{ compareOrientation, onCompareOrientationChange, autoSlide, onAutoSlideChange, onGifExport, gifLoading, gifMessage, beforeImage, afterImage }} />}
       {activeMode === 'export'   && <ExportProps  {...{ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading, exportMessage }} />}
     </aside>
   );
@@ -178,6 +204,7 @@ const FRAME_COLORS: { id: FrameColor; label: string; swatch: string }[] = [
 ];
 
 function MockupProps({
+  image,
   frameId, onFrameChange, frameColor, onFrameColorChange,
   bgStyle, onBgStyleChange, shadowIntensity, onShadowChange,
   frameCornerRadius, onCornerRadiusChange,
@@ -185,9 +212,38 @@ function MockupProps({
   mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange,
   mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange,
   showMockupDate, onShowMockupDateChange, mockupTextColor, onMockupTextColorChange,
-}: Omit<Props, 'activeMode'|'image'>) {
+  mockupAssets, mockupsLoading, selectedMockupId, onSelectedMockupChange,
+  compositeX, compositeY, compositeScale, compositeRotation,
+  onCompositeXChange, onCompositeYChange, onCompositeScaleChange, onCompositeRotationChange, onCompositeReset, onCompositeExport,
+}: Omit<Props, 'activeMode'>) {
   return (
     <>
+      <RSection title="커스텀 PNG 목업">
+        {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets?.length ? (
+          <div className={styles.mockupAssetGrid}>
+            {mockupAssets.map((asset) => <button key={asset.id} className={`${styles.frameBtn} ${selectedMockupId === asset.id ? styles.frameBtnActive : ''}`} onClick={() => onSelectedMockupChange?.(asset.id)}>{asset.label}</button>)}
+            <button className={`${styles.frameBtn} ${!selectedMockupId ? styles.frameBtnActive : ''}`} onClick={() => onSelectedMockupChange?.('')}>기본 프레임</button>
+          </div>
+        ) : <p className={styles.hint}>public/mockups에 PNG와 manifest를 추가하면 여기에서 선택할 수 있습니다.</p>}
+      </RSection>
+
+      {selectedMockupId && (
+        <>
+          <RSection title="이미지 합성">
+            <Slider label="X 위치" value={compositeX ?? 0} min={-100} max={100} unit="%" onChange={value => onCompositeXChange?.(value)} />
+            <Slider label="Y 위치" value={compositeY ?? 0} min={-100} max={100} unit="%" onChange={value => onCompositeYChange?.(value)} />
+            <Slider label="Scale" value={Math.round((compositeScale ?? 1) * 100)} min={10} max={300} unit="%" onChange={value => onCompositeScaleChange?.(value / 100)} />
+            <Slider label="Rotate" value={compositeRotation ?? 0} min={-180} max={180} unit="°" onChange={value => onCompositeRotationChange?.(value)} />
+            <Button variant="secondary" size="sm" fullWidth onClick={onCompositeReset}>조정 초기화</Button>
+          </RSection>
+          <div className={styles.exportFooter}>
+            <Button variant="primary" size="lg" fullWidth disabled={!image} onClick={onCompositeExport}>합성 PNG 저장</Button>
+            <p className={styles.exportNote}>{image ? '사용자 이미지와 목업을 합성해서만 저장합니다.' : '이미지를 업로드해야 저장할 수 있어요.'}</p>
+          </div>
+        </>
+      )}
+
+      {!selectedMockupId && <>
       <RSection title="프레임">
         <div className={styles.frameGrid}>
           {FRAMES.map((f) => (
@@ -310,12 +366,14 @@ function MockupProps({
           </div>
         )}
       </RSection>
+      </>}
     </>
   );
 }
 
 /* ── Compare Props ────────────────────────── */
-function CompareProps({ compareOrientation, onCompareOrientationChange }: Omit<Props, 'activeMode'|'image'>) {
+function CompareProps({ compareOrientation, onCompareOrientationChange, autoSlide, onAutoSlideChange, onGifExport, gifLoading, gifMessage, beforeImage, afterImage }: Omit<Props, 'activeMode'|'image'>) {
+  const readyForGif = Boolean(beforeImage && afterImage);
   return (
     <>
       <RSection title="슬라이더 방향">
@@ -336,6 +394,15 @@ function CompareProps({ compareOrientation, onCompareOrientationChange }: Omit<P
           가운데 손잡이를 드래그하거나 이미지를 클릭/드래그하면<br />
           Before와 After를 비교할 수 있습니다.
         </p>
+      </RSection>
+      <RSection title="자동 비교">
+        <Button variant={autoSlide ? 'secondary' : 'primary'} fullWidth onClick={() => onAutoSlideChange?.(!autoSlide)} disabled={!readyForGif}>
+          {autoSlide ? '자동 슬라이드 정지' : '자동 슬라이드'}
+        </Button>
+        <Button variant="secondary" fullWidth loading={gifLoading} onClick={onGifExport} disabled={!readyForGif}>
+          GIF 저장
+        </Button>
+        <p className={styles.hint}>{readyForGif ? (gifMessage ?? 'Before와 After를 GIF로 저장할 수 있습니다.') : 'Before와 After 이미지를 모두 업로드해야 GIF를 저장할 수 있어요.'}</p>
       </RSection>
     </>
   );

@@ -1,20 +1,28 @@
-import { HashRouter as BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter as BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { Landing } from './pages/Landing';
 import { Editor } from './pages/Editor';
 import { Pricing } from './pages/Pricing';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
-export default function App() {
+function AppShell() {
+  const { pathname } = useLocation();
+  const isEditor = pathname === '/editor';
+
   return (
-    <BrowserRouter>
-      <Header />
+    <ErrorBoundary>
+      {!isEditor && <Header />}
       <Routes>
         <Route path="/"        element={<Landing />} />
         <Route path="/editor"  element={<Editor />} />
         <Route path="/pricing" element={<Pricing />} />
       </Routes>
-      <Footer />
-    </BrowserRouter>
+      {!isEditor && <Footer />}
+    </ErrorBoundary>
   );
+}
+
+export default function App() {
+  return <BrowserRouter><AppShell /></BrowserRouter>;
 }

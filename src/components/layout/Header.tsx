@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { Badge } from '../ui/Badge';
@@ -7,7 +7,9 @@ import styles from './Header.module.css';
 
 export function Header() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [comingSoon, setComingSoon] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <>
@@ -28,20 +30,32 @@ export function Header() {
           </Link>
 
           {/* Nav */}
-          <nav className={styles.nav}>
-            <Link to="/"        className={`${styles.navLink} ${pathname === '/'        ? styles.active : ''}`}>홈</Link>
-            <Link to="/editor"  className={`${styles.navLink} ${pathname === '/editor'  ? styles.active : ''}`}>에디터</Link>
-            <Link to="/pricing" className={`${styles.navLink} ${pathname === '/pricing' ? styles.active : ''}`}>요금제</Link>
+          <nav id="primary-navigation" className={`${styles.nav} ${menuOpen ? styles.navOpen : ''}`}>
+            <Link to="/"        onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/'        ? styles.active : ''}`}>홈</Link>
+            <Link to="/editor"  onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/editor'  ? styles.active : ''}`}>에디터</Link>
+            <Link to="/pricing" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/pricing' ? styles.active : ''}`}>요금제</Link>
           </nav>
 
           {/* Actions */}
           <div className={styles.actions}>
-            <Button variant="ghost" size="sm" onClick={() => setComingSoon(true)}>
+            <Button className={styles.loginButton} variant="ghost" size="sm" onClick={() => setComingSoon(true)}>
               로그인
             </Button>
-            <Button variant="primary" size="sm" onClick={() => setComingSoon(true)}>
+            <Button variant="primary" size="sm" onClick={() => navigate('/editor')}>
               무료로 시작
             </Button>
+            <button
+              type="button"
+              className={styles.menuButton}
+              aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
+              aria-expanded={menuOpen}
+              aria-controls="primary-navigation"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
           </div>
         </div>
       </header>

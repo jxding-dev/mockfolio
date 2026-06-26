@@ -1,0 +1,49 @@
+.wrap {
+  width: min(100%, 760px);
+}
+
+.stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--bg-muted);
+  box-shadow: var(--shadow-lg);
+  line-height: 0;
+  user-select: none;
+}
+
+.imageLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.dragging { cursor: grabbing; }
+
+.userImage {
+  position: absolute;
+  display: block;
+  max-width: none;
+  height: auto;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.mockupImage {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.hint {
+  margin-top: var(--space-3);
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  text-align: center;
+}

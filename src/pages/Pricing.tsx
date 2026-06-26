@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Modal } from '../components/ui/Modal';
@@ -7,6 +8,7 @@ import styles from './Pricing.module.css';
 
 export function Pricing() {
   const [comingSoon, setComingSoon] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <main className={styles.page}>
@@ -58,10 +60,9 @@ export function Pricing() {
             <Button
               variant={plan.id === 'free' ? 'primary' : 'secondary'}
               fullWidth
-              onClick={() => !plan.available && setComingSoon(true)}
-              disabled={false}
+              onClick={() => plan.available ? navigate('/editor') : setComingSoon(true)}
             >
-              {plan.available ? '지금 무료로 시작' : '출시 알림 신청'}
+              {plan.available ? '지금 무료로 시작' : '준비 중'}
             </Button>
           </div>
         ))}
@@ -75,10 +76,10 @@ export function Pricing() {
         </p>
       </div>
 
-      <Modal open={comingSoon} onClose={() => setComingSoon(false)} title="출시 알림 신청">
+      <Modal open={comingSoon} onClose={() => setComingSoon(false)} title="준비 중입니다">
         <div className={styles.comingSoon}>
           <div className={styles.csEmoji}>📬</div>
-          <p>유료 플랜은 현재 개발 중입니다.<br />출시되면 가장 먼저 알려드릴게요.</p>
+          <p>유료 플랜은 현재 개발 중입니다.<br />지금은 로그인 없이 무료 기능을 사용하세요.</p>
           <Button variant="primary" fullWidth onClick={() => setComingSoon(false)}>
             확인
           </Button>

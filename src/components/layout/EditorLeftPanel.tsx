@@ -21,6 +21,17 @@ interface Props {
   onAfterChange?: (img: UploadedImage) => void;
   onBeforeRemove?: () => void;
   onAfterRemove?: () => void;
+  inspectSource?: 'image' | 'url';
+  onInspectSourceChange?: (value: 'image' | 'url') => void;
+  urlInput?: string;
+  onUrlInputChange?: (value: string) => void;
+  previewWidth?: number;
+  previewHeight?: number;
+  onPreviewSizeChange?: (width: number, height: number) => void;
+  onPreviewUrl?: () => void;
+  onPreviewRefresh?: () => void;
+  onOpenPreview?: () => void;
+  previewReady?: boolean;
 }
 
 export function EditorLeftPanel({
@@ -37,6 +48,10 @@ export function EditorLeftPanel({
   onAfterChange,
   onBeforeRemove,
   onAfterRemove,
+  inspectSource = 'image', onInspectSourceChange,
+  urlInput = '', onUrlInputChange,
+  previewWidth = 390, previewHeight = 844, onPreviewSizeChange,
+  onPreviewUrl, onPreviewRefresh, onOpenPreview, previewReady = false,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { handleInputChange } = useImageUpload({ onSuccess: onImageChange, onError });
@@ -102,25 +117,52 @@ export function EditorLeftPanel({
 
       {/* ── Device Section (Inspect only) ── */}
       {activeMode === 'inspect' && (
-        <Section title="디바이스">
-          {(['mobile', 'tablet', 'desktop'] as DevicePreset['category'][]).map((cat) => (
-            <div key={cat} className={styles.deviceGroup}>
-              <div className={styles.deviceGroupLabel}>
-                {cat === 'mobile' ? '📱 모바일' : cat === 'tablet' ? '📲 태블릿' : '🖥 데스크탑'}
-              </div>
-              {byCategory(cat).map((d) => (
-                <button
-                  key={d.id}
-                  className={`${styles.deviceBtn} ${selectedDeviceId === d.id ? styles.deviceBtnActive : ''}`}
-                  onClick={() => onDeviceChange(d.id)}
-                >
-                  <span className={styles.deviceLabel}>{d.label}</span>
-                  <span className={styles.deviceSize}>{d.width}×{d.height}</span>
-                </button>
-              ))}
+        <>
+          <Section title="미리보기">
+            <div className={styles.previewModeRow}>
+              <button className={`${styles.previewModeBtn} ${inspectSource === 'image' ? styles.previewModeBtnActive : ''}`} onClick={() => onInspectSourceChange?.('image')}>이미지</button>
+              <button className={`${styles.previewModeBtn} ${inspectSource === 'url' ? styles.previewModeBtnActive : ''}`} onClick={() => onInspectSourceChange?.('url')}>URL</button>
             </div>
-          ))}
-        </Section>
+            {inspectSource === 'url' && (
+              <>
+                <input className={styles.urlInput} value={urlInput} onChange={(event) => onUrlInputChange?.(event.target.value)} placeholder="example.com" inputMode="url" aria-label="미리보기 URL" />
+                <div className={styles.previewActions}>
+                  <Button size="sm" variant="primary" onClick={onPreviewUrl}>미리보기</Button>
+                  <Button size="sm" variant="secondary" onClick={onPreviewRefresh} disabled={!previewReady}>새로고침</Button>
+                </div>
+                <div className={styles.sizeInputs}>
+                  <label>W<input type="number" min="240" max="1920" value={previewWidth} onChange={(event) => onPreviewSizeChange?.(Number(event.target.value), previewHeight)} /></label>
+                  <label>H<input type="number" min="240" max="1920" value={previewHeight} onChange={(event) => onPreviewSizeChange?.(previewWidth, Number(event.target.value))} /></label>
+                </div>
+                <div className={styles.presetRow}>
+                  {[
+                    ['Mobile', 390, 844], ['Tablet', 768, 1024], ['Desktop', 1440, 900], ['Wide', 1920, 1080],
+                  ].map(([label, width, height]) => <button key={String(label)} onClick={() => onPreviewSizeChange?.(Number(width), Number(height))}>{label}</button>)}
+                </div>
+                <Button size="sm" variant="ghost" fullWidth onClick={onOpenPreview} disabled={!previewReady}>새 창에서 열기</Button>
+              </>
+            )}
+          </Section>
+          <Section title="디바이스">
+            {(['mobile', 'tablet', 'desktop'] as DevicePreset['category'][]).map((cat) => (
+              <div key={cat} className={styles.deviceGroup}>
+                <div className={styles.deviceGroupLabel}>
+                  {cat === 'mobile' ? '📱 모바일' : cat === 'tablet' ? '📲 태블릿' : '🖥 데스크탑'}
+                </div>
+                {byCategory(cat).map((d) => (
+                  <button
+                    key={d.id}
+                    className={`${styles.deviceBtn} ${selectedDeviceId === d.id ? styles.deviceBtnActive : ''}`}
+                    onClick={() => onDeviceChange(d.id)}
+                  >
+                    <span className={styles.deviceLabel}>{d.label}</span>
+                    <span className={styles.deviceSize}>{d.width}×{d.height}</span>
+                  </button>
+                ))}
+              </div>
+            ))}
+          </Section>
+        </>
       )}
 
       {/* ── Mockup mode hint ─────────────── */}

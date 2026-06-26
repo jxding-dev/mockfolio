@@ -424,7 +424,7 @@ export function Landing() {
                   ))}
                 </ul>
                 <Button variant="secondary" fullWidth onClick={() => setComingSoon(true)}>
-                  출시 알림 신청
+                  준비 중
                 </Button>
               </div>
             ))}
@@ -447,10 +447,10 @@ export function Landing() {
         </div>
       </section>
 
-      <Modal open={comingSoon} onClose={() => setComingSoon(false)} title="출시 알림 신청">
+      <Modal open={comingSoon} onClose={() => setComingSoon(false)} title="준비 중입니다">
         <div className={styles.comingSoonModal}>
           <div className={styles.csEmoji}>📬</div>
-          <p>유료 플랜은 현재 개발 중입니다.<br />출시 소식을 가장 먼저 전해드릴게요.</p>
+          <p>유료 플랜은 현재 개발 중입니다.<br />지금은 로그인 없이 무료 기능을 사용하세요.</p>
           <Button variant="primary" fullWidth onClick={() => setComingSoon(false)}>
             확인
           </Button>

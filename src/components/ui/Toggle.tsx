@@ -9,16 +9,18 @@ interface Props {
 
 export function Toggle({ value, onChange, label, size = 'md' }: Props) {
   return (
-    <label className={`${styles.wrap} ${styles[size]}`}>
+    <div className={`${styles.wrap} ${styles[size]}`}>
       {label && <span className={styles.label}>{label}</span>}
       <button
+        type="button"
         role="switch"
         aria-checked={value}
+        aria-label={label ?? '옵션 전환'}
         onClick={() => onChange(!value)}
         className={`${styles.track} ${value ? styles.on : ''}`}
       >
         <span className={styles.thumb} />
       </button>
-    </label>
+    </div>
   );
 }

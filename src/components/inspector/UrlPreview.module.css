@@ -1,0 +1,48 @@
+.preview {
+  width: min(100%, 1120px);
+  padding: var(--space-5);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  background: var(--bg-base);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.deviceLabel {
+  margin-bottom: var(--space-3);
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.viewport {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-muted);
+}
+
+.frame {
+  flex: none;
+  transform-origin: top center;
+  overflow: hidden;
+  background: #fff;
+}
+
+.frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+
+.notice {
+  margin-top: var(--space-3);
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  overflow-wrap: anywhere;
+}
