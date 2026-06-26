@@ -14,6 +14,13 @@ interface Props {
   onImageChange: (img: UploadedImage) => void;
   onImageRemove: () => void;
   onError: (msg: string) => void;
+  // Compare
+  beforeImage?: UploadedImage | null;
+  afterImage?: UploadedImage | null;
+  onBeforeChange?: (img: UploadedImage) => void;
+  onAfterChange?: (img: UploadedImage) => void;
+  onBeforeRemove?: () => void;
+  onAfterRemove?: () => void;
 }
 
 export function EditorLeftPanel({
@@ -24,6 +31,12 @@ export function EditorLeftPanel({
   onImageChange,
   onImageRemove,
   onError,
+  beforeImage = null,
+  afterImage = null,
+  onBeforeChange,
+  onAfterChange,
+  onBeforeRemove,
+  onAfterRemove,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { handleFiles } = useImageUpload({ onSuccess: onImageChange, onError });
@@ -31,9 +44,27 @@ export function EditorLeftPanel({
   const byCategory = (cat: DevicePreset['category']) =>
     DEVICE_PRESETS.filter((d) => d.category === cat);
 
+  const isCompare = activeMode === 'compare';
+
   return (
     <aside className={styles.panel}>
-      {/* ── Image Section ─────────────────── */}
+      {/* ── Compare slots ─────────────────── */}
+      {isCompare ? (
+        <Section title="비교 이미지">
+          <ImageSlot
+            label="Before" image={beforeImage}
+            onChange={(img) => onBeforeChange?.(img)} onRemove={onBeforeRemove}
+            onError={onError}
+          />
+          <div className={styles.slotSpacer} />
+          <ImageSlot
+            label="After" image={afterImage}
+            onChange={(img) => onAfterChange?.(img)} onRemove={onAfterRemove}
+            onError={onError}
+          />
+        </Section>
+      ) : (
+      /* ── Image Section ─────────────────── */
       <Section title="이미지">
         {image ? (
           <div className={styles.imageCard}>
@@ -67,9 +98,10 @@ export function EditorLeftPanel({
           onChange={(e) => e.target.files && handleFiles(e.target.files)}
         />
       </Section>
+      )}
 
-      {/* ── Device Section (Inspect/Compare mode) ── */}
-      {(activeMode === 'inspect' || activeMode === 'compare') && (
+      {/* ── Device Section (Inspect only) ── */}
+      {activeMode === 'inspect' && (
         <Section title="디바이스">
           {(['mobile', 'tablet', 'desktop'] as DevicePreset['category'][]).map((cat) => (
             <div key={cat} className={styles.deviceGroup}>
@@ -122,6 +154,49 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <div className={styles.section}>
       <div className={styles.sectionTitle}>{title}</div>
       <div className={styles.sectionBody}>{children}</div>
+    </div>
+  );
+}
+
+/* ── Image Slot (compare before/after) ─────── */
+function ImageSlot({
+  label, image, onChange, onRemove, onError,
+}: {
+  label: string;
+  image: UploadedImage | null;
+  onChange: (img: UploadedImage) => void;
+  onRemove?: () => void;
+  onError: (msg: string) => void;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  const { handleFiles } = useImageUpload({ onSuccess: onChange, onError });
+
+  return (
+    <div>
+      <div className={styles.slotLabel}>{label}</div>
+      {image ? (
+        <div className={styles.imageCard}>
+          <div className={styles.imageThumbWrap}>
+            <img src={image.dataUrl} alt={label} className={styles.imageThumb} />
+          </div>
+          <div className={styles.imageActions}>
+            <Button variant="ghost" size="sm" onClick={() => ref.current?.click()}>교체</Button>
+            <Button variant="danger" size="sm" onClick={onRemove}>삭제</Button>
+          </div>
+        </div>
+      ) : (
+        <button className={styles.uploadBtn} onClick={() => ref.current?.click()}>
+          <span className={styles.uploadBtnIcon}>+</span>
+          {label} 업로드
+        </button>
+      )}
+      <input
+        ref={ref}
+        type="file"
+        accept="image/png,image/jpeg,image/jpg,image/webp"
+        className={styles.hidden}
+        onChange={(e) => e.target.files && handleFiles(e.target.files)}
+      />
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import type { AppMode, UploadedImage } from '../../types';
+import type { AppMode, UploadedImage, FrameId, FrameColor, BgStyle } from '../../types';
+import { FRAMES } from '../../data/frames';
+import { BACKGROUNDS } from '../../data/backgrounds';
 import { Slider } from '../ui/Slider';
 import { Toggle } from '../ui/Toggle';
 import { Button } from '../ui/Button';
@@ -21,11 +23,30 @@ interface Props {
   onMarginsChange?: (v: boolean) => void;
   fitMode?: 'fit' | 'fill' | 'original';
   onFitModeChange?: (v: 'fit' | 'fill' | 'original') => void;
+  inspectOrientation?: 'portrait' | 'landscape';
+  onInspectOrientationChange?: (v: 'portrait' | 'landscape') => void;
   // Mockup props
+  frameId?: FrameId;
+  onFrameChange?: (v: FrameId) => void;
+  frameColor?: FrameColor;
+  onFrameColorChange?: (v: FrameColor) => void;
+  bgStyle?: BgStyle;
+  onBgStyleChange?: (v: BgStyle) => void;
   shadowIntensity?: number;
   onShadowChange?: (v: number) => void;
   frameCornerRadius?: number;
   onCornerRadiusChange?: (v: number) => void;
+  mockupTitle?: string;
+  onMockupTitleChange?: (v: string) => void;
+  mockupSubtitle?: string;
+  onMockupSubtitleChange?: (v: string) => void;
+  mockupTags?: string;
+  onMockupTagsChange?: (v: string) => void;
+  mockupTextPosition?: 'top' | 'bottom' | 'none';
+  onMockupTextPositionChange?: (v: 'top' | 'bottom' | 'none') => void;
+  // Compare props
+  compareOrientation?: 'horizontal' | 'vertical';
+  onCompareOrientationChange?: (v: 'horizontal' | 'vertical') => void;
   // Export props
   exportScale?: number;
   onExportScaleChange?: (v: number) => void;
@@ -39,16 +60,25 @@ export function EditorRightPanel({
   showGuides, showGrid, showCenter, showMargins,
   onGuidesChange, onGridChange, onCenterChange, onMarginsChange,
   fitMode = 'fit', onFitModeChange,
+  inspectOrientation = 'portrait', onInspectOrientationChange,
+  frameId = 'browser', onFrameChange,
+  frameColor = 'light', onFrameColorChange,
+  bgStyle = 'soft-gradient', onBgStyleChange,
   shadowIntensity = 60, onShadowChange,
   frameCornerRadius = 8, onCornerRadiusChange,
+  mockupTitle = '', onMockupTitleChange,
+  mockupSubtitle = '', onMockupSubtitleChange,
+  mockupTags = '', onMockupTagsChange,
+  mockupTextPosition = 'none', onMockupTextPositionChange,
+  compareOrientation = 'horizontal', onCompareOrientationChange,
   exportScale = 2, onExportScaleChange,
   transparentBg = false, onTransparentBgChange,
 }: Props) {
   return (
     <aside className={styles.panel}>
-      {activeMode === 'inspect'  && <InspectProps {...{ showGuides, showGrid, showCenter, showMargins, onGuidesChange, onGridChange, onCenterChange, onMarginsChange, fitMode, onFitModeChange }} />}
-      {activeMode === 'mockup'   && <MockupProps  {...{ shadowIntensity, onShadowChange, frameCornerRadius, onCornerRadiusChange }} />}
-      {activeMode === 'compare'  && <CompareProps />}
+      {activeMode === 'inspect'  && <InspectProps {...{ showGuides, showGrid, showCenter, showMargins, onGuidesChange, onGridChange, onCenterChange, onMarginsChange, fitMode, onFitModeChange, inspectOrientation, onInspectOrientationChange }} />}
+      {activeMode === 'mockup'   && <MockupProps  {...{ frameId, onFrameChange, frameColor, onFrameColorChange, bgStyle, onBgStyleChange, shadowIntensity, onShadowChange, frameCornerRadius, onCornerRadiusChange, mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange, mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange }} />}
+      {activeMode === 'compare'  && <CompareProps {...{ compareOrientation, onCompareOrientationChange }} />}
       {activeMode === 'export'   && <ExportProps  {...{ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading }} />}
     </aside>
   );
@@ -65,9 +95,22 @@ function RSection({ title, children }: { title: string; children: React.ReactNod
 }
 
 /* ── Inspect Props ────────────────────────── */
-function InspectProps({ showGuides, showGrid, showCenter, showMargins, onGuidesChange, onGridChange, onCenterChange, onMarginsChange, fitMode, onFitModeChange }: Omit<Props, 'activeMode' | 'image'>) {
+function InspectProps({ showGuides, showGrid, showCenter, showMargins, onGuidesChange, onGridChange, onCenterChange, onMarginsChange, fitMode, onFitModeChange, inspectOrientation, onInspectOrientationChange }: Omit<Props, 'activeMode' | 'image'>) {
   return (
     <>
+      <RSection title="방향">
+        <div className={styles.fitRow}>
+          <button
+            className={`${styles.fitBtn} ${inspectOrientation === 'portrait' ? styles.fitBtnActive : ''}`}
+            onClick={() => onInspectOrientationChange?.('portrait')}
+          >▯ 세로</button>
+          <button
+            className={`${styles.fitBtn} ${inspectOrientation === 'landscape' ? styles.fitBtnActive : ''}`}
+            onClick={() => onInspectOrientationChange?.('landscape')}
+          >▭ 가로</button>
+        </div>
+      </RSection>
+
       <RSection title="이미지 맞춤">
         <div className={styles.fitRow}>
           {(['fit','fill','original'] as const).map((m) => (
@@ -111,11 +154,67 @@ function CheckItem({ label }: { label: string }) {
 }
 
 /* ── Mockup Props ─────────────────────────── */
-function MockupProps({ shadowIntensity, onShadowChange, frameCornerRadius, onCornerRadiusChange }: Omit<Props, 'activeMode'|'image'>) {
+const FRAME_COLORS: { id: FrameColor; label: string; swatch: string }[] = [
+  { id: 'light',  label: '라이트', swatch: '#f3f4f6' },
+  { id: 'dark',   label: '다크',   swatch: '#1f2329' },
+  { id: 'silver', label: '실버',   swatch: '#c8ccd2' },
+];
+
+function MockupProps({
+  frameId, onFrameChange, frameColor, onFrameColorChange,
+  bgStyle, onBgStyleChange, shadowIntensity, onShadowChange,
+  frameCornerRadius, onCornerRadiusChange,
+  mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange,
+  mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange,
+}: Omit<Props, 'activeMode'|'image'>) {
   return (
     <>
-      <RSection title="프레임 설정">
-        <p className={styles.hint}>프레임 선택은 4단계(Mockup Mode)에서 추가됩니다.</p>
+      <RSection title="프레임">
+        <div className={styles.frameGrid}>
+          {FRAMES.map((f) => (
+            <button
+              key={f.id}
+              className={`${styles.frameBtn} ${frameId === f.id ? styles.frameBtnActive : ''}`}
+              onClick={() => onFrameChange?.(f.id)}
+              title={f.description}
+            >
+              <span className={styles.frameIcon}>{f.icon}</span>
+              <span className={styles.frameLabel}>{f.label}</span>
+            </button>
+          ))}
+        </div>
+      </RSection>
+
+      <RSection title="프레임 색상">
+        <div className={styles.swatchRow}>
+          {FRAME_COLORS.map((c) => (
+            <button
+              key={c.id}
+              className={`${styles.swatch} ${frameColor === c.id ? styles.swatchActive : ''}`}
+              onClick={() => onFrameColorChange?.(c.id)}
+              title={c.label}
+            >
+              <span className={styles.swatchDot} style={{ background: c.swatch }} />
+              <span className={styles.swatchLabel}>{c.label}</span>
+            </button>
+          ))}
+        </div>
+      </RSection>
+
+      <RSection title="배경">
+        <div className={styles.bgGrid}>
+          {BACKGROUNDS.map((b) => (
+            <button
+              key={b.id}
+              className={`${styles.bgBtn} ${bgStyle === b.id ? styles.bgBtnActive : ''}`}
+              onClick={() => onBgStyleChange?.(b.id)}
+              title={b.label}
+            >
+              <span className={styles.bgPreview} style={{ background: b.css }} />
+              <span className={styles.bgLabel}>{b.label}</span>
+            </button>
+          ))}
+        </div>
       </RSection>
 
       <RSection title="그림자">
@@ -135,16 +234,70 @@ function MockupProps({ shadowIntensity, onShadowChange, frameCornerRadius, onCor
           onChange={v => onCornerRadiusChange?.(v)}
         />
       </RSection>
+
+      <RSection title="텍스트 오버레이">
+        <div className={styles.fitRow}>
+          {(['none','top','bottom'] as const).map((p) => (
+            <button
+              key={p}
+              className={`${styles.fitBtn} ${mockupTextPosition === p ? styles.fitBtnActive : ''}`}
+              onClick={() => onMockupTextPositionChange?.(p)}
+            >
+              {p === 'none' ? '없음' : p === 'top' ? '위' : '아래'}
+            </button>
+          ))}
+        </div>
+        {mockupTextPosition !== 'none' && (
+          <div className={styles.textFields}>
+            <input
+              className={styles.textInput}
+              placeholder="제목"
+              value={mockupTitle ?? ''}
+              onChange={(e) => onMockupTitleChange?.(e.target.value)}
+            />
+            <input
+              className={styles.textInput}
+              placeholder="부제목"
+              value={mockupSubtitle ?? ''}
+              onChange={(e) => onMockupSubtitleChange?.(e.target.value)}
+            />
+            <input
+              className={styles.textInput}
+              placeholder="태그 (쉼표로 구분)"
+              value={mockupTags ?? ''}
+              onChange={(e) => onMockupTagsChange?.(e.target.value)}
+            />
+          </div>
+        )}
+      </RSection>
     </>
   );
 }
 
 /* ── Compare Props ────────────────────────── */
-function CompareProps() {
+function CompareProps({ compareOrientation, onCompareOrientationChange }: Omit<Props, 'activeMode'|'image'>) {
   return (
-    <RSection title="Before / After">
-      <p className={styles.hint}>비교 기능은 5단계에서 구현됩니다.</p>
-    </RSection>
+    <>
+      <RSection title="슬라이더 방향">
+        <div className={styles.fitRow}>
+          <button
+            className={`${styles.fitBtn} ${compareOrientation === 'horizontal' ? styles.fitBtnActive : ''}`}
+            onClick={() => onCompareOrientationChange?.('horizontal')}
+          >↔ 좌우</button>
+          <button
+            className={`${styles.fitBtn} ${compareOrientation === 'vertical' ? styles.fitBtnActive : ''}`}
+            onClick={() => onCompareOrientationChange?.('vertical')}
+          >↕ 상하</button>
+        </div>
+      </RSection>
+
+      <RSection title="사용법">
+        <p className={styles.hint}>
+          가운데 손잡이를 드래그하거나 이미지를 클릭/드래그하면<br />
+          Before와 After를 비교할 수 있습니다.
+        </p>
+      </RSection>
+    </>
   );
 }
 

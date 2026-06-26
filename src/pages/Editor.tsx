@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
-import type { AppMode, UploadedImage } from '../types';
+import type { AppMode, UploadedImage, FrameId, FrameColor, BgStyle } from '../types';
 import { DEVICE_PRESETS } from '../data/devices';
 import { useImageUpload } from '../hooks/useImageUpload';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import { EditorTopBar } from '../components/layout/EditorTopBar';
 import { EditorLeftPanel } from '../components/layout/EditorLeftPanel';
 import { EditorRightPanel } from '../components/layout/EditorRightPanel';
@@ -9,14 +10,15 @@ import { EditorCanvas } from '../components/layout/EditorCanvas';
 import styles from './Editor.module.css';
 
 /* ─── Upload Zone ────────────────────────────────────── */
-function UploadZone({ onUpload, error, onClearError }: {
+function UploadZone({ onUpload, error, onError, onClearError }: {
   onUpload: (img: UploadedImage) => void;
   error: string | null;
+  onError: (msg: string) => void;
   onClearError: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
-  const { handleFiles } = useImageUpload({ onSuccess: onUpload, onError: (msg) => { onClearError(); console.warn(msg); } });
+  const { handleFiles } = useImageUpload({ onSuccess: onUpload, onError });
 
   const onDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); setDragging(true); }, []);
   const onDragLeave = useCallback(() => setDragging(false), []);
@@ -85,31 +87,85 @@ function UploadZone({ onUpload, error, onClearError }: {
   );
 }
 
+/* ─── Persisted editor settings ──────────────────────── */
+interface EditorSettings {
+  projectName: string;
+  activeMode: AppMode;
+  selectedDeviceId: string;
+  // Inspect
+  fitMode: 'fit' | 'fill' | 'original';
+  inspectOrientation: 'portrait' | 'landscape';
+  showGuides: boolean;
+  showGrid: boolean;
+  showCenter: boolean;
+  showMargins: boolean;
+  // Mockup
+  frameId: FrameId;
+  frameColor: FrameColor;
+  bgStyle: BgStyle;
+  shadowIntensity: number;
+  frameCornerRadius: number;
+  mockupTitle: string;
+  mockupSubtitle: string;
+  mockupTags: string;
+  mockupTextPosition: 'top' | 'bottom' | 'none';
+  // Compare
+  compareOrientation: 'horizontal' | 'vertical';
+  // Export
+  exportScale: number;
+  transparentBg: boolean;
+}
+
+const DEFAULT_SETTINGS: EditorSettings = {
+  projectName: '내 프로젝트',
+  activeMode: 'inspect',
+  selectedDeviceId: DEVICE_PRESETS[1].id,
+  fitMode: 'fit',
+  inspectOrientation: 'portrait',
+  showGuides: false,
+  showGrid: false,
+  showCenter: false,
+  showMargins: false,
+  frameId: 'browser',
+  frameColor: 'light',
+  bgStyle: 'soft-gradient',
+  shadowIntensity: 60,
+  frameCornerRadius: 8,
+  mockupTitle: '',
+  mockupSubtitle: '',
+  mockupTags: '',
+  mockupTextPosition: 'none',
+  compareOrientation: 'horizontal',
+  exportScale: 2,
+  transparentBg: false,
+};
+
 /* ─── Workspace (3-panel editor) ─────────────────────── */
 function Workspace({ image, onImageRemove, onImageChange }: {
   image: UploadedImage;
   onImageRemove: () => void;
   onImageChange: (img: UploadedImage) => void;
 }) {
-  const [activeMode, setActiveMode] = useState<AppMode>('inspect');
-  const [projectName, setProjectName] = useState('내 프로젝트');
-  const [selectedDeviceId, setSelectedDeviceId] = useState(DEVICE_PRESETS[1].id);
+  // All lightweight UI settings persist to localStorage (images stay in-memory).
+  const [settings, setSettings] = useLocalStorage<EditorSettings>('mf_settings', DEFAULT_SETTINGS);
+  const patch = useCallback(
+    <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) =>
+      setSettings((s) => ({ ...s, [key]: value })),
+    [setSettings]
+  );
+
+  const {
+    projectName, activeMode, selectedDeviceId,
+    fitMode, inspectOrientation, showGuides, showGrid, showCenter, showMargins,
+    frameId, frameColor, bgStyle, shadowIntensity, frameCornerRadius,
+    mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition,
+    compareOrientation, exportScale, transparentBg,
+  } = settings;
+
+  // Transient (not persisted): images + UI status
   const [error, setError] = useState<string | null>(null);
-
-  // Inspect settings
-  const [fitMode, setFitMode]       = useState<'fit'|'fill'|'original'>('fit');
-  const [showGuides, setShowGuides]   = useState(false);
-  const [showGrid, setShowGrid]       = useState(false);
-  const [showCenter, setShowCenter]   = useState(false);
-  const [showMargins, setShowMargins] = useState(false);
-
-  // Mockup settings
-  const [shadowIntensity, setShadowIntensity]     = useState(60);
-  const [frameCornerRadius, setFrameCornerRadius] = useState(8);
-
-  // Export settings
-  const [exportScale, setExportScale]     = useState(2);
-  const [transparentBg, setTransparentBg] = useState(false);
+  const [beforeImage, setBeforeImage] = useState<UploadedImage | null>(null);
+  const [afterImage, setAfterImage]   = useState<UploadedImage | null>(null);
   const [exportLoading, setExportLoading] = useState(false);
 
   const exportRef = useRef<HTMLDivElement | null>(null);
@@ -136,9 +192,9 @@ function Workspace({ image, onImageRemove, onImageChange }: {
       {/* Top bar */}
       <EditorTopBar
         projectName={projectName}
-        onProjectNameChange={setProjectName}
+        onProjectNameChange={(v) => patch('projectName', v)}
         activeMode={activeMode}
-        onModeChange={setActiveMode}
+        onModeChange={(v) => patch('activeMode', v)}
         saveState="saved"
       />
 
@@ -156,10 +212,16 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           image={image}
           activeMode={activeMode}
           selectedDeviceId={selectedDeviceId}
-          onDeviceChange={setSelectedDeviceId}
+          onDeviceChange={(v) => patch('selectedDeviceId', v)}
           onImageChange={onImageChange}
           onImageRemove={onImageRemove}
           onError={setError}
+          beforeImage={beforeImage}
+          afterImage={afterImage}
+          onBeforeChange={setBeforeImage}
+          onAfterChange={setAfterImage}
+          onBeforeRemove={() => setBeforeImage(null)}
+          onAfterRemove={() => setAfterImage(null)}
         />
 
         <EditorCanvas
@@ -167,34 +229,63 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           activeMode={activeMode}
           selectedDeviceId={selectedDeviceId}
           fitMode={fitMode}
+          inspectOrientation={inspectOrientation}
           guides={{ showGuides, showGrid, showCenter, showMargins }}
           shadowIntensity={shadowIntensity}
           frameCornerRadius={frameCornerRadius}
           exportRef={exportRef}
           transparentBg={transparentBg}
+          frameId={frameId}
+          frameColor={frameColor}
+          bgStyle={bgStyle}
+          mockupTitle={mockupTitle}
+          mockupSubtitle={mockupSubtitle}
+          mockupTags={mockupTags}
+          mockupTextPosition={mockupTextPosition}
+          beforeImage={beforeImage}
+          afterImage={afterImage}
+          compareOrientation={compareOrientation}
         />
 
         <EditorRightPanel
           activeMode={activeMode}
           image={image}
           fitMode={fitMode}
-          onFitModeChange={setFitMode}
+          onFitModeChange={(v) => patch('fitMode', v)}
+          inspectOrientation={inspectOrientation}
+          onInspectOrientationChange={(v) => patch('inspectOrientation', v)}
           showGuides={showGuides}
           showGrid={showGrid}
           showCenter={showCenter}
           showMargins={showMargins}
-          onGuidesChange={setShowGuides}
-          onGridChange={setShowGrid}
-          onCenterChange={setShowCenter}
-          onMarginsChange={setShowMargins}
+          onGuidesChange={(v) => patch('showGuides', v)}
+          onGridChange={(v) => patch('showGrid', v)}
+          onCenterChange={(v) => patch('showCenter', v)}
+          onMarginsChange={(v) => patch('showMargins', v)}
+          frameId={frameId}
+          onFrameChange={(v) => patch('frameId', v)}
+          frameColor={frameColor}
+          onFrameColorChange={(v) => patch('frameColor', v)}
+          bgStyle={bgStyle}
+          onBgStyleChange={(v) => patch('bgStyle', v)}
           shadowIntensity={shadowIntensity}
-          onShadowChange={setShadowIntensity}
+          onShadowChange={(v) => patch('shadowIntensity', v)}
           frameCornerRadius={frameCornerRadius}
-          onCornerRadiusChange={setFrameCornerRadius}
+          onCornerRadiusChange={(v) => patch('frameCornerRadius', v)}
+          mockupTitle={mockupTitle}
+          onMockupTitleChange={(v) => patch('mockupTitle', v)}
+          mockupSubtitle={mockupSubtitle}
+          onMockupSubtitleChange={(v) => patch('mockupSubtitle', v)}
+          mockupTags={mockupTags}
+          onMockupTagsChange={(v) => patch('mockupTags', v)}
+          mockupTextPosition={mockupTextPosition}
+          onMockupTextPositionChange={(v) => patch('mockupTextPosition', v)}
+          compareOrientation={compareOrientation}
+          onCompareOrientationChange={(v) => patch('compareOrientation', v)}
           exportScale={exportScale}
-          onExportScaleChange={setExportScale}
+          onExportScaleChange={(v) => patch('exportScale', v)}
           transparentBg={transparentBg}
-          onTransparentBgChange={setTransparentBg}
+          onTransparentBgChange={(v) => patch('transparentBg', v)}
           onExport={handleExport}
           exportLoading={exportLoading}
         />
@@ -213,6 +304,7 @@ export function Editor() {
       <UploadZone
         onUpload={(img) => { setImage(img); setError(null); }}
         error={error}
+        onError={setError}
         onClearError={() => setError(null)}
       />
     );

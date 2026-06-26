@@ -169,6 +169,155 @@
   text-align: center;
 }
 
+/* ── Frame Grid ───────────────────────────── */
+.frameGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.frameBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 2px;
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  cursor: pointer;
+  transition: all var(--ease-fast);
+}
+
+.frameBtn:hover {
+  border-color: var(--accent-muted);
+  background: var(--accent-subtle);
+}
+
+.frameBtnActive {
+  border-color: var(--accent) !important;
+  background: var(--accent-subtle) !important;
+}
+
+.frameIcon { font-size: 16px; line-height: 1; }
+
+.frameLabel {
+  font-size: 9px;
+  color: var(--text-secondary);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.frameBtnActive .frameLabel { color: var(--accent); font-weight: var(--weight-semibold); }
+
+/* ── Swatch (frame color) ─────────────────── */
+.swatchRow {
+  display: flex;
+  gap: 6px;
+}
+
+.swatch {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 2px;
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--ease-fast);
+  background: var(--bg-subtle);
+}
+
+.swatch:hover { border-color: var(--accent-muted); }
+
+.swatchActive {
+  border-color: var(--accent) !important;
+  background: var(--accent-subtle) !important;
+}
+
+.swatchDot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.12);
+}
+
+.swatchLabel {
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+.swatchActive .swatchLabel { color: var(--accent); font-weight: var(--weight-semibold); }
+
+/* ── Background Grid ──────────────────────── */
+.bgGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.bgBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--ease-fast);
+  background: var(--bg-subtle);
+}
+
+.bgBtn:hover { border-color: var(--accent-muted); }
+
+.bgBtnActive {
+  border-color: var(--accent) !important;
+}
+
+.bgPreview {
+  width: 100%;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.bgLabel {
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+.bgBtnActive .bgLabel { color: var(--accent); font-weight: var(--weight-semibold); }
+
+/* ── Text Fields ──────────────────────────── */
+.textFields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: var(--space-2);
+}
+
+.textInput {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  font-size: var(--text-xs);
+  color: var(--text-primary);
+  transition: border-color var(--ease-fast);
+}
+
+.textInput::placeholder { color: var(--text-tertiary); }
+
+.textInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
 /* ── Hint ─────────────────────────────────── */
 .hint {
   font-size: var(--text-xs);

@@ -1,0 +1,245 @@
+/* ══════════════════════════════════════════════
+   Device Frames — pure CSS/SVG, no external images
+   Color variants set --frame-bg / --frame-border
+══════════════════════════════════════════════ */
+.colorLight  { --frame-bg: #f3f4f6; --frame-border: #d1d5db; --frame-deep: #e5e7eb; }
+.colorDark   { --frame-bg: #1f2329; --frame-border: #0d0f12; --frame-deep: #2a2f37; }
+.colorSilver { --frame-bg: #c8ccd2; --frame-border: #9aa0aa; --frame-deep: #b4b9c1; }
+
+.bareImage {
+  display: block;
+  max-width: 480px;
+  max-height: 640px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ── Phone ────────────────────────────────── */
+.phone {
+  position: relative;
+  width: 260px;
+  background: var(--frame-bg);
+  border: 2px solid var(--frame-border);
+  border-radius: 36px;
+  padding: 12px;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.06);
+}
+
+.phoneNotch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 22px;
+  background: var(--frame-border);
+  border-radius: 0 0 14px 14px;
+  z-index: 2;
+}
+
+.phoneScreen {
+  position: relative;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 9 / 19.5;
+}
+
+.phoneScreen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+/* ── Browser ──────────────────────────────── */
+.browser {
+  width: 520px;
+  max-width: 100%;
+  background: var(--frame-bg);
+  border: 1px solid var(--frame-border);
+  overflow: hidden;
+}
+
+.browserBar {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  background: var(--frame-bg);
+  border-bottom: 1px solid var(--frame-deep);
+}
+
+.dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.browserUrl {
+  flex: 1;
+  height: 20px;
+  margin-left: 8px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.colorDark .browserUrl { background: rgba(255,255,255,0.08); color: #9aa3af; }
+
+.browserScreen {
+  background: #fff;
+  line-height: 0;
+}
+
+.browserScreen img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 540px;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* ── Laptop (MacBook) ─────────────────────── */
+.laptop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 560px;
+  max-width: 100%;
+}
+
+.laptopLid {
+  position: relative;
+  width: 100%;
+  background: var(--frame-border);
+  border-radius: 16px 16px 0 0;
+  padding: 14px 14px 14px;
+}
+
+.laptopCamera {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4b5563;
+}
+
+.laptopScreen {
+  border-radius: 4px;
+  overflow: hidden;
+  background: #000;
+  line-height: 0;
+}
+
+.laptopScreen img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 380px;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.laptopBase {
+  position: relative;
+  width: 116%;
+  height: 14px;
+  background: linear-gradient(180deg, var(--frame-bg) 0%, var(--frame-deep) 100%);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.laptopNotch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 7px;
+  background: var(--frame-deep);
+  border-radius: 0 0 8px 8px;
+}
+
+/* ── Tablet (iPad) ────────────────────────── */
+.tablet {
+  position: relative;
+  width: 420px;
+  max-width: 100%;
+  background: var(--frame-bg);
+  border: 2px solid var(--frame-border);
+  border-radius: 26px;
+  padding: 16px;
+}
+
+.tabletCamera {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4b5563;
+  z-index: 2;
+}
+
+.tabletScreen {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 4 / 3;
+  line-height: 0;
+}
+
+.tabletScreen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+/* ── Phone + Desktop combo ────────────────── */
+.combo {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding-right: 60px;
+  padding-bottom: 20px;
+}
+
+.comboBrowser {
+  width: 480px;
+}
+
+.comboPhone {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 150px;
+  border-radius: 26px;
+  padding: 8px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+}
+
+.comboPhone .phoneScreen { border-radius: 18px; }
+
+.comboPhone .phoneNotch {
+  top: 8px;
+  width: 56px;
+  height: 14px;
+  border-radius: 0 0 9px 9px;
+}

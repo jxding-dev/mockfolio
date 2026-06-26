@@ -1,7 +1,10 @@
 import { useRef, useState, useCallback } from 'react';
-import type { AppMode, UploadedImage } from '../../types';
+import type { AppMode, UploadedImage, FrameId, FrameColor, BgStyle } from '../../types';
 import type { DevicePreset } from '../../types';
 import { DEVICE_PRESETS } from '../../data/devices';
+import { getBackground } from '../../data/backgrounds';
+import { DeviceFrame } from '../mockup/DeviceFrame';
+import { CompareSlider } from '../mockup/CompareSlider';
 import styles from './EditorCanvas.module.css';
 
 interface GuideOptions {
@@ -16,11 +19,25 @@ interface Props {
   activeMode: AppMode;
   selectedDeviceId: string;
   fitMode?: 'fit' | 'fill' | 'original';
+  inspectOrientation?: 'portrait' | 'landscape';
   guides?: GuideOptions;
   shadowIntensity?: number;
   frameCornerRadius?: number;
   exportRef?: React.RefObject<HTMLDivElement | null>;
   transparentBg?: boolean;
+  // Mockup
+  frameId?: FrameId;
+  frameColor?: FrameColor;
+  bgStyle?: BgStyle;
+  bgCustomColor?: string;
+  mockupTitle?: string;
+  mockupSubtitle?: string;
+  mockupTags?: string;
+  mockupTextPosition?: 'top' | 'bottom' | 'none';
+  // Compare
+  beforeImage?: UploadedImage | null;
+  afterImage?: UploadedImage | null;
+  compareOrientation?: 'horizontal' | 'vertical';
 }
 
 const MIN_ZOOM = 0.25;
@@ -32,11 +49,23 @@ export function EditorCanvas({
   activeMode,
   selectedDeviceId,
   fitMode = 'fit',
+  inspectOrientation = 'portrait',
   guides = {},
   shadowIntensity = 60,
   frameCornerRadius = 8,
   exportRef,
   transparentBg = false,
+  frameId = 'browser',
+  frameColor = 'light',
+  bgStyle = 'soft-gradient',
+  bgCustomColor = '#6366F1',
+  mockupTitle = '',
+  mockupSubtitle = '',
+  mockupTags = '',
+  mockupTextPosition = 'none',
+  beforeImage = null,
+  afterImage = null,
+  compareOrientation = 'horizontal',
 }: Props) {
   const [zoom, setZoom] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,6 +82,9 @@ export function EditorCanvas({
   const zoomOut = () => setZoom((z) => Math.max(MIN_ZOOM, +(z - ZOOM_STEP).toFixed(2)));
   const resetZoom = () => setZoom(1);
 
+  const isCompare = activeMode === 'compare';
+  const hasContent = isCompare ? (!!beforeImage || !!afterImage) : !!image;
+
   return (
     <div className={styles.wrap}>
       {/* canvas area */}
@@ -61,18 +93,33 @@ export function EditorCanvas({
         className={styles.canvas}
         onWheel={handleWheel}
       >
-        {image ? (
+        {isCompare ? (
+          <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
+            <div ref={exportRef as React.RefObject<HTMLDivElement>}>
+              <CompareSlider before={beforeImage} after={afterImage} orientation={compareOrientation} />
+            </div>
+          </div>
+        ) : image ? (
           <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
             <CanvasContent
               image={image}
               device={device}
               activeMode={activeMode}
               fitMode={fitMode}
+              inspectOrientation={inspectOrientation}
               guides={guides}
               shadowIntensity={shadowIntensity}
               frameCornerRadius={frameCornerRadius}
               exportRef={exportRef}
               transparentBg={transparentBg}
+              frameId={frameId}
+              frameColor={frameColor}
+              bgStyle={bgStyle}
+              bgCustomColor={bgCustomColor}
+              mockupTitle={mockupTitle}
+              mockupSubtitle={mockupSubtitle}
+              mockupTags={mockupTags}
+              mockupTextPosition={mockupTextPosition}
             />
           </div>
         ) : (
@@ -81,7 +128,7 @@ export function EditorCanvas({
       </div>
 
       {/* zoom controls */}
-      {image && (
+      {hasContent && (
         <div className={styles.zoomBar}>
           <button className={styles.zoomBtn} onClick={zoomOut} title="축소" disabled={zoom <= MIN_ZOOM}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
@@ -93,7 +140,9 @@ export function EditorCanvas({
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
           </button>
           <div className={styles.zoomDivider} />
-          <span className={styles.deviceInfo}>{device.label} · {device.width}×{device.height}</span>
+          <span className={styles.deviceInfo}>
+            {isCompare ? 'Before / After' : `${device.label} · ${device.width}×${device.height}`}
+          </span>
         </div>
       )}
     </div>
@@ -102,18 +151,29 @@ export function EditorCanvas({
 
 /* ── Canvas content (mode-aware) ──────────── */
 function CanvasContent({
-  image, device, activeMode, fitMode, guides,
+  image, device, activeMode, fitMode, inspectOrientation, guides,
   shadowIntensity, frameCornerRadius, exportRef, transparentBg,
+  frameId, frameColor, bgStyle, bgCustomColor,
+  mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition,
 }: {
   image: UploadedImage;
   device: DevicePreset;
   activeMode: AppMode;
   fitMode: 'fit' | 'fill' | 'original';
+  inspectOrientation: 'portrait' | 'landscape';
   guides: GuideOptions;
   shadowIntensity: number;
   frameCornerRadius: number;
   exportRef?: React.RefObject<HTMLDivElement | null>;
   transparentBg: boolean;
+  frameId: FrameId;
+  frameColor: FrameColor;
+  bgStyle: BgStyle;
+  bgCustomColor: string;
+  mockupTitle: string;
+  mockupSubtitle: string;
+  mockupTags: string;
+  mockupTextPosition: 'top' | 'bottom' | 'none';
 }) {
   if (activeMode === 'inspect' || activeMode === 'compare') {
     return (
@@ -121,6 +181,7 @@ function CanvasContent({
         image={image}
         device={device}
         fitMode={fitMode}
+        orientation={inspectOrientation}
         guides={guides}
       />
     );
@@ -130,11 +191,18 @@ function CanvasContent({
     return (
       <MockupView
         image={image}
-        device={device}
         shadowIntensity={shadowIntensity}
         frameCornerRadius={frameCornerRadius}
         exportRef={exportRef}
         transparentBg={transparentBg}
+        frameId={frameId}
+        frameColor={frameColor}
+        bgStyle={bgStyle}
+        bgCustomColor={bgCustomColor}
+        title={mockupTitle}
+        subtitle={mockupSubtitle}
+        tags={mockupTags}
+        textPosition={mockupTextPosition}
       />
     );
   }
@@ -154,15 +222,19 @@ function CanvasContent({
 
 /* ── Inspect View ─────────────────────────── */
 function InspectView({
-  image, device, fitMode, guides,
+  image, device, fitMode, orientation, guides,
 }: {
   image: UploadedImage;
   device: DevicePreset;
   fitMode: 'fit' | 'fill' | 'original';
+  orientation: 'portrait' | 'landscape';
   guides: GuideOptions;
 }) {
-  const maxH = Math.min(device.height, 700);
-  const maxW = device.width;
+  const landscape = orientation === 'landscape';
+  const dispW = landscape ? device.height : device.width;
+  const dispH = landscape ? device.width : device.height;
+  const maxH = Math.min(dispH, 700);
+  const maxW = Math.min(dispW, 1100);
 
   let imgStyle: React.CSSProperties = {};
   if (fitMode === 'fit') {
@@ -180,7 +252,7 @@ function InspectView({
     >
       {/* device label */}
       <div className={styles.deviceLabel}>
-        {device.label} · {device.dpr}×
+        {device.label} · {dispW}×{dispH} · {landscape ? '가로' : '세로'}
       </div>
 
       {/* image */}
@@ -213,34 +285,67 @@ function InspectView({
 /* ── Mockup View ──────────────────────────── */
 function MockupView({
   image, shadowIntensity, frameCornerRadius, exportRef, transparentBg,
+  frameId, frameColor, bgStyle, bgCustomColor,
+  title, subtitle, tags, textPosition,
 }: {
   image: UploadedImage;
-  device: DevicePreset;
   shadowIntensity: number;
   frameCornerRadius: number;
   exportRef?: React.RefObject<HTMLDivElement | null>;
   transparentBg: boolean;
+  frameId: FrameId;
+  frameColor: FrameColor;
+  bgStyle: BgStyle;
+  bgCustomColor: string;
+  title: string;
+  subtitle: string;
+  tags: string;
+  textPosition: 'top' | 'bottom' | 'none';
 }) {
+  const bg = getBackground(bgStyle, bgCustomColor);
   const shadowAlpha = shadowIntensity / 100;
   const shadow = `0 ${24 + shadowIntensity * 0.4}px ${48 + shadowIntensity}px rgba(0,0,0,${(shadowAlpha * 0.6).toFixed(2)})`;
+
+  const textColor = bg.dark ? '#ffffff' : '#1a1d24';
+  const subColor = bg.dark ? 'rgba(255,255,255,0.7)' : 'rgba(26,29,36,0.6)';
+  const hasText = textPosition !== 'none' && (title || subtitle || tags);
+
+  const tagList = tags.split(',').map((t) => t.trim()).filter(Boolean);
+
+  const textBlock = hasText ? (
+    <div className={styles.mockupText} style={{ color: textColor }}>
+      {title && <div className={styles.mockupTitle}>{title}</div>}
+      {subtitle && <div className={styles.mockupSubtitle} style={{ color: subColor }}>{subtitle}</div>}
+      {tagList.length > 0 && (
+        <div className={styles.mockupTags}>
+          {tagList.map((t, i) => (
+            <span key={i} className={styles.mockupTag} style={{
+              borderColor: bg.dark ? 'rgba(255,255,255,0.25)' : 'rgba(26,29,36,0.18)',
+              color: subColor,
+            }}>{t}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  ) : null;
 
   return (
     <div
       ref={exportRef as React.RefObject<HTMLDivElement>}
       className={styles.mockupScene}
-      style={{ background: transparentBg ? 'transparent' : undefined }}
+      style={{ background: transparentBg ? 'transparent' : bg.css }}
     >
-      <div
-        className={styles.mockupFrame}
-        style={{ borderRadius: frameCornerRadius, boxShadow: shadow }}
-      >
-        <img
-          src={image.dataUrl}
-          alt={image.name}
-          className={styles.mockupImage}
-          draggable={false}
+      {textPosition === 'top' && textBlock}
+      <div className={styles.mockupFrameWrap} style={{ filter: `drop-shadow(${shadow})` }}>
+        <DeviceFrame
+          frameId={frameId}
+          frameColor={frameColor}
+          imageUrl={image.dataUrl}
+          imageAlt={image.name}
+          cornerRadius={frameCornerRadius}
         />
       </div>
+      {textPosition === 'bottom' && textBlock}
     </div>
   );
 }

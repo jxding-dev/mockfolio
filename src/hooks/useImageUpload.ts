@@ -51,7 +51,9 @@ export function useImageUpload({ onSuccess, onError }: UseImageUploadOptions) {
 
   const handleFiles = useCallback(
     (files: FileList | File[]) => {
-      Array.from(files).forEach(processFile);
+      // Single-image tool: only the first file is used.
+      const first = Array.from(files)[0];
+      if (first) processFile(first);
     },
     [processFile]
   );
