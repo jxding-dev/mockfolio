@@ -14,24 +14,5 @@ export const FRAMES: FrameMeta[] = [
   { id: 'laptop',       label: 'Laptop',          icon: '💻', description: '맥북 스타일 노트북' },
   { id: 'tablet',       label: 'Tablet',          icon: '📲', description: '아이패드 스타일 태블릿' },
   { id: 'phone-desktop',label: 'Phone + Desktop', icon: '🖥',  description: '폰과 데스크탑 콤보' },
+  { id: 'cover-card',   label: 'Cover Card',      icon: '✦',  description: '포트폴리오 커버 카드' },
 ];
-
-export const DEFAULT_MOCKUP_SETTINGS = {
-  frameId: 'browser' as FrameId,
-  frameColor: 'light' as const,
-  bgStyle: 'soft-gradient' as const,
-  bgCustomColor: '#6366F1',
-  fitMode: 'fit' as const,
-  cornerRadius: 8,
-  shadowIntensity: 60,
-  scale: 1,
-  offsetX: 0,
-  offsetY: 0,
-  rotation: 0,
-  title: '',
-  subtitle: '',
-  tags: '',
-  showDate: false,
-  textPosition: 'none' as const,
-  textColor: '#FFFFFF',
-};

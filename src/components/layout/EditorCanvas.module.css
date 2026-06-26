@@ -197,6 +197,13 @@
   border-radius: var(--radius-full);
 }
 
+.mockupDate {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.04em;
+}
+
 /* ── Export Scene ─────────────────────────── */
 .exportScene {
   position: relative;

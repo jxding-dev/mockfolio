@@ -3,6 +3,7 @@ import type { AppMode, UploadedImage, FrameId, FrameColor, BgStyle } from '../ty
 import { DEVICE_PRESETS } from '../data/devices';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { exportPng } from '../utils/exportPng';
 import { EditorTopBar } from '../components/layout/EditorTopBar';
 import { EditorLeftPanel } from '../components/layout/EditorLeftPanel';
 import { EditorRightPanel } from '../components/layout/EditorRightPanel';
@@ -18,7 +19,7 @@ function UploadZone({ onUpload, error, onError, onClearError }: {
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
-  const { handleFiles } = useImageUpload({ onSuccess: onUpload, onError });
+  const { handleFiles, handleInputChange } = useImageUpload({ onSuccess: onUpload, onError });
 
   const onDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); setDragging(true); }, []);
   const onDragLeave = useCallback(() => setDragging(false), []);
@@ -47,7 +48,7 @@ function UploadZone({ onUpload, error, onError, onClearError }: {
           aria-label="이미지 업로드"
         >
           <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp"
-            className={styles.hiddenInput} onChange={(e) => e.target.files && handleFiles(e.target.files)} />
+            className={styles.hiddenInput} onChange={handleInputChange} />
 
           <div className={styles.dropzoneIcon}>
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
@@ -105,10 +106,15 @@ interface EditorSettings {
   bgStyle: BgStyle;
   shadowIntensity: number;
   frameCornerRadius: number;
+  mockupScale: number;
+  mockupOffsetX: number;
+  mockupOffsetY: number;
   mockupTitle: string;
   mockupSubtitle: string;
   mockupTags: string;
   mockupTextPosition: 'top' | 'bottom' | 'none';
+  showMockupDate: boolean;
+  mockupTextColor: string;
   // Compare
   compareOrientation: 'horizontal' | 'vertical';
   // Export
@@ -131,10 +137,15 @@ const DEFAULT_SETTINGS: EditorSettings = {
   bgStyle: 'soft-gradient',
   shadowIntensity: 60,
   frameCornerRadius: 8,
+  mockupScale: 1,
+  mockupOffsetX: 0,
+  mockupOffsetY: 0,
   mockupTitle: '',
   mockupSubtitle: '',
   mockupTags: '',
   mockupTextPosition: 'none',
+  showMockupDate: false,
+  mockupTextColor: '#1A1D24',
   compareOrientation: 'horizontal',
   exportScale: 2,
   transparentBg: false,
@@ -158,7 +169,8 @@ function Workspace({ image, onImageRemove, onImageChange }: {
     projectName, activeMode, selectedDeviceId,
     fitMode, inspectOrientation, showGuides, showGrid, showCenter, showMargins,
     frameId, frameColor, bgStyle, shadowIntensity, frameCornerRadius,
-    mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition,
+    mockupScale, mockupOffsetX, mockupOffsetY,
+    mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
     compareOrientation, exportScale, transparentBg,
   } = settings;
 
@@ -167,21 +179,19 @@ function Workspace({ image, onImageRemove, onImageChange }: {
   const [beforeImage, setBeforeImage] = useState<UploadedImage | null>(null);
   const [afterImage, setAfterImage]   = useState<UploadedImage | null>(null);
   const [exportLoading, setExportLoading] = useState(false);
+  const [exportMessage, setExportMessage] = useState<string | null>(null);
 
   const exportRef = useRef<HTMLDivElement | null>(null);
 
   const handleExport = useCallback(async () => {
     if (!exportRef.current) return;
     setExportLoading(true);
+    setExportMessage(null);
     try {
-      const { toPng } = await import('html-to-image');
-      const dataUrl = await toPng(exportRef.current, { pixelRatio: exportScale });
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = `${projectName.replace(/\s+/g, '_')}_${exportScale}x.png`;
-      a.click();
-    } catch (e) {
-      console.error(e);
+      const fileName = await exportPng(exportRef.current, projectName, exportScale);
+      setExportMessage(`${fileName} 파일을 저장했습니다.`);
+    } catch {
+      setExportMessage('PNG를 저장하지 못했습니다. 이미지를 다시 확인한 뒤 재시도하세요.');
     } finally {
       setExportLoading(false);
     }
@@ -233,6 +243,9 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           guides={{ showGuides, showGrid, showCenter, showMargins }}
           shadowIntensity={shadowIntensity}
           frameCornerRadius={frameCornerRadius}
+          mockupScale={mockupScale}
+          mockupOffsetX={mockupOffsetX}
+          mockupOffsetY={mockupOffsetY}
           exportRef={exportRef}
           transparentBg={transparentBg}
           frameId={frameId}
@@ -242,6 +255,8 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           mockupSubtitle={mockupSubtitle}
           mockupTags={mockupTags}
           mockupTextPosition={mockupTextPosition}
+          showMockupDate={showMockupDate}
+          mockupTextColor={mockupTextColor}
           beforeImage={beforeImage}
           afterImage={afterImage}
           compareOrientation={compareOrientation}
@@ -272,6 +287,12 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           onShadowChange={(v) => patch('shadowIntensity', v)}
           frameCornerRadius={frameCornerRadius}
           onCornerRadiusChange={(v) => patch('frameCornerRadius', v)}
+          mockupScale={mockupScale}
+          onMockupScaleChange={(v) => patch('mockupScale', v)}
+          mockupOffsetX={mockupOffsetX}
+          onMockupOffsetXChange={(v) => patch('mockupOffsetX', v)}
+          mockupOffsetY={mockupOffsetY}
+          onMockupOffsetYChange={(v) => patch('mockupOffsetY', v)}
           mockupTitle={mockupTitle}
           onMockupTitleChange={(v) => patch('mockupTitle', v)}
           mockupSubtitle={mockupSubtitle}
@@ -280,6 +301,10 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           onMockupTagsChange={(v) => patch('mockupTags', v)}
           mockupTextPosition={mockupTextPosition}
           onMockupTextPositionChange={(v) => patch('mockupTextPosition', v)}
+          showMockupDate={showMockupDate}
+          onShowMockupDateChange={(v) => patch('showMockupDate', v)}
+          mockupTextColor={mockupTextColor}
+          onMockupTextColorChange={(v) => patch('mockupTextColor', v)}
           compareOrientation={compareOrientation}
           onCompareOrientationChange={(v) => patch('compareOrientation', v)}
           exportScale={exportScale}
@@ -288,6 +313,7 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           onTransparentBgChange={(v) => patch('transparentBg', v)}
           onExport={handleExport}
           exportLoading={exportLoading}
+          exportMessage={exportMessage}
         />
       </div>
     </div>

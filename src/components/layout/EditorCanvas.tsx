@@ -23,17 +23,21 @@ interface Props {
   guides?: GuideOptions;
   shadowIntensity?: number;
   frameCornerRadius?: number;
+  mockupScale?: number;
+  mockupOffsetX?: number;
+  mockupOffsetY?: number;
   exportRef?: React.RefObject<HTMLDivElement | null>;
   transparentBg?: boolean;
   // Mockup
   frameId?: FrameId;
   frameColor?: FrameColor;
   bgStyle?: BgStyle;
-  bgCustomColor?: string;
   mockupTitle?: string;
   mockupSubtitle?: string;
   mockupTags?: string;
   mockupTextPosition?: 'top' | 'bottom' | 'none';
+  showMockupDate?: boolean;
+  mockupTextColor?: string;
   // Compare
   beforeImage?: UploadedImage | null;
   afterImage?: UploadedImage | null;
@@ -53,16 +57,20 @@ export function EditorCanvas({
   guides = {},
   shadowIntensity = 60,
   frameCornerRadius = 8,
+  mockupScale = 1,
+  mockupOffsetX = 0,
+  mockupOffsetY = 0,
   exportRef,
   transparentBg = false,
   frameId = 'browser',
   frameColor = 'light',
   bgStyle = 'soft-gradient',
-  bgCustomColor = '#6366F1',
   mockupTitle = '',
   mockupSubtitle = '',
   mockupTags = '',
   mockupTextPosition = 'none',
+  showMockupDate = false,
+  mockupTextColor = '#1A1D24',
   beforeImage = null,
   afterImage = null,
   compareOrientation = 'horizontal',
@@ -110,16 +118,20 @@ export function EditorCanvas({
               guides={guides}
               shadowIntensity={shadowIntensity}
               frameCornerRadius={frameCornerRadius}
+              mockupScale={mockupScale}
+              mockupOffsetX={mockupOffsetX}
+              mockupOffsetY={mockupOffsetY}
               exportRef={exportRef}
               transparentBg={transparentBg}
               frameId={frameId}
               frameColor={frameColor}
               bgStyle={bgStyle}
-              bgCustomColor={bgCustomColor}
               mockupTitle={mockupTitle}
               mockupSubtitle={mockupSubtitle}
               mockupTags={mockupTags}
               mockupTextPosition={mockupTextPosition}
+              showMockupDate={showMockupDate}
+              mockupTextColor={mockupTextColor}
             />
           </div>
         ) : (
@@ -152,9 +164,9 @@ export function EditorCanvas({
 /* ── Canvas content (mode-aware) ──────────── */
 function CanvasContent({
   image, device, activeMode, fitMode, inspectOrientation, guides,
-  shadowIntensity, frameCornerRadius, exportRef, transparentBg,
-  frameId, frameColor, bgStyle, bgCustomColor,
-  mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition,
+  shadowIntensity, frameCornerRadius, mockupScale, mockupOffsetX, mockupOffsetY, exportRef, transparentBg,
+  frameId, frameColor, bgStyle,
+  mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
 }: {
   image: UploadedImage;
   device: DevicePreset;
@@ -164,16 +176,20 @@ function CanvasContent({
   guides: GuideOptions;
   shadowIntensity: number;
   frameCornerRadius: number;
+  mockupScale: number;
+  mockupOffsetX: number;
+  mockupOffsetY: number;
   exportRef?: React.RefObject<HTMLDivElement | null>;
   transparentBg: boolean;
   frameId: FrameId;
   frameColor: FrameColor;
   bgStyle: BgStyle;
-  bgCustomColor: string;
   mockupTitle: string;
   mockupSubtitle: string;
   mockupTags: string;
   mockupTextPosition: 'top' | 'bottom' | 'none';
+  showMockupDate: boolean;
+  mockupTextColor: string;
 }) {
   if (activeMode === 'inspect' || activeMode === 'compare') {
     return (
@@ -193,16 +209,20 @@ function CanvasContent({
         image={image}
         shadowIntensity={shadowIntensity}
         frameCornerRadius={frameCornerRadius}
+        scale={mockupScale}
+        offsetX={mockupOffsetX}
+        offsetY={mockupOffsetY}
         exportRef={exportRef}
         transparentBg={transparentBg}
         frameId={frameId}
         frameColor={frameColor}
         bgStyle={bgStyle}
-        bgCustomColor={bgCustomColor}
         title={mockupTitle}
         subtitle={mockupSubtitle}
         tags={mockupTags}
         textPosition={mockupTextPosition}
+        showDate={showMockupDate}
+        textColor={mockupTextColor}
       />
     );
   }
@@ -211,8 +231,22 @@ function CanvasContent({
     return (
       <ExportView
         image={image}
+        shadowIntensity={shadowIntensity}
+        frameCornerRadius={frameCornerRadius}
+        scale={mockupScale}
+        offsetX={mockupOffsetX}
+        offsetY={mockupOffsetY}
         exportRef={exportRef}
         transparentBg={transparentBg}
+        frameId={frameId}
+        frameColor={frameColor}
+        bgStyle={bgStyle}
+        title={mockupTitle}
+        subtitle={mockupSubtitle}
+        tags={mockupTags}
+        textPosition={mockupTextPosition}
+        showDate={showMockupDate}
+        textColor={mockupTextColor}
       />
     );
   }
@@ -284,31 +318,35 @@ function InspectView({
 
 /* ── Mockup View ──────────────────────────── */
 function MockupView({
-  image, shadowIntensity, frameCornerRadius, exportRef, transparentBg,
-  frameId, frameColor, bgStyle, bgCustomColor,
-  title, subtitle, tags, textPosition,
+  image, shadowIntensity, frameCornerRadius, scale, offsetX, offsetY, exportRef, transparentBg,
+  frameId, frameColor, bgStyle,
+  title, subtitle, tags, textPosition, showDate, textColor,
 }: {
   image: UploadedImage;
   shadowIntensity: number;
   frameCornerRadius: number;
+  scale: number;
+  offsetX: number;
+  offsetY: number;
   exportRef?: React.RefObject<HTMLDivElement | null>;
   transparentBg: boolean;
   frameId: FrameId;
   frameColor: FrameColor;
   bgStyle: BgStyle;
-  bgCustomColor: string;
   title: string;
   subtitle: string;
   tags: string;
   textPosition: 'top' | 'bottom' | 'none';
+  showDate: boolean;
+  textColor: string;
 }) {
-  const bg = getBackground(bgStyle, bgCustomColor);
+  const bg = getBackground(bgStyle);
   const shadowAlpha = shadowIntensity / 100;
   const shadow = `0 ${24 + shadowIntensity * 0.4}px ${48 + shadowIntensity}px rgba(0,0,0,${(shadowAlpha * 0.6).toFixed(2)})`;
 
-  const textColor = bg.dark ? '#ffffff' : '#1a1d24';
-  const subColor = bg.dark ? 'rgba(255,255,255,0.7)' : 'rgba(26,29,36,0.6)';
-  const hasText = textPosition !== 'none' && (title || subtitle || tags);
+  const subColor = `${textColor}B3`;
+  const hasText = textPosition !== 'none' && (title || subtitle || tags || showDate);
+  const dateLabel = new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date());
 
   const tagList = tags.split(',').map((t) => t.trim()).filter(Boolean);
 
@@ -326,6 +364,7 @@ function MockupView({
           ))}
         </div>
       )}
+      {showDate && <div className={styles.mockupDate} style={{ color: subColor }}>{dateLabel}</div>}
     </div>
   ) : null;
 
@@ -336,7 +375,10 @@ function MockupView({
       style={{ background: transparentBg ? 'transparent' : bg.css }}
     >
       {textPosition === 'top' && textBlock}
-      <div className={styles.mockupFrameWrap} style={{ filter: `drop-shadow(${shadow})` }}>
+      <div
+        className={styles.mockupFrameWrap}
+        style={{ filter: `drop-shadow(${shadow})`, transform: `translate(${offsetX}px, ${offsetY}px) scale(${scale})` }}
+      >
         <DeviceFrame
           frameId={frameId}
           frameColor={frameColor}
@@ -351,31 +393,7 @@ function MockupView({
 }
 
 /* ── Export View ──────────────────────────── */
-function ExportView({
-  image, exportRef, transparentBg,
-}: {
-  image: UploadedImage;
-  exportRef?: React.RefObject<HTMLDivElement | null>;
-  transparentBg: boolean;
-}) {
-  return (
-    <div
-      ref={exportRef as React.RefObject<HTMLDivElement>}
-      className={styles.exportScene}
-      style={{ background: transparentBg ? 'transparent' : undefined }}
-    >
-      <img
-        src={image.dataUrl}
-        alt={image.name}
-        className={styles.exportImage}
-        draggable={false}
-      />
-      <div className={styles.exportBadge}>
-        PNG · {image.width}×{image.height}
-      </div>
-    </div>
-  );
-}
+const ExportView = MockupView;
 
 /* ── Empty State ──────────────────────────── */
 function EmptyState() {

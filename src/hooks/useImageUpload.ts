@@ -1,7 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, type ChangeEvent } from 'react';
 import type { UploadedImage } from '../types';
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+const MAX_IMAGE_PIXELS = 40_000_000;
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
 
 function uid(): string {
@@ -30,6 +31,11 @@ export function useImageUpload({ onSuccess, onError }: UseImageUploadOptions) {
         const dataUrl = e.target?.result as string;
         const img = new Image();
         img.onload = () => {
+          const pixelCount = img.naturalWidth * img.naturalHeight;
+          if (!img.naturalWidth || !img.naturalHeight || pixelCount > MAX_IMAGE_PIXELS) {
+            onError?.(`"${file.name}" — 이미지 해상도가 너무 큽니다. 최대 4,000만 픽셀까지 업로드 가능합니다.`);
+            return;
+          }
           onSuccess({
             id: uid(),
             name: file.name,
@@ -58,5 +64,10 @@ export function useImageUpload({ onSuccess, onError }: UseImageUploadOptions) {
     [processFile]
   );
 
-  return { handleFiles };
+  const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) handleFiles(event.target.files);
+    event.target.value = '';
+  }, [handleFiles]);
+
+  return { handleFiles, handleInputChange };
 }

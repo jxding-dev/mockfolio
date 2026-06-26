@@ -1,105 +1,71 @@
 # Mockfolio — Portfolio Mockup Builder
 
-반응형 검수부터 포트폴리오 목업 제작까지, 한 번에.
-
-## 프로젝트 소개
-
-Mockfolio는 웹/앱 화면 캡처 이미지를 업로드해서:
-
-1. 모바일/태블릿/데스크탑 크기로 반응형 검수
-2. 제공된 목업 프레임에 화면을 넣어 포트폴리오용 이미지 제작
-3. 고해상도 PNG로 내보내기
-
-를 할 수 있는 **로컬 전용 웹 도구**입니다.
+웹·앱 화면 캡처를 브라우저 안에서 검수하고, 포트폴리오용 목업 PNG로 저장하는 로컬 우선 도구입니다.
 
 ## 주요 기능
 
-| 기능 | 설명 |
-|------|------|
-| 반응형 Inspect | 360px ~ 1920px 8종 디바이스로 즉시 확인 |
-| Before / After | 수정 전후 슬라이더 비교 |
-| Mockup Editor | CSS/SVG 기반 프레임, 배경, 그림자 조절 |
-| PNG Export | 1× / 2× 고해상도 저장 |
-| 완전 로컬 처리 | 이미지가 서버로 전송되지 않음 |
+- **이미지 업로드**: PNG, JPG, JPEG, WebP 파일을 드래그 앤 드롭 또는 파일 선택으로 업로드합니다. 최대 파일 크기는 20MB, 최대 해상도는 4,000만 픽셀입니다.
+- **반응형 Inspect**: 360px부터 1920px까지의 모바일·태블릿·데스크탑 프리셋, 세로/가로 전환, Fit/Fill/Original, 안전영역·8px 그리드·중앙선·여백 가이드를 제공합니다.
+- **Before / After**: 수정 전후 이미지를 좌우 또는 상하 슬라이더로 비교합니다.
+- **Mockup Editor**: 외부 목업 이미지 없이 CSS/HTML로 만든 Phone, Browser, Laptop, Tablet, Phone + Desktop, Cover Card 프레임을 제공합니다. 프레임 색상, 배경, 그림자, 모서리, 크기와 위치, 텍스트·태그·날짜를 조절할 수 있습니다.
+- **PNG Export**: 완성된 목업 캔버스를 1× 또는 2× PNG로 저장합니다. 파일명은 `mockfolio-프로젝트명-날짜.png` 형식으로 생성됩니다.
+- **Coming Soon UI**: 로그인, Pro, Studio 플랜은 화면만 제공하며 실제 인증·결제·서버 기능은 없습니다.
+
+## 로컬 처리 원칙
+
+- 업로드한 이미지는 브라우저 메모리에서만 처리하며 외부 서버로 전송하지 않습니다.
+- 설정값만 `localStorage`에 저장합니다. 이미지 원본은 저장하지 않습니다.
+- AI, 이미지 생성, 외부 목업 이미지, 로그인, 결제 기능을 사용하지 않습니다.
 
 ## 기술 스택
 
-- **React 19** + **TypeScript**
-- **Vite 8**
-- **React Router DOM 7**
-- **html-to-image** (PNG 내보내기)
-- CSS Modules (스파게티 코드 방지)
-- LocalStorage 기반 데이터 저장
+- React 19 + TypeScript
+- Vite 8
+- React Router DOM 7
+- html-to-image (PNG 내보내기)
+- CSS Modules + 디자인 토큰
 
-## 설치 방법
+## 설치 및 실행
 
 ```bash
 git clone https://github.com/jxding-dev/mockfolio.git
 cd mockfolio
 npm install
-```
-
-## 실행 방법
-
-```bash
-# 개발 서버 (권장)
 npm run dev
-
-# 또는 Windows에서 run.bat 더블클릭
 ```
 
-브라우저에서 `http://localhost:5173` 접속
+Windows PowerShell에서 실행 정책으로 `npm` 명령이 차단되면 `npm.cmd run dev`를 사용합니다.
 
-## 빌드 방법
+## 빌드
 
 ```bash
+npm run lint
 npm run build
 npm run preview
 ```
 
 ## 폴더 구조
 
-```
+```text
 src/
 ├── components/
-│   ├── layout/      # Header, Footer
-│   ├── upload/      # 이미지 업로드
-│   ├── inspector/   # 반응형 검수 (2단계~)
-│   ├── mockup/      # 목업 에디터 (3단계~)
-│   ├── export/      # PNG 내보내기 (4단계~)
-│   ├── pricing/     # 요금제 UI (Coming Soon)
-│   └── ui/          # 공통 컴포넌트 (Button, Modal, Badge)
+│   ├── layout/      # 에디터 레이아웃과 패널
+│   ├── mockup/      # CSS 기반 디바이스 프레임과 비교 슬라이더
+│   └── ui/          # Button, Modal, Toggle, Slider 등 공통 UI
+├── data/            # 디바이스·프레임·배경·플랜 데이터
+├── hooks/           # 이미지 업로드와 localStorage 훅
 ├── pages/           # Landing, Editor, Pricing
-├── hooks/           # useProject, useImageUpload, useLocalStorage
-├── utils/           # export 유틸
-├── data/            # 디바이스 프리셋, 플랜 데이터, 프레임 데이터
-├── types/           # TypeScript 타입 정의
-└── styles/          # tokens.css (디자인 토큰), reset.css
+├── styles/          # 전역 리셋과 디자인 토큰
+├── types/           # 공용 TypeScript 타입
+└── utils/           # PNG 내보내기 유틸리티
 
 public/
-├── mockups/         # 추후 직접 제작한 목업 이미지 추가 위치
-└── samples/         # 샘플 이미지
+├── mockups/         # 추후 직접 제작한 목업 에셋 추가 위치
+└── samples/         # 직접 만든 샘플 에셋 추가 위치
 ```
 
-## 현재 제한 사항
+## 현재 제한 사항과 향후 계획
 
-- 1단계: 구조 및 기본 화면만 구현됨
-- 에디터 기능은 2~8단계에서 순차적으로 추가 예정
-- 로그인/결제 기능 미구현 (Coming Soon UI만)
-- 서버 없음, 클라우드 저장 없음
-
-## 추후 예정 기능
-
-- [ ] 이미지 업로드 및 에디터 (2~3단계)
-- [ ] 반응형 Inspect Mode (5단계)
-- [ ] Before/After 비교 (6단계)
-- [ ] Mockup Mode (7단계)
-- [ ] PNG Export (8단계)
-- [ ] Pro/Studio 유료 플랜 (별도 백엔드 연동 예정)
-
-## 개인정보 보호
-
-🔒 **No AI · No Server Upload · Local First**
-
-모든 이미지는 브라우저 내에서만 처리됩니다. 외부 서버로 전송되지 않습니다.
-AI 이미지 분석 또는 생성 기능이 없습니다. 결제 및 로그인 기능은 현재 미구현입니다.
+- 무료 버전은 이미지 1개 작업과 1×/2× PNG 내보내기를 지원합니다.
+- Pro/Studio의 다중 프로젝트, 3×/4× 내보내기, 브랜드 프리셋, 협업·클라우드 기능은 Coming Soon UI만 있으며 아직 구현하지 않았습니다.
+- 추후 직접 제작한 목업 에셋을 `public/mockups`에 추가할 수 있도록 폴더를 유지합니다.

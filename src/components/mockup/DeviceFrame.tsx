@@ -30,6 +30,8 @@ export function DeviceFrame({ frameId, frameColor, imageUrl, imageAlt, cornerRad
       return <TabletFrame className={colorClass} imageUrl={imageUrl} imageAlt={imageAlt} />;
     case 'phone-desktop':
       return <PhoneDesktopFrame className={colorClass} imageUrl={imageUrl} imageAlt={imageAlt} radius={cornerRadius} />;
+    case 'cover-card':
+      return <CoverCard imageUrl={imageUrl} imageAlt={imageAlt} radius={cornerRadius} />;
     case 'none':
     default:
       return (
@@ -122,6 +124,22 @@ function PhoneDesktopFrame({ className, imageUrl, imageAlt, radius }: { classNam
         <div className={styles.phoneScreen}>
           <img src={imageUrl} alt={imageAlt} draggable={false} />
         </div>
+      </div>
+    </div>
+  );
+}
+
+function CoverCard({ imageUrl, imageAlt, radius }: { imageUrl: string; imageAlt: string; radius: number }) {
+  return (
+    <div className={styles.coverCard} style={{ borderRadius: Math.max(radius, 18) }}>
+      <div className={styles.coverCardGlow} />
+      <div className={styles.coverCardChrome}>
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className={styles.coverCardScreen}>
+        <img src={imageUrl} alt={imageAlt} draggable={false} />
       </div>
     </div>
   );

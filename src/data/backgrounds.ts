@@ -35,17 +35,19 @@ export const BACKGROUNDS: BgMeta[] = [
     dark: false,
   },
   {
-    id: 'mesh',
-    label: '메쉬',
-    css: 'radial-gradient(at 20% 20%, #a5b4fc 0px, transparent 50%), radial-gradient(at 80% 0%, #f0abfc 0px, transparent 50%), radial-gradient(at 80% 80%, #818cf8 0px, transparent 50%), radial-gradient(at 0% 80%, #c4b5fd 0px, transparent 50%), #eef2ff',
+    id: 'paper-texture',
+    label: '페이퍼',
+    css: 'repeating-linear-gradient(0deg, rgba(80, 61, 43, 0.025) 0 1px, transparent 1px 4px), repeating-linear-gradient(90deg, rgba(80, 61, 43, 0.018) 0 1px, transparent 1px 5px), #f4efe7',
+    dark: false,
+  },
+  {
+    id: 'glass-panel',
+    label: '글래스',
+    css: 'radial-gradient(circle at 18% 16%, rgba(191, 219, 254, 0.95), transparent 34%), radial-gradient(circle at 86% 82%, rgba(221, 214, 254, 0.9), transparent 38%), linear-gradient(135deg, #eaf2ff 0%, #f7f2ff 100%)',
     dark: false,
   },
 ];
 
-export function getBackground(id: BgStyle, customColor?: string): BgMeta {
-  const found = BACKGROUNDS.find((b) => b.id === id) ?? BACKGROUNDS[0];
-  if (customColor && id === 'white') {
-    return { ...found, css: customColor };
-  }
-  return found;
+export function getBackground(id: BgStyle): BgMeta {
+  return BACKGROUNDS.find((b) => b.id === id) ?? BACKGROUNDS[0];
 }

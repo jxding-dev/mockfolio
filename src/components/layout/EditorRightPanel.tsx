@@ -36,6 +36,12 @@ interface Props {
   onShadowChange?: (v: number) => void;
   frameCornerRadius?: number;
   onCornerRadiusChange?: (v: number) => void;
+  mockupScale?: number;
+  onMockupScaleChange?: (v: number) => void;
+  mockupOffsetX?: number;
+  onMockupOffsetXChange?: (v: number) => void;
+  mockupOffsetY?: number;
+  onMockupOffsetYChange?: (v: number) => void;
   mockupTitle?: string;
   onMockupTitleChange?: (v: string) => void;
   mockupSubtitle?: string;
@@ -44,6 +50,10 @@ interface Props {
   onMockupTagsChange?: (v: string) => void;
   mockupTextPosition?: 'top' | 'bottom' | 'none';
   onMockupTextPositionChange?: (v: 'top' | 'bottom' | 'none') => void;
+  showMockupDate?: boolean;
+  onShowMockupDateChange?: (v: boolean) => void;
+  mockupTextColor?: string;
+  onMockupTextColorChange?: (v: string) => void;
   // Compare props
   compareOrientation?: 'horizontal' | 'vertical';
   onCompareOrientationChange?: (v: 'horizontal' | 'vertical') => void;
@@ -52,6 +62,7 @@ interface Props {
   onExportScaleChange?: (v: number) => void;
   transparentBg?: boolean;
   onTransparentBgChange?: (v: boolean) => void;
+  exportMessage?: string | null;
 }
 
 export function EditorRightPanel({
@@ -66,20 +77,26 @@ export function EditorRightPanel({
   bgStyle = 'soft-gradient', onBgStyleChange,
   shadowIntensity = 60, onShadowChange,
   frameCornerRadius = 8, onCornerRadiusChange,
+  mockupScale = 1, onMockupScaleChange,
+  mockupOffsetX = 0, onMockupOffsetXChange,
+  mockupOffsetY = 0, onMockupOffsetYChange,
   mockupTitle = '', onMockupTitleChange,
   mockupSubtitle = '', onMockupSubtitleChange,
   mockupTags = '', onMockupTagsChange,
   mockupTextPosition = 'none', onMockupTextPositionChange,
+  showMockupDate = false, onShowMockupDateChange,
+  mockupTextColor = '#1A1D24', onMockupTextColorChange,
   compareOrientation = 'horizontal', onCompareOrientationChange,
   exportScale = 2, onExportScaleChange,
   transparentBg = false, onTransparentBgChange,
+  exportMessage,
 }: Props) {
   return (
     <aside className={styles.panel}>
       {activeMode === 'inspect'  && <InspectProps {...{ showGuides, showGrid, showCenter, showMargins, onGuidesChange, onGridChange, onCenterChange, onMarginsChange, fitMode, onFitModeChange, inspectOrientation, onInspectOrientationChange }} />}
-      {activeMode === 'mockup'   && <MockupProps  {...{ frameId, onFrameChange, frameColor, onFrameColorChange, bgStyle, onBgStyleChange, shadowIntensity, onShadowChange, frameCornerRadius, onCornerRadiusChange, mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange, mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange }} />}
+      {activeMode === 'mockup'   && <MockupProps  {...{ frameId, onFrameChange, frameColor, onFrameColorChange, bgStyle, onBgStyleChange, shadowIntensity, onShadowChange, frameCornerRadius, onCornerRadiusChange, mockupScale, onMockupScaleChange, mockupOffsetX, onMockupOffsetXChange, mockupOffsetY, onMockupOffsetYChange, mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange, mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange, showMockupDate, onShowMockupDateChange, mockupTextColor, onMockupTextColorChange }} />}
       {activeMode === 'compare'  && <CompareProps {...{ compareOrientation, onCompareOrientationChange }} />}
-      {activeMode === 'export'   && <ExportProps  {...{ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading }} />}
+      {activeMode === 'export'   && <ExportProps  {...{ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading, exportMessage }} />}
     </aside>
   );
 }
@@ -164,8 +181,10 @@ function MockupProps({
   frameId, onFrameChange, frameColor, onFrameColorChange,
   bgStyle, onBgStyleChange, shadowIntensity, onShadowChange,
   frameCornerRadius, onCornerRadiusChange,
+  mockupScale, onMockupScaleChange, mockupOffsetX, onMockupOffsetXChange, mockupOffsetY, onMockupOffsetYChange,
   mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange,
   mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange,
+  showMockupDate, onShowMockupDateChange, mockupTextColor, onMockupTextColorChange,
 }: Omit<Props, 'activeMode'|'image'>) {
   return (
     <>
@@ -235,6 +254,17 @@ function MockupProps({
         />
       </RSection>
 
+      <RSection title="배치">
+        <Slider
+          label="크기"
+          value={Math.round((mockupScale ?? 1) * 100)}
+          min={60} max={130} unit="%"
+          onChange={v => onMockupScaleChange?.(v / 100)}
+        />
+        <Slider label="가로 위치" value={mockupOffsetX ?? 0} min={-160} max={160} unit="px" onChange={v => onMockupOffsetXChange?.(v)} />
+        <Slider label="세로 위치" value={mockupOffsetY ?? 0} min={-160} max={160} unit="px" onChange={v => onMockupOffsetYChange?.(v)} />
+      </RSection>
+
       <RSection title="텍스트 오버레이">
         <div className={styles.fitRow}>
           {(['none','top','bottom'] as const).map((p) => (
@@ -267,6 +297,16 @@ function MockupProps({
               value={mockupTags ?? ''}
               onChange={(e) => onMockupTagsChange?.(e.target.value)}
             />
+            <label className={styles.colorField}>
+              <span>텍스트 색상</span>
+              <input
+                type="color"
+                value={mockupTextColor ?? '#1A1D24'}
+                onChange={(e) => onMockupTextColorChange?.(e.target.value)}
+                aria-label="텍스트 색상"
+              />
+            </label>
+            <Toggle label="날짜 표시" value={showMockupDate ?? false} onChange={v => onShowMockupDateChange?.(v)} />
           </div>
         )}
       </RSection>
@@ -302,8 +342,8 @@ function CompareProps({ compareOrientation, onCompareOrientationChange }: Omit<P
 }
 
 /* ── Export Props ─────────────────────────── */
-function ExportProps({ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading }: Omit<Props, 'activeMode'>) {
-  const scales = [1, 2, 3] as const;
+function ExportProps({ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading, exportMessage }: Omit<Props, 'activeMode'>) {
+  const scales = [1, 2] as const;
 
   return (
     <>
@@ -359,6 +399,7 @@ function ExportProps({ image, exportScale, onExportScaleChange, transparentBg, o
         <p className={styles.exportNote}>
           {!image ? '이미지를 먼저 업로드하세요.' : '다운로드 폴더에 저장됩니다.'}
         </p>
+        {exportMessage && <p className={styles.exportMessage} role="status">{exportMessage}</p>}
       </div>
     </>
   );

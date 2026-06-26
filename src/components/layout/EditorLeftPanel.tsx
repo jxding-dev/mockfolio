@@ -39,7 +39,7 @@ export function EditorLeftPanel({
   onAfterRemove,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { handleFiles } = useImageUpload({ onSuccess: onImageChange, onError });
+  const { handleInputChange } = useImageUpload({ onSuccess: onImageChange, onError });
 
   const byCategory = (cat: DevicePreset['category']) =>
     DEVICE_PRESETS.filter((d) => d.category === cat);
@@ -95,7 +95,7 @@ export function EditorLeftPanel({
           type="file"
           accept="image/png,image/jpeg,image/jpg,image/webp"
           className={styles.hidden}
-          onChange={(e) => e.target.files && handleFiles(e.target.files)}
+          onChange={handleInputChange}
         />
       </Section>
       )}
@@ -169,7 +169,7 @@ function ImageSlot({
   onError: (msg: string) => void;
 }) {
   const ref = useRef<HTMLInputElement>(null);
-  const { handleFiles } = useImageUpload({ onSuccess: onChange, onError });
+  const { handleInputChange } = useImageUpload({ onSuccess: onChange, onError });
 
   return (
     <div>
@@ -195,7 +195,7 @@ function ImageSlot({
         type="file"
         accept="image/png,image/jpeg,image/jpg,image/webp"
         className={styles.hidden}
-        onChange={(e) => e.target.files && handleFiles(e.target.files)}
+        onChange={handleInputChange}
       />
     </div>
   );

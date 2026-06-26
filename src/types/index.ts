@@ -36,7 +36,8 @@ export type FrameId =
   | 'browser'
   | 'laptop'
   | 'tablet'
-  | 'phone-desktop';
+  | 'phone-desktop'
+  | 'cover-card';
 
 export type FrameColor = 'light' | 'dark' | 'silver';
 
@@ -45,7 +46,8 @@ export type BgStyle =
   | 'soft-gradient'
   | 'dark-studio'
   | 'warm-neutral'
-  | 'mesh';
+  | 'paper-texture'
+  | 'glass-panel';
 
 export type FitMode = 'fit' | 'fill' | 'original';
 
@@ -53,14 +55,11 @@ export interface MockupSettings {
   frameId: FrameId;
   frameColor: FrameColor;
   bgStyle: BgStyle;
-  bgCustomColor: string;
-  fitMode: FitMode;
   cornerRadius: number;      // px
   shadowIntensity: number;   // 0-100
   scale: number;             // 0.3-1.5
   offsetX: number;
   offsetY: number;
-  rotation: number;          // degrees
   title: string;
   subtitle: string;
   tags: string;
