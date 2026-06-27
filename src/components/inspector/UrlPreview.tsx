@@ -32,8 +32,9 @@ export function UrlPreview({ url, width, height, refreshKey }: Props) {
             key={refreshKey}
             src={url}
             title="URL 반응형 미리보기"
-            sandbox="allow-forms allow-modals allow-popups allow-scripts"
+            sandbox="allow-forms allow-popups allow-scripts"
             referrerPolicy="no-referrer"
+            loading="lazy"
           />
         </div>
       </div>

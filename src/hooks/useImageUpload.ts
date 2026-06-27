@@ -3,6 +3,8 @@ import type { UploadedImage } from '../types';
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 const MAX_IMAGE_PIXELS = 40_000_000;
+const MAX_IMAGE_URL_LENGTH = 2048;
+const IMAGE_URL_TIMEOUT_MS = 12_000;
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
 
 function uid(): string {
@@ -11,11 +13,11 @@ function uid(): string {
 
 function normalizeImageUrl(value: string): string | null {
   const trimmed = value.trim();
-  if (!trimmed) return null;
+  if (!trimmed || trimmed.length > MAX_IMAGE_URL_LENGTH) return null;
   const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
   try {
     const url = new URL(withProtocol);
-    return url.protocol === 'http:' || url.protocol === 'https:' ? url.toString() : null;
+    return url.protocol === 'https:' ? url.toString() : null;
   } catch {
     return null;
   }
@@ -102,16 +104,29 @@ export function useImageUpload({ onSuccess, onError }: UseImageUploadOptions) {
     async (value: string) => {
       const url = normalizeImageUrl(value);
       if (!url) {
-        onError?.('http 또는 https 이미지 URL을 입력해주세요.');
+        onError?.('https 이미지 URL을 입력해주세요.');
         return false;
       }
 
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), IMAGE_URL_TIMEOUT_MS);
       try {
-        const response = await fetch(url, { mode: 'cors', credentials: 'omit' });
+        const response = await fetch(url, {
+          mode: 'cors',
+          credentials: 'omit',
+          cache: 'no-store',
+          referrerPolicy: 'no-referrer',
+          signal: controller.signal,
+        });
         if (!response.ok) throw new Error('bad-response');
         const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
         if (contentType && !contentType.startsWith('image/')) {
           onError?.('이미지 파일 URL만 불러올 수 있습니다. PNG, JPG, WebP 링크를 넣어주세요.');
+          return false;
+        }
+        const contentLength = Number(response.headers.get('content-length') ?? 0);
+        if (Number.isFinite(contentLength) && contentLength > MAX_FILE_SIZE) {
+          onError?.('이미지 링크의 파일 크기가 너무 큽니다. 최대 20MB까지 가능합니다.');
           return false;
         }
         const blob = await response.blob();
@@ -135,6 +150,8 @@ export function useImageUpload({ onSuccess, onError }: UseImageUploadOptions) {
       } catch {
         onError?.('이미지 링크를 불러오지 못했습니다. CORS가 허용된 직접 이미지 URL을 사용해주세요.');
         return false;
+      } finally {
+        window.clearTimeout(timeoutId);
       }
     },
     [processDataUrl, onError]

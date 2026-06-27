@@ -5,6 +5,19 @@ interface MockupManifest {
   mockups?: unknown;
 }
 
+function safeMockupSource(value: string): string | null {
+  const normalized = value.replace(/\\/g, '/').replace(/^\/+/, '');
+  if (
+    !normalized.startsWith('mockups/overlays/')
+    || normalized.includes('../')
+    || normalized.includes('/..')
+    || /^[a-z][a-z\d+.-]*:/i.test(normalized)
+  ) {
+    return null;
+  }
+  return normalized;
+}
+
 function isMockupAsset(value: unknown): value is { id: string; label: string; src: string; category?: string } {
   return typeof value === 'object' && value !== null
     && typeof (value as Record<string, unknown>).id === 'string'
@@ -24,12 +37,15 @@ export function useMockupAssets() {
       .then((manifest) => {
         if (!active) return;
         const mockups = Array.isArray(manifest.mockups) ? manifest.mockups : [];
-        setAssets(mockups.filter(isMockupAsset).map((asset) => ({
-          id: asset.id.slice(0, 80),
-          label: asset.label.slice(0, 80),
-          src: `${base}${asset.src.replace(/^\/+/, '')}`,
-          category: typeof asset.category === 'string' ? asset.category.slice(0, 40) : '기본 목업',
-        })));
+        setAssets(mockups.filter(isMockupAsset).flatMap((asset) => {
+          const safeSource = safeMockupSource(asset.src);
+          return safeSource ? [{
+            id: asset.id.slice(0, 80),
+            label: asset.label.slice(0, 80),
+            src: `${base}${safeSource}`,
+            category: typeof asset.category === 'string' ? asset.category.slice(0, 40) : '기본 목업',
+          }] : [];
+        }));
       })
       .catch(() => active && setAssets([]))
       .finally(() => active && setLoading(false));

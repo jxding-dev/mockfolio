@@ -10,6 +10,7 @@ The current `main` branch is the supported version of Mockfolio.
 - The app does not provide an API, server-side image storage, analytics, authentication, or payment processing.
 - Only lightweight editor settings are stored in browser `localStorage`; image data is not persisted.
 - Uploads are limited to PNG, JPG, JPEG, and WebP files up to 20MB and 40 million pixels.
+- Direct image URL imports must be HTTPS image resources that allow CORS. Requests use `credentials: omit`, enforce the same 20MB limit, and are converted to in-memory data URLs before composition.
 
 ## Reporting a vulnerability
 
