@@ -52,7 +52,7 @@ interface Props {
   previewHeight?: number;
   urlRefreshKey?: number;
   selectedMockup?: MockupAsset | null;
-  compositeTransform?: { x: number; y: number; scale: number; rotation: number };
+  compositeTransform?: { x: number; y: number; scale: number; stretchX: number; stretchY: number; rotation: number; skewX: number; skewY: number };
   onCompositePositionChange?: (x: number, y: number) => void;
 }
 
@@ -93,7 +93,7 @@ export function EditorCanvas({
   previewHeight = 844,
   urlRefreshKey = 0,
   selectedMockup = null,
-  compositeTransform = { x: 0, y: 0, scale: 1, rotation: 0 },
+  compositeTransform = { x: 0, y: 0, scale: 1, stretchX: 1, stretchY: 1, rotation: 0, skewX: 0, skewY: 0 },
   onCompositePositionChange,
 }: Props) {
   const [zoom, setZoom] = useState(1);
@@ -220,7 +220,7 @@ function CanvasContent({
   showMockupDate: boolean;
   mockupTextColor: string;
   selectedMockup: MockupAsset | null;
-  compositeTransform: { x: number; y: number; scale: number; rotation: number };
+  compositeTransform: { x: number; y: number; scale: number; stretchX: number; stretchY: number; rotation: number; skewX: number; skewY: number };
   onCompositePositionChange?: (x: number, y: number) => void;
 }) {
   if (activeMode === 'inspect' || activeMode === 'compare') {

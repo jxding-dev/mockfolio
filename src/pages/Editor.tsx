@@ -14,11 +14,12 @@ import { EditorCanvas } from '../components/layout/EditorCanvas';
 import styles from './Editor.module.css';
 
 /* ─── Upload Zone ────────────────────────────────────── */
-function UploadZone({ onUpload, error, onError, onClearError }: {
+function UploadZone({ onUpload, error, onError, onClearError, onStartWithUrl }: {
   onUpload: (img: UploadedImage) => void;
   error: string | null;
   onError: (msg: string) => void;
   onClearError: () => void;
+  onStartWithUrl: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -39,7 +40,7 @@ function UploadZone({ onUpload, error, onError, onClearError }: {
             <div className={styles.uploadLogoMark}>M</div>
             <span className={styles.uploadLogoText}>Mockfolio</span>
           </div>
-          <p className={styles.uploadTagline}>반응형 검수 + 포트폴리오 목업 제작 도구</p>
+          <p className={styles.uploadTagline}>이미지 업로드 또는 URL 링크로 시작하는 목업 제작 도구</p>
         </div>
 
         <div
@@ -68,12 +69,16 @@ function UploadZone({ onUpload, error, onError, onClearError }: {
           </div>
 
           <div className={styles.dropzoneText}>
-            <strong>{dragging ? '여기에 놓으세요!' : '화면 캡처를 여기에 끌어다 놓으세요'}</strong>
-            <span>또는 클릭해서 파일 선택</span>
+            <strong>{dragging ? '여기에 놓으세요!' : '화면 캡처 이미지를 여기에 끌어다 놓으세요'}</strong>
+            <span>또는 클릭해서 파일 선택 · URL은 아래 버튼으로 시작</span>
           </div>
 
           <div className={styles.dropzoneMeta}>PNG · JPG · WebP · 최대 20MB</div>
         </div>
+
+        <button className={styles.urlStartButton} type="button" onClick={onStartWithUrl}>
+          URL 링크로 반응형 검수 시작
+        </button>
 
         {error && (
           <div className={styles.errorBanner} role="alert">
@@ -83,7 +88,7 @@ function UploadZone({ onUpload, error, onError, onClearError }: {
         )}
 
         <div className={styles.uploadTips}>
-          <div className={styles.tip}><span className={styles.tipIcon}>📐</span><span>업로드 후 <strong>반응형 검수</strong>로 레이아웃을 확인하세요</span></div>
+          <div className={styles.tip}><span className={styles.tipIcon}>📐</span><span>이미지 또는 <strong>URL 링크</strong>로 반응형 레이아웃을 확인하세요</span></div>
           <div className={styles.tip}><span className={styles.tipIcon}>🖼</span><span>목업 모드에서 <strong>프레임과 배경</strong>을 꾸미세요</span></div>
           <div className={styles.tip}><span className={styles.tipIcon}>💾</span><span><strong>PNG 2×</strong> 고해상도로 바로 다운로드</span></div>
         </div>
@@ -98,7 +103,7 @@ function UploadZone({ onUpload, error, onError, onClearError }: {
 
 /* ─── Workspace (3-panel editor) ─────────────────────── */
 function Workspace({ image, onImageRemove, onImageChange }: {
-  image: UploadedImage;
+  image: UploadedImage | null;
   onImageRemove: () => void;
   onImageChange: (img: UploadedImage) => void;
 }) {
@@ -118,7 +123,7 @@ function Workspace({ image, onImageRemove, onImageChange }: {
     mockupScale, mockupOffsetX, mockupOffsetY,
     mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
     compareOrientation, exportScale, transparentBg,
-    selectedMockupId, compositeX, compositeY, compositeScale, compositeRotation,
+    selectedMockupId, compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY,
   } = settings;
 
   // Transient (not persisted): images + UI status
@@ -157,7 +162,11 @@ function Workspace({ image, onImageRemove, onImageChange }: {
         x: compositeX,
         y: compositeY,
         scale: compositeScale,
+        stretchX: compositeStretchX,
+        stretchY: compositeStretchY,
         rotation: compositeRotation,
+        skewX: compositeSkewX,
+        skewY: compositeSkewY,
       }, projectName);
       setExportMessage('합성된 PNG 파일을 저장했습니다.');
     } catch {
@@ -165,21 +174,21 @@ function Workspace({ image, onImageRemove, onImageChange }: {
     } finally {
       setExportLoading(false);
     }
-  }, [compositeRotation, compositeScale, compositeX, compositeY, image, projectName, selectedMockup]);
+  }, [compositeRotation, compositeScale, compositeSkewX, compositeSkewY, compositeStretchX, compositeStretchY, compositeX, compositeY, image, projectName, selectedMockup]);
 
   const handleGifExport = useCallback(async () => {
     if (!beforeImage || !afterImage) return;
     setGifLoading(true);
     setGifMessage(null);
     try {
-      await exportComparisonGif(beforeImage.dataUrl, afterImage.dataUrl, projectName);
+      await exportComparisonGif(beforeImage.dataUrl, afterImage.dataUrl, projectName, compareOrientation);
       setGifMessage('GIF 파일을 저장했습니다.');
     } catch {
       setGifMessage('GIF를 생성하지 못했습니다. 이미지를 다시 확인해주세요.');
     } finally {
       setGifLoading(false);
     }
-  }, [afterImage, beforeImage, projectName]);
+  }, [afterImage, beforeImage, compareOrientation, projectName]);
 
   const handleExport = useCallback(async () => {
     if (selectedMockup) {
@@ -282,7 +291,7 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           previewHeight={previewHeight}
           urlRefreshKey={urlRefreshKey}
           selectedMockup={selectedMockup}
-          compositeTransform={{ x: compositeX, y: compositeY, scale: compositeScale, rotation: compositeRotation }}
+          compositeTransform={{ x: compositeX, y: compositeY, scale: compositeScale, stretchX: compositeStretchX, stretchY: compositeStretchY, rotation: compositeRotation, skewX: compositeSkewX, skewY: compositeSkewY }}
           onCompositePositionChange={(x, y) => { patch('compositeX', x); patch('compositeY', y); }}
           autoSlide={autoSlide}
         />
@@ -346,13 +355,21 @@ function Workspace({ image, onImageRemove, onImageChange }: {
           compositeX={compositeX}
           compositeY={compositeY}
           compositeScale={compositeScale}
+          compositeStretchX={compositeStretchX}
+          compositeStretchY={compositeStretchY}
           compositeRotation={compositeRotation}
+          compositeSkewX={compositeSkewX}
+          compositeSkewY={compositeSkewY}
           onCompositeXChange={(value) => patch('compositeX', value)}
           onCompositeYChange={(value) => patch('compositeY', value)}
           onCompositeScaleChange={(value) => patch('compositeScale', value)}
+          onCompositeStretchXChange={(value) => patch('compositeStretchX', value)}
+          onCompositeStretchYChange={(value) => patch('compositeStretchY', value)}
           onCompositeRotationChange={(value) => patch('compositeRotation', value)}
+          onCompositeSkewXChange={(value) => patch('compositeSkewX', value)}
+          onCompositeSkewYChange={(value) => patch('compositeSkewY', value)}
           onCompositeReset={() => {
-            patch('compositeX', 0); patch('compositeY', 0); patch('compositeScale', 1); patch('compositeRotation', 0);
+            patch('compositeX', 0); patch('compositeY', 0); patch('compositeScale', 1); patch('compositeStretchX', 1); patch('compositeStretchY', 1); patch('compositeRotation', 0); patch('compositeSkewX', 0); patch('compositeSkewY', 0);
           }}
           onCompositeExport={handleCompositeExport}
           autoSlide={autoSlide}
@@ -371,15 +388,17 @@ function Workspace({ image, onImageRemove, onImageChange }: {
 /* ─── Main Editor Page ───────────────────────────────── */
 export function Editor() {
   const [image, setImage] = useState<UploadedImage | null>(null);
+  const [started, setStarted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!image) {
+  if (!image && !started) {
     return (
       <UploadZone
-        onUpload={(img) => { setImage(img); setError(null); }}
+        onUpload={(img) => { setImage(img); setStarted(true); setError(null); }}
         error={error}
         onError={setError}
         onClearError={() => setError(null)}
+        onStartWithUrl={() => { setStarted(true); setError(null); }}
       />
     );
   }

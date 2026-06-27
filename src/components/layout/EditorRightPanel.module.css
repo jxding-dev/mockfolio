@@ -191,6 +191,26 @@
   gap: var(--space-2);
 }
 
+.mockupCategoryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.mockupCategory {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mockupCategoryTitle {
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  color: var(--text-tertiary);
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+
 .frameBtn {
   display: flex;
   flex-direction: column;

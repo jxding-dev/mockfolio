@@ -71,11 +71,19 @@ interface Props {
   compositeX?: number;
   compositeY?: number;
   compositeScale?: number;
+  compositeStretchX?: number;
+  compositeStretchY?: number;
   compositeRotation?: number;
+  compositeSkewX?: number;
+  compositeSkewY?: number;
   onCompositeXChange?: (value: number) => void;
   onCompositeYChange?: (value: number) => void;
   onCompositeScaleChange?: (value: number) => void;
+  onCompositeStretchXChange?: (value: number) => void;
+  onCompositeStretchYChange?: (value: number) => void;
   onCompositeRotationChange?: (value: number) => void;
+  onCompositeSkewXChange?: (value: number) => void;
+  onCompositeSkewYChange?: (value: number) => void;
   onCompositeReset?: () => void;
   onCompositeExport?: () => void;
   autoSlide?: boolean;
@@ -113,14 +121,14 @@ export function EditorRightPanel({
   transparentBg = false, onTransparentBgChange,
   exportMessage,
   mockupAssets = [], mockupsLoading = false, selectedMockupId = '', onSelectedMockupChange,
-  compositeX = 0, compositeY = 0, compositeScale = 1, compositeRotation = 0,
-  onCompositeXChange, onCompositeYChange, onCompositeScaleChange, onCompositeRotationChange, onCompositeReset, onCompositeExport,
+  compositeX = 0, compositeY = 0, compositeScale = 1, compositeStretchX = 1, compositeStretchY = 1, compositeRotation = 0, compositeSkewX = 0, compositeSkewY = 0,
+  onCompositeXChange, onCompositeYChange, onCompositeScaleChange, onCompositeStretchXChange, onCompositeStretchYChange, onCompositeRotationChange, onCompositeSkewXChange, onCompositeSkewYChange, onCompositeReset, onCompositeExport,
   autoSlide = false, onAutoSlideChange, onGifExport, gifLoading = false, gifMessage, beforeImage = null, afterImage = null,
 }: Props) {
   return (
     <aside className={styles.panel}>
       {activeMode === 'inspect'  && <InspectProps {...{ showGuides, showGrid, showCenter, showMargins, onGuidesChange, onGridChange, onCenterChange, onMarginsChange, fitMode, onFitModeChange, inspectOrientation, onInspectOrientationChange }} />}
-      {activeMode === 'mockup'   && <MockupProps  {...{ image, frameId, onFrameChange, frameColor, onFrameColorChange, bgStyle, onBgStyleChange, shadowIntensity, onShadowChange, frameCornerRadius, onCornerRadiusChange, mockupScale, onMockupScaleChange, mockupOffsetX, onMockupOffsetXChange, mockupOffsetY, onMockupOffsetYChange, mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange, mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange, showMockupDate, onShowMockupDateChange, mockupTextColor, onMockupTextColorChange, mockupAssets, mockupsLoading, selectedMockupId, onSelectedMockupChange, compositeX, compositeY, compositeScale, compositeRotation, onCompositeXChange, onCompositeYChange, onCompositeScaleChange, onCompositeRotationChange, onCompositeReset, onCompositeExport }} />}
+      {activeMode === 'mockup'   && <MockupProps  {...{ image, onExport, exportLoading, exportMessage, frameId, onFrameChange, frameColor, onFrameColorChange, bgStyle, onBgStyleChange, shadowIntensity, onShadowChange, frameCornerRadius, onCornerRadiusChange, mockupScale, onMockupScaleChange, mockupOffsetX, onMockupOffsetXChange, mockupOffsetY, onMockupOffsetYChange, mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange, mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange, showMockupDate, onShowMockupDateChange, mockupTextColor, onMockupTextColorChange, mockupAssets, mockupsLoading, selectedMockupId, onSelectedMockupChange, compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY, onCompositeXChange, onCompositeYChange, onCompositeScaleChange, onCompositeStretchXChange, onCompositeStretchYChange, onCompositeRotationChange, onCompositeSkewXChange, onCompositeSkewYChange, onCompositeReset, onCompositeExport }} />}
       {activeMode === 'compare'  && <CompareProps {...{ compareOrientation, onCompareOrientationChange, autoSlide, onAutoSlideChange, onGifExport, gifLoading, gifMessage, beforeImage, afterImage }} />}
       {activeMode === 'export'   && <ExportProps  {...{ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading, exportMessage }} />}
     </aside>
@@ -205,6 +213,7 @@ const FRAME_COLORS: { id: FrameColor; label: string; swatch: string }[] = [
 
 function MockupProps({
   image,
+  onExport, exportLoading, exportMessage,
   frameId, onFrameChange, frameColor, onFrameColorChange,
   bgStyle, onBgStyleChange, shadowIntensity, onShadowChange,
   frameCornerRadius, onCornerRadiusChange,
@@ -213,18 +222,40 @@ function MockupProps({
   mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange,
   showMockupDate, onShowMockupDateChange, mockupTextColor, onMockupTextColorChange,
   mockupAssets, mockupsLoading, selectedMockupId, onSelectedMockupChange,
-  compositeX, compositeY, compositeScale, compositeRotation,
-  onCompositeXChange, onCompositeYChange, onCompositeScaleChange, onCompositeRotationChange, onCompositeReset, onCompositeExport,
+  compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY,
+  onCompositeXChange, onCompositeYChange, onCompositeScaleChange, onCompositeStretchXChange, onCompositeStretchYChange, onCompositeRotationChange, onCompositeSkewXChange, onCompositeSkewYChange, onCompositeReset, onCompositeExport,
 }: Omit<Props, 'activeMode'>) {
+  const mockupGroups = (mockupAssets ?? []).reduce<Record<string, MockupAsset[]>>((groups, asset) => {
+    const category = asset.category || '기본 목업';
+    groups[category] = [...(groups[category] ?? []), asset];
+    return groups;
+  }, {});
+
   return (
     <>
       <RSection title="커스텀 PNG 목업">
         {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets?.length ? (
-          <div className={styles.mockupAssetGrid}>
-            {mockupAssets.map((asset) => <button key={asset.id} className={`${styles.frameBtn} ${selectedMockupId === asset.id ? styles.frameBtnActive : ''}`} onClick={() => onSelectedMockupChange?.(asset.id)}>{asset.label}</button>)}
+          <div className={styles.mockupCategoryList}>
+            {Object.entries(mockupGroups).map(([category, assets]) => (
+              <div key={category} className={styles.mockupCategory}>
+                <div className={styles.mockupCategoryTitle}>{category}</div>
+                <div className={styles.mockupAssetGrid}>
+                  {assets.map((asset) => (
+                    <button
+                      key={asset.id}
+                      className={`${styles.frameBtn} ${selectedMockupId === asset.id ? styles.frameBtnActive : ''}`}
+                      onClick={() => onSelectedMockupChange?.(asset.id)}
+                    >
+                      {asset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
             <button className={`${styles.frameBtn} ${!selectedMockupId ? styles.frameBtnActive : ''}`} onClick={() => onSelectedMockupChange?.('')}>기본 프레임</button>
           </div>
         ) : <p className={styles.hint}>public/mockups에 PNG와 manifest를 추가하면 여기에서 선택할 수 있습니다.</p>}
+        <p className={styles.hint}>사용자 이미지는 목업 PNG 뒤에 배치되고, 투명하게 뚫린 영역으로만 보입니다.</p>
       </RSection>
 
       {selectedMockupId && (
@@ -233,12 +264,17 @@ function MockupProps({
             <Slider label="X 위치" value={compositeX ?? 0} min={-100} max={100} unit="%" onChange={value => onCompositeXChange?.(value)} />
             <Slider label="Y 위치" value={compositeY ?? 0} min={-100} max={100} unit="%" onChange={value => onCompositeYChange?.(value)} />
             <Slider label="Scale" value={Math.round((compositeScale ?? 1) * 100)} min={10} max={300} unit="%" onChange={value => onCompositeScaleChange?.(value / 100)} />
+            <Slider label="가로 늘림" value={Math.round((compositeStretchX ?? 1) * 100)} min={25} max={400} unit="%" onChange={value => onCompositeStretchXChange?.(value / 100)} />
+            <Slider label="세로 늘림" value={Math.round((compositeStretchY ?? 1) * 100)} min={25} max={400} unit="%" onChange={value => onCompositeStretchYChange?.(value / 100)} />
             <Slider label="Rotate" value={compositeRotation ?? 0} min={-180} max={180} unit="°" onChange={value => onCompositeRotationChange?.(value)} />
+            <Slider label="X 비틀기" value={compositeSkewX ?? 0} min={-60} max={60} unit="°" onChange={value => onCompositeSkewXChange?.(value)} />
+            <Slider label="Y 비틀기" value={compositeSkewY ?? 0} min={-60} max={60} unit="°" onChange={value => onCompositeSkewYChange?.(value)} />
             <Button variant="secondary" size="sm" fullWidth onClick={onCompositeReset}>조정 초기화</Button>
           </RSection>
           <div className={styles.exportFooter}>
-            <Button variant="primary" size="lg" fullWidth disabled={!image} onClick={onCompositeExport}>합성 PNG 저장</Button>
+            <Button variant="primary" size="lg" fullWidth loading={exportLoading} disabled={!image} onClick={onCompositeExport}>합성 PNG 저장</Button>
             <p className={styles.exportNote}>{image ? '사용자 이미지와 목업을 합성해서만 저장합니다.' : '이미지를 업로드해야 저장할 수 있어요.'}</p>
+            {exportMessage && <p className={styles.exportMessage} role="status">{exportMessage}</p>}
           </div>
         </>
       )}
@@ -366,6 +402,15 @@ function MockupProps({
           </div>
         )}
       </RSection>
+      <div className={styles.exportFooter}>
+        <Button variant="primary" size="lg" fullWidth loading={exportLoading} disabled={!image} onClick={onExport}>
+          목업 PNG 저장
+        </Button>
+        <p className={styles.exportNote}>
+          {!image ? '이미지를 업로드해야 저장할 수 있어요.' : '현재 목업 화면을 PNG로 저장합니다.'}
+        </p>
+        {exportMessage && <p className={styles.exportMessage} role="status">{exportMessage}</p>}
+      </div>
       </>}
     </>
   );

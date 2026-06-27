@@ -126,6 +126,30 @@
   font-family: var(--font-mono);
 }
 
+.urlStartButton {
+  width: 100%;
+  min-height: 42px;
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-base);
+  color: var(--accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition:
+    border-color var(--ease-fast),
+    background var(--ease-fast),
+    box-shadow var(--ease-fast);
+}
+
+.urlStartButton:hover,
+.urlStartButton:focus-visible {
+  border-color: var(--accent-muted);
+  background: var(--accent-subtle);
+  box-shadow: 0 0 0 4px rgba(99,102,241,0.08);
+  outline: none;
+}
+
 /* ── Error ────────────────────────────────── */
 .errorBanner {
   display: flex;

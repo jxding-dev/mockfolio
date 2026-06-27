@@ -1,3 +1,34 @@
 {
-  "mockups": []
+  "mockups": [
+    {
+      "id": "outdoor-shelter-ad",
+      "label": "Outdoor Shelter",
+      "category": "실사 광고 목업",
+      "src": "mockups/overlays/outdoor-shelter-ad.png"
+    },
+    {
+      "id": "city-building-billboard",
+      "label": "City Billboard",
+      "category": "실사 광고 목업",
+      "src": "mockups/overlays/city-building-billboard.png"
+    },
+    {
+      "id": "round-storefront-sign",
+      "label": "Round Sign",
+      "category": "간판 목업",
+      "src": "mockups/overlays/round-storefront-sign.png"
+    },
+    {
+      "id": "sample-mobile-portrait",
+      "label": "Mobile Portrait",
+      "category": "샘플 목업",
+      "src": "mockups/overlays/sample-mobile-portrait.png"
+    },
+    {
+      "id": "sample-desktop-studio",
+      "label": "Desktop Studio",
+      "category": "샘플 목업",
+      "src": "mockups/overlays/sample-desktop-studio.png"
+    }
+  ]
 }

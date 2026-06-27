@@ -105,6 +105,9 @@ export function EditorLeftPanel({
             이미지 업로드
           </button>
         )}
+        <p className={styles.hint}>
+          이미지를 넣어 목업으로 합성하거나, Inspect 탭의 URL 모드에서 링크를 넣어 반응형을 확인하세요.
+        </p>
         <input
           ref={inputRef}
           type="file"

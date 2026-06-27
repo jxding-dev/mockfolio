@@ -7,7 +7,11 @@ interface Transform {
   x: number;
   y: number;
   scale: number;
+  stretchX: number;
+  stretchY: number;
   rotation: number;
+  skewX: number;
+  skewY: number;
 }
 
 interface Props {
@@ -51,7 +55,7 @@ export function MockupComposer({ image, mockup, transform, onPositionChange }: P
               left: `${50 + transform.x}%`,
               top: `${50 + transform.y}%`,
               width: `${transform.scale * 100}%`,
-              transform: `translate(-50%, -50%) rotate(${transform.rotation}deg)`,
+              transform: `translate(-50%, -50%) rotate(${transform.rotation}deg) skew(${transform.skewX}deg, ${transform.skewY}deg) scale(${transform.stretchX}, ${transform.stretchY})`,
             }}
             draggable={false}
           />

@@ -4,8 +4,14 @@ interface ImageTransform {
   x: number;
   y: number;
   scale: number;
+  stretchX: number;
+  stretchY: number;
   rotation: number;
+  skewX: number;
+  skewY: number;
 }
+
+type ComparisonOrientation = 'horizontal' | 'vertical';
 
 function safeFilePart(value: string): string {
   const cleaned = value.trim().replace(/\s+/g, '-').replace(/[^\p{L}\p{N}._-]/gu, '');
@@ -37,11 +43,15 @@ function drawComposite(context: CanvasRenderingContext2D, user: HTMLImageElement
   const imageHeight = imageWidth * (user.naturalHeight / user.naturalWidth);
   const centerX = width * (0.5 + transform.x / 100);
   const centerY = height * (0.5 + transform.y / 100);
+  const skewXRadians = (transform.skewX * Math.PI) / 180;
+  const skewYRadians = (transform.skewY * Math.PI) / 180;
 
   context.clearRect(0, 0, width, height);
   context.save();
   context.translate(centerX, centerY);
   context.rotate((transform.rotation * Math.PI) / 180);
+  context.transform(1, Math.tan(skewYRadians), Math.tan(skewXRadians), 1, 0, 0);
+  context.scale(transform.stretchX, transform.stretchY);
   context.drawImage(user, -imageWidth / 2, -imageHeight / 2, imageWidth, imageHeight);
   context.restore();
   context.drawImage(mockup, 0, 0, width, height);
@@ -68,18 +78,35 @@ export async function exportMockupComposite(
   downloadBlob(blob, `mockfolio-${safeFilePart(projectName)}-mockup.png`);
 }
 
-function drawComparison(context: CanvasRenderingContext2D, before: HTMLImageElement, after: HTMLImageElement, width: number, height: number, position: number) {
+function drawComparison(
+  context: CanvasRenderingContext2D,
+  before: HTMLImageElement,
+  after: HTMLImageElement,
+  width: number,
+  height: number,
+  position: number,
+  orientation: ComparisonOrientation,
+) {
   context.clearRect(0, 0, width, height);
   context.drawImage(after, 0, 0, width, height);
   context.save();
   context.beginPath();
-  context.rect(0, 0, width * position, height);
+  if (orientation === 'vertical') {
+    context.rect(0, 0, width, height * position);
+  } else {
+    context.rect(0, 0, width * position, height);
+  }
   context.clip();
   context.drawImage(before, 0, 0, width, height);
   context.restore();
 }
 
-export async function exportComparisonGif(beforeSource: string, afterSource: string, projectName: string) {
+export async function exportComparisonGif(
+  beforeSource: string,
+  afterSource: string,
+  projectName: string,
+  orientation: ComparisonOrientation = 'horizontal',
+) {
   const [before, after] = await Promise.all([loadImage(beforeSource), loadImage(afterSource)]);
   const sourceWidth = Math.max(before.naturalWidth, after.naturalWidth);
   const sourceHeight = Math.max(before.naturalHeight, after.naturalHeight);
@@ -95,7 +122,7 @@ export async function exportComparisonGif(beforeSource: string, afterSource: str
   const encoder = GIFEncoder();
   const frameCount = 20;
   for (let index = 0; index <= frameCount; index += 1) {
-    drawComparison(context, before, after, width, height, index / frameCount);
+    drawComparison(context, before, after, width, height, index / frameCount, orientation);
     const rgba = context.getImageData(0, 0, width, height).data;
     const palette = quantize(rgba, 128);
     encoder.writeFrame(applyPalette(rgba, palette), width, height, {

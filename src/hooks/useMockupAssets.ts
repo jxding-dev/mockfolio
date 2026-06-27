@@ -5,7 +5,7 @@ interface MockupManifest {
   mockups?: unknown;
 }
 
-function isMockupAsset(value: unknown): value is { id: string; label: string; src: string } {
+function isMockupAsset(value: unknown): value is { id: string; label: string; src: string; category?: string } {
   return typeof value === 'object' && value !== null
     && typeof (value as Record<string, unknown>).id === 'string'
     && typeof (value as Record<string, unknown>).label === 'string'
@@ -28,6 +28,7 @@ export function useMockupAssets() {
           id: asset.id.slice(0, 80),
           label: asset.label.slice(0, 80),
           src: `${base}${asset.src.replace(/^\/+/, '')}`,
+          category: typeof asset.category === 'string' ? asset.category.slice(0, 40) : '기본 목업',
         })));
       })
       .catch(() => active && setAssets([]))
