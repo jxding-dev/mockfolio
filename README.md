@@ -1,82 +1,110 @@
-# Mockfolio — Portfolio Mockup Builder
+# Mockfolio
 
-웹·앱 화면 캡처를 브라우저 안에서 검수하고, 포트폴리오용 목업 PNG로 저장하는 로컬 우선 도구입니다.
+웹·앱 화면 캡처를 **브라우저 안에서만** 검수하고, 포트폴리오용 목업 PNG로 저장하는 로컬 우선 도구.
+이 문서가 프로젝트의 유일한 기준 문서다. 다음 작업자(사람·AI)는 작업 전 **반드시 전체를 읽고**, 기존 UI/UX·보안 결정을 망치지 않게 작은 단위로만 변경한다. 전체 재작성 금지.
 
-## 주요 기능
+- 저장소: `jxding-dev/mockfolio` · 브랜치: `main`
+- 배포: GitHub Pages — https://jxding-dev.github.io/mockfolio/
+- 라우팅: `HashRouter` · Vite base: `/mockfolio/` (둘 다 변경 금지)
 
-- **이미지 업로드**: PNG, JPG, JPEG, WebP 파일을 드래그 앤 드롭 또는 파일 선택으로 업로드합니다. 최대 파일 크기는 20MB, 최대 해상도는 4,000만 픽셀입니다.
-- **반응형 Inspect**: 360px부터 1920px까지의 모바일·태블릿·데스크탑 프리셋, 세로/가로 전환, Fit/Fill/Original, 안전영역·8px 그리드·중앙선·여백 가이드를 제공합니다.
-- **Before / After**: 수정 전후 이미지를 좌우 또는 상하 슬라이더로 비교합니다.
-- **Mockup Editor**: 외부 목업 이미지 없이 CSS/HTML로 만든 Phone, Browser, Laptop, Tablet, Phone + Desktop, Cover Card 프레임을 제공합니다. 프레임 색상, 배경, 그림자, 모서리, 크기와 위치, 텍스트·태그·날짜를 조절할 수 있습니다.
-- **Custom PNG Mockup**: 직접 만든 투명 PNG 목업 위에 업로드 이미지를 합성하고 위치·크기·회전을 조정한 뒤 합성 결과만 PNG로 저장합니다.
-- **URL Preview & GIF**: URL을 지정한 디바이스 크기의 iframe으로 확인하고, Before/After 비교를 자동 슬라이드 GIF로 저장할 수 있습니다.
-- **PNG Export**: 완성된 목업 캔버스를 1× 또는 2× PNG로 저장합니다. 파일명은 `mockfolio-프로젝트명-날짜.png` 형식으로 생성됩니다.
-- **Coming Soon UI**: 로그인, Pro, Studio 플랜은 화면만 제공하며 실제 인증·결제·서버 기능은 없습니다.
+---
 
-## 로컬 처리 원칙
+## 1. 절대 지켜야 할 정책 (건드리면 안 됨)
 
-- 업로드한 이미지는 브라우저 메모리에서만 처리하며 외부 서버로 전송하지 않습니다.
-- 설정값만 `localStorage`에 저장합니다. 이미지 원본은 저장하지 않습니다.
-- AI, 이미지 생성, 외부 목업 이미지, 로그인, 결제 기능을 사용하지 않습니다.
+- 유료 API · 앱 내부 AI 연결 · 이미지 생성 금지
+- 사용자 업로드 이미지를 **서버로 전송 금지** (모든 처리는 브라우저 메모리)
+- 실제 로그인/결제/계정 저장 구현 금지 — 로그인·Pro·Studio는 **Coming Soon UI만**
+- 목업은 **CSS/SVG/HTML 또는 직접 제작한 투명 PNG 오버레이만** 사용 (외부 목업 이미지 무단 사용 금지)
+- 이미지 URL 불러오기는 `credentials: 'omit'` 유지, HTTPS 직접 이미지만 허용
+- `public/mockups/manifest.json` 경로 검증(`mockups/overlays/`로 시작, `../`·절대경로·프로토콜 차단) 완화 금지
+- iframe `sandbox`를 불필요하게 넓히지 말 것 (`allow-same-origin` 추가 금지)
+- CSP를 완화할 땐 정확한 사유를 커밋에 남길 것
+- 목업 PNG 단독 다운로드 기능 금지 — Export는 **합성 결과만** 허용
+- 외부 유료 라이브러리/API 추가 금지, Tailwind 등 스타일 체계 새로 도입 금지
 
-## 기술 스택
+---
 
-- React 19 + TypeScript
-- Vite 8
-- React Router DOM 7
-- html-to-image (PNG 내보내기)
-- CSS Modules + 디자인 토큰
+## 2. 기능
 
-## 설치 및 실행
+- **이미지 업로드**: PNG/JPG/JPEG/WebP, 최대 20MB·4,000만 픽셀. 드래그앤드롭 또는 파일 선택.
+- **반응형 Inspect**: 360~1920px 모바일·태블릿·데스크탑 프리셋, 세로/가로 전환, Fit/Fill/Original, 안전영역·8px 그리드·중앙선·여백 가이드.
+- **URL 미리보기**: URL을 지정 디바이스 크기 iframe으로 확인. X-Frame-Options/CSP로 막힌 사이트는 새 창 열기로 안내 (정상 동작).
+- **Before/After**: 좌우·상하 비교 슬라이더, 자동 슬라이드(rAF), GIF 저장(`gifenc`).
+- **Mockup (CSS 프레임)**: Phone, Browser, Laptop, Tablet, Phone+Desktop, Cover Card. 프레임 색상·배경·그림자·모서리·크기/위치·텍스트/태그/날짜 조절.
+- **Custom PNG Mockup**: 투명 PNG 목업 위에 업로드 이미지를 합성(위치·스케일·늘림·회전·스큐), 합성 결과만 PNG 저장.
+- **PNG Export**: 1×/2× 저장. 파일명 `mockfolio-프로젝트명-날짜.png`.
+
+업로드한 이미지 원본은 저장하지 않는다. `localStorage`(키 `mf_settings`)에는 **UI 설정만** 저장하며, 읽을 때 `normalizeEditorSettings()`로 전부 검증한다. 새로고침하면 업로드 이미지는 사라진다.
+
+---
+
+## 3. 기술 스택 · 실행
+
+- React 19 + TypeScript · Vite 8 · React Router DOM 7 · CSS Modules + 디자인 토큰
+- PNG 내보내기 `html-to-image` · GIF `gifenc` · 린트 `oxlint`
 
 ```bash
-git clone https://github.com/jxding-dev/mockfolio.git
-cd mockfolio
 npm install
-npm run dev
+npm run dev       # 개발 서버
+npm run lint      # oxlint
+npm run build     # tsc -b && vite build
+npm run preview   # 빌드 미리보기
 ```
 
-Windows PowerShell에서 실행 정책으로 `npm` 명령이 차단되면 `npm.cmd run dev`를 사용합니다.
+작업 후 반드시: `npm run lint` → `npm run build` → `npm audit --omit=dev --audit-level=high`,
+그리고 UI를 **홈 1280px / 에디터 1280px / 에디터 390px**에서 확인한 뒤 push.
 
-## 빌드
+---
 
-```bash
-npm run lint
-npm run build
-npm run preview
-```
-
-## 공개 배포
-
-- `main` 브랜치에 반영되면 GitHub Actions가 린트와 빌드를 수행한 뒤 GitHub Pages에 배포합니다.
-- 배포 작업은 GitHub 공식 Pages 액션만 사용하며, CI는 모든 `main` 및 `codex/**` 브랜치 푸시와 `main` 대상 Pull Request에서 실행됩니다.
-- 서비스는 이미지를 외부로 전송하지 않습니다. 배포 환경을 GitHub Pages 이외로 바꿀 경우 [SECURITY.md](SECURITY.md)의 보안 헤더 요구사항을 적용해야 합니다.
-
-## 폴더 구조
+## 4. 폴더 구조
 
 ```text
 src/
-├── components/
-│   ├── layout/      # 에디터 레이아웃과 패널
-│   ├── mockup/      # CSS 기반 디바이스 프레임과 비교 슬라이더
-│   └── ui/          # Button, Modal, Toggle, Slider 등 공통 UI
-├── data/            # 디바이스·프레임·배경·플랜 데이터
-├── hooks/           # 이미지 업로드와 localStorage 훅
-├── pages/           # Landing, Editor, Pricing
-├── styles/          # 전역 리셋과 디자인 토큰
-├── types/           # 공용 TypeScript 타입
-└── utils/           # PNG 내보내기 유틸리티
-
-public/
-├── mockups/         # 추후 직접 제작한 목업 에셋 추가 위치
-└── samples/         # 직접 만든 샘플 에셋 추가 위치
+  pages/        Landing.tsx · Editor.tsx · Pricing.tsx
+  components/
+    layout/     EditorTopBar · EditorLeftPanel · EditorCanvas · EditorRightPanel · Header
+    inspector/  UrlPreview            # iframe URL 미리보기
+    mockup/     DeviceFrame · CompareSlider · MockupComposer
+    ui/         Button · Modal · Toggle · Slider · ErrorBoundary
+  data/         editorSettings.ts(+normalize) · devices · frames · backgrounds · mockups · plans
+  hooks/        useImageUpload · useLocalStorage · useMockupAssets
+  utils/        exportPng · mediaExport(GIF·합성) · urlPreview
+  types/        index.ts
+  styles/       tokens.css · reset.css
+public/mockups/ manifest.json · overlays/{ecommerce,app,web,poster,banner,social,ads,signage,samples}/
 ```
 
-`public/mockups`에 투명 PNG를 넣고 같은 폴더의 `manifest.json`에 표시용 이름과 경로를 등록하면 Mockup 모드에서 선택할 수 있습니다. 예시는 `public/mockups/README.md`를 참고하세요.
+상태는 `Editor.tsx`의 `EditorSettings` 한 객체에 모이고 `patch(key, value)`로만 갱신한다. 새 옵션을 추가할 땐 `editorSettings.ts`의 타입·기본값·`normalizeEditorSettings`를 함께 갱신한다.
 
-## 현재 제한 사항과 향후 계획
+---
 
-- 무료 버전은 이미지 1개 작업과 1×/2× PNG 내보내기를 지원합니다.
-- Pro/Studio의 다중 프로젝트, 3×/4× 내보내기, 브랜드 프리셋, 협업·클라우드 기능은 Coming Soon UI만 있으며 아직 구현하지 않았습니다.
-- 추후 직접 제작한 목업 에셋을 `public/mockups`에 추가할 수 있도록 폴더를 유지합니다.
-- 공개 운영 전에는 [SECURITY.md](SECURITY.md)의 취약점 신고 경로와 배포 요구사항을 확인하세요.
+## 5. 커스텀 목업 PNG 추가
+
+1. 투명 PNG를 `public/mockups/overlays/{category}/` 아래에 넣는다 (사용자 이미지가 들어갈 영역은 alpha로 뚫는다).
+2. `public/mockups/manifest.json`에 등록한다:
+
+```json
+{ "id": "unique-id", "label": "표시 이름", "category": "표시 카테고리", "src": "mockups/overlays/app/my-mockup.png" }
+```
+
+`src`는 반드시 `mockups/overlays/`로 시작. 외부 URL·`../`·절대경로는 런타임에서 차단된다.
+
+---
+
+## 6. 배포 · 보안 헤더
+
+- `main` push 시 GitHub Actions가 `lint → audit → build → GitHub Pages 배포` 수행 (`.github/workflows/deploy.yml`).
+- **Settings → Pages → Source는 "GitHub Actions"** 여야 새 빌드가 반영된다. (브랜치 배포 방식 아님)
+- 보안 헤더는 `index.html`의 CSP·Permissions-Policy·`referrer=no-referrer`로 적용. GitHub Pages 외 환경으로 옮기면 엣지에서 `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy`를 동일하게 설정해야 한다.
+- 취약점은 공개 이슈가 아니라 저장소의 **private security advisory**로 신고.
+- 분석·인증·결제·백엔드를 도입하려면 데이터 처리 모델이 바뀌므로 별도 보안/프라이버시 검토 후 진행.
+
+---
+
+## 7. 알려진 한계
+
+- iframe URL 미리보기는 사이트의 X-Frame-Options/CSP로 막힐 수 있다.
+- 웹페이지 URL을 canvas로 캡처/export하는 기능은 브라우저 보안상 안정 제공 불가.
+- 외부 이미지 URL은 CORS 허용된 직접 이미지 파일만 불러올 수 있다.
+- 이미지는 메모리 기반이라 새로고침 시 사라진다. (`localStorage`엔 UI 설정만)
+- Pro/Studio의 다중 프로젝트·고배율 export·협업 기능은 Coming Soon UI만 존재.
