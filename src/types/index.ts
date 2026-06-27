@@ -53,8 +53,11 @@ export type PlanId = 'free' | 'pro' | 'studio';
 export interface Plan {
   id: PlanId;
   name: string;
-  price: string;
+  monthly: number;          // KRW per month, billed monthly (0 = free)
+  annual: number;           // KRW per month, billed annually
   description: string;
   features: string[];
   available: boolean;
+  highlighted?: boolean;
+  cta: string;
 }
