@@ -51,12 +51,17 @@
 npm install
 npm run dev       # 개발 서버
 npm run lint      # oxlint
-npm run build     # tsc -b && vite build
+npm test          # vitest — 보안/검증 순수 함수 단위 테스트
+npm run build     # tsc -b (strict) && vite build
 npm run preview   # 빌드 미리보기
 ```
 
-작업 후 반드시: `npm run lint` → `npm run build` → `npm audit --omit=dev --audit-level=high`,
-그리고 UI를 **홈 1280px / 에디터 1280px / 에디터 390px**에서 확인한 뒤 push.
+작업 후 반드시: `npm run lint` → `npm test` → `npm run build` → `npm audit --omit=dev --audit-level=high`,
+그리고 UI를 **홈 1280px / 에디터 1280px / 에디터 390px**에서 확인한 뒤 push. (CI도 동일 게이트를 강제한다.)
+
+- TypeScript는 **strict** 모드다. 새 코드도 null 안전성을 유지한다.
+- 보안 핵심 순수 함수(`normalizeEditorSettings`, `normalizeImageUrl`, `normalizePreviewUrl`, `safeMockupSource`)는 **단위 테스트로 보호**된다. 이 로직을 바꾸면 테스트도 갱신한다.
+- 알 수 없는 경로는 `*` 라우트의 404 페이지로 처리된다. SEO/OG 메타와 `manifest.webmanifest`·`robots.txt`·`sitemap.xml`은 `public/`과 `index.html`에 있다.
 
 ---
 

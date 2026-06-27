@@ -11,7 +11,7 @@ function uid(): string {
   return `img_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function normalizeImageUrl(value: string): string | null {
+export function normalizeImageUrl(value: string): string | null {
   const trimmed = value.trim();
   if (!trimmed || trimmed.length > MAX_IMAGE_URL_LENGTH) return null;
   const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;

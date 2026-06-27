@@ -4,6 +4,7 @@ import { Footer } from './components/layout/Footer';
 import { Landing } from './pages/Landing';
 import { Editor } from './pages/Editor';
 import { Pricing } from './pages/Pricing';
+import { NotFound } from './pages/NotFound';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
 function AppShell() {
@@ -17,6 +18,7 @@ function AppShell() {
         <Route path="/"        element={<Landing />} />
         <Route path="/editor"  element={<Editor />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="*"        element={<NotFound />} />
       </Routes>
       {!isEditor && <Footer />}
     </ErrorBoundary>

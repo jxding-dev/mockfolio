@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jxding-dev.github.io/mockfolio/sitemap.xml

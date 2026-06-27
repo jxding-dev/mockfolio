@@ -5,7 +5,7 @@ interface MockupManifest {
   mockups?: unknown;
 }
 
-function safeMockupSource(value: string): string | null {
+export function safeMockupSource(value: string): string | null {
   const normalized = value.replace(/\\/g, '/').replace(/^\/+/, '');
   if (
     !normalized.startsWith('mockups/overlays/')

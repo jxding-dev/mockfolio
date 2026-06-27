@@ -1,0 +1,19 @@
+{
+  "name": "Mockfolio — 반응형 검수 + 포트폴리오 목업",
+  "short_name": "Mockfolio",
+  "description": "화면 캡처를 브라우저 안에서 검수하고 포트폴리오용 목업 PNG로 저장하는 로컬 우선 도구.",
+  "lang": "ko",
+  "start_url": "/mockfolio/",
+  "scope": "/mockfolio/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366F1",
+  "icons": [
+    {
+      "src": "/mockfolio/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
