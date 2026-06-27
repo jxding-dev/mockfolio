@@ -67,7 +67,14 @@ export function Header() {
             계정 기능은 현재 개발 중입니다.<br />
             지금은 <strong>로그인 없이 무료로</strong> 모든 핵심 기능을 사용하실 수 있습니다.
           </p>
-          <Button variant="primary" fullWidth onClick={() => setComingSoon(false)}>
+          <Button
+            variant="primary"
+            fullWidth
+            onClick={() => {
+              setComingSoon(false);
+              navigate('/editor');
+            }}
+          >
             에디터 바로 열기
           </Button>
         </div>

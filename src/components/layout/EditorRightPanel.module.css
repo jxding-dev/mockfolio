@@ -217,9 +217,15 @@
   align-items: center;
   gap: 3px;
   padding: 8px 2px;
+  min-width: 0;
   border: 1.5px solid var(--border-default);
   border-radius: var(--radius-md);
   background: var(--bg-subtle);
+  color: var(--text-secondary);
+  font-size: 10px;
+  line-height: 1.25;
+  text-align: center;
+  overflow-wrap: anywhere;
   cursor: pointer;
   transition: all var(--ease-fast);
 }
@@ -232,6 +238,8 @@
 .frameBtnActive {
   border-color: var(--accent) !important;
   background: var(--accent-subtle) !important;
+  color: var(--accent) !important;
+  font-weight: var(--weight-semibold);
 }
 
 .frameIcon { font-size: 16px; line-height: 1; }
@@ -377,4 +385,44 @@
   color: var(--text-tertiary);
   line-height: var(--leading-normal);
   padding: var(--space-1) 0;
+}
+
+@media (max-width: 768px) {
+  .panel {
+    width: 100%;
+    flex-shrink: 0;
+    border-left: 0;
+    border-top: 1px solid var(--border-muted);
+    overflow: visible;
+  }
+
+  .sectionBody {
+    padding-inline: var(--space-4);
+  }
+
+  .frameBtn { min-height: 40px; }
+}
+
+@media (max-width: 480px) {
+  .fitRow,
+  .scaleRow,
+  .swatchRow {
+    flex-wrap: wrap;
+  }
+
+  .fitBtn,
+  .scaleBtn,
+  .swatch {
+    min-width: 0;
+  }
+
+  .mockupAssetGrid,
+  .frameGrid,
+  .bgGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exportFooter {
+    padding-inline: var(--space-4);
+  }
 }

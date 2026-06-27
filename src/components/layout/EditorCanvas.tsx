@@ -100,6 +100,7 @@ export function EditorCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const device = DEVICE_PRESETS.find((d) => d.id === selectedDeviceId) ?? DEVICE_PRESETS[0];
+  const showingUrlPreview = activeMode === 'inspect' && inspectSource === 'url';
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     if (!e.ctrlKey && !e.metaKey) return;
@@ -112,7 +113,7 @@ export function EditorCanvas({
   const resetZoom = () => setZoom(1);
 
   const isCompare = activeMode === 'compare';
-  const hasContent = isCompare ? (!!beforeImage || !!afterImage) : !!image;
+  const hasContent = isCompare ? (!!beforeImage || !!afterImage) : showingUrlPreview ? Boolean(previewUrl) : !!image;
 
   return (
     <div className={styles.wrap}>
@@ -128,9 +129,13 @@ export function EditorCanvas({
               <CompareSlider before={beforeImage} after={afterImage} orientation={compareOrientation} autoSlide={autoSlide} />
             </div>
           </div>
-        ) : activeMode === 'inspect' && inspectSource === 'url' && previewUrl ? (
+        ) : showingUrlPreview ? (
           <div className={styles.sceneOuter}>
-            <UrlPreview url={previewUrl} width={previewWidth} height={previewHeight} refreshKey={urlRefreshKey} />
+            {previewUrl ? (
+              <UrlPreview url={previewUrl} width={previewWidth} height={previewHeight} refreshKey={urlRefreshKey} />
+            ) : (
+              <UrlEmptyState />
+            )}
           </div>
         ) : image ? (
           <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
@@ -446,6 +451,22 @@ function EmptyState() {
       </div>
       <p className={styles.emptyTitle}>이미지를 업로드하세요</p>
       <p className={styles.emptyDesc}>PNG, JPG, WebP · 최대 20MB</p>
+    </div>
+  );
+}
+
+function UrlEmptyState() {
+  return (
+    <div className={`${styles.emptyState} ${styles.urlEmptyState}`}>
+      <div className={styles.emptyIcon}>
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <rect x="8" y="12" width="32" height="24" rx="6" stroke="currentColor" strokeWidth="2" />
+          <path d="M16 22h16M16 28h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <path d="M18 36h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.45" />
+        </svg>
+      </div>
+      <p className={styles.emptyTitle}>URL을 입력하고 미리보기를 눌러주세요</p>
+      <p className={styles.emptyDesc}>왼쪽 패널에서 Mobile · Tablet · Desktop · Wide 크기를 바로 바꿀 수 있습니다.</p>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import type { UploadedImage } from '../types';
 import { DEFAULT_EDITOR_SETTINGS, normalizeEditorSettings, type EditorSettings } from '../data/editorSettings';
 import { useImageUpload } from '../hooks/useImageUpload';
@@ -102,10 +102,11 @@ function UploadZone({ onUpload, error, onError, onClearError, onStartWithUrl }: 
 }
 
 /* ─── Workspace (3-panel editor) ─────────────────────── */
-function Workspace({ image, onImageRemove, onImageChange }: {
+function Workspace({ image, onImageRemove, onImageChange, initialInspectSource = 'image' }: {
   image: UploadedImage | null;
   onImageRemove: () => void;
   onImageChange: (img: UploadedImage) => void;
+  initialInspectSource?: 'image' | 'url';
 }) {
   // All lightweight UI settings persist to localStorage (images stay in-memory).
   const [settings, setSettings] = useLocalStorage<EditorSettings>('mf_settings', DEFAULT_EDITOR_SETTINGS, normalizeEditorSettings);
@@ -136,10 +137,20 @@ function Workspace({ image, onImageRemove, onImageChange }: {
   const [autoSlide, setAutoSlide] = useState(false);
   const [gifLoading, setGifLoading] = useState(false);
   const [gifMessage, setGifMessage] = useState<string | null>(null);
+  const [initialSourceApplied, setInitialSourceApplied] = useState(false);
   const { assets: mockupAssets, loading: mockupsLoading } = useMockupAssets();
 
   const exportRef = useRef<HTMLDivElement | null>(null);
   const selectedMockup = mockupAssets.find((asset) => asset.id === selectedMockupId) ?? null;
+
+  useEffect(() => {
+    if (initialSourceApplied) return;
+    if (initialInspectSource === 'url') {
+      if (activeMode !== 'inspect') patch('activeMode', 'inspect');
+      if (inspectSource !== 'url') patch('inspectSource', 'url');
+    }
+    setInitialSourceApplied(true);
+  }, [activeMode, initialInspectSource, initialSourceApplied, inspectSource, patch]);
 
   const handlePreviewUrl = useCallback(() => {
     const normalized = normalizePreviewUrl(urlInput);
@@ -389,16 +400,17 @@ function Workspace({ image, onImageRemove, onImageChange }: {
 export function Editor() {
   const [image, setImage] = useState<UploadedImage | null>(null);
   const [started, setStarted] = useState(false);
+  const [initialInspectSource, setInitialInspectSource] = useState<'image' | 'url'>('image');
   const [error, setError] = useState<string | null>(null);
 
   if (!image && !started) {
     return (
       <UploadZone
-        onUpload={(img) => { setImage(img); setStarted(true); setError(null); }}
+        onUpload={(img) => { setImage(img); setInitialInspectSource('image'); setStarted(true); setError(null); }}
         error={error}
         onError={setError}
         onClearError={() => setError(null)}
-        onStartWithUrl={() => { setStarted(true); setError(null); }}
+        onStartWithUrl={() => { setInitialInspectSource('url'); setStarted(true); setError(null); }}
       />
     );
   }
@@ -408,6 +420,7 @@ export function Editor() {
       image={image}
       onImageRemove={() => setImage(null)}
       onImageChange={(img) => setImage(img)}
+      initialInspectSource={initialInspectSource}
     />
   );
 }

@@ -254,6 +254,17 @@
 
 .emptyDesc {
   font-size: var(--text-sm);
+  max-width: 340px;
+  text-align: center;
+  line-height: var(--leading-normal);
+}
+
+.urlEmptyState {
+  max-width: min(420px, 100%);
+  padding: var(--space-8);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 /* ── Zoom Bar ─────────────────────────────── */
@@ -318,4 +329,44 @@
   color: var(--text-tertiary);
   white-space: nowrap;
   font-family: var(--font-mono);
+}
+
+@media (max-width: 768px) {
+  .wrap {
+    flex: 0 0 420px;
+    min-height: 420px;
+  }
+
+  .canvas {
+    padding: var(--space-5);
+  }
+
+  .mockupScene {
+    padding: var(--space-6);
+    min-width: min(320px, 100%);
+  }
+}
+
+@media (max-width: 480px) {
+  .wrap {
+    flex-basis: 380px;
+    min-height: 380px;
+  }
+
+  .canvas {
+    padding: var(--space-4);
+  }
+
+  .zoomBar {
+    max-width: calc(100% - 24px);
+    overflow: hidden;
+  }
+
+  .deviceInfo {
+    display: none;
+  }
+
+  .urlEmptyState {
+    padding: var(--space-5);
+  }
 }

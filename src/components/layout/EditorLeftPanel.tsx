@@ -106,7 +106,7 @@ export function EditorLeftPanel({
           </button>
         )}
         <p className={styles.hint}>
-          파일을 올리거나 직접 이미지 URL을 넣어 목업으로 합성하세요. 웹페이지 URL 검수는 Inspect 탭의 URL 모드를 사용하세요.
+          파일 업로드 또는 이미지 링크를 넣어 목업에 합성하세요. 웹페이지 검수는 아래 URL 모드를 사용하세요.
         </p>
         <ImageUrlInput onLoad={loadImageUrl} placeholder="https://example.com/screenshot.png" />
         <input
@@ -129,9 +129,20 @@ export function EditorLeftPanel({
             </div>
             {inspectSource === 'url' && (
               <>
-                <input className={styles.urlInput} value={urlInput} onChange={(event) => onUrlInputChange?.(event.target.value)} placeholder="example.com" inputMode="url" aria-label="미리보기 URL" />
+                <p className={styles.hint}>웹페이지 주소를 넣고 사이트 미리보기를 누르세요. https://가 없으면 자동으로 붙습니다.</p>
+                <input
+                  className={styles.urlInput}
+                  value={urlInput}
+                  onChange={(event) => onUrlInputChange?.(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') onPreviewUrl?.();
+                  }}
+                  placeholder="example.com"
+                  inputMode="url"
+                  aria-label="사이트 미리보기 URL"
+                />
                 <div className={styles.previewActions}>
-                  <Button size="sm" variant="primary" onClick={onPreviewUrl}>미리보기</Button>
+                  <Button size="sm" variant="primary" onClick={onPreviewUrl}>사이트 미리보기</Button>
                   <Button size="sm" variant="secondary" onClick={onPreviewRefresh} disabled={!previewReady}>새로고침</Button>
                 </div>
                 <div className={styles.sizeInputs}>
@@ -261,10 +272,14 @@ function ImageUrlInput({
   const [loading, setLoading] = useState(false);
 
   const handleLoad = async () => {
+    if (!value.trim() || loading) return;
     setLoading(true);
-    const ok = await onLoad(value);
-    if (ok) setValue('');
-    setLoading(false);
+    try {
+      const ok = await onLoad(value);
+      if (ok) setValue('');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -273,12 +288,15 @@ function ImageUrlInput({
         className={styles.linkInput}
         value={value}
         onChange={(event) => setValue(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') void handleLoad();
+        }}
         placeholder={placeholder}
         inputMode="url"
         aria-label="이미지 URL"
       />
       <Button size="sm" variant="secondary" onClick={handleLoad} loading={loading} disabled={!value.trim()}>
-        링크 불러오기
+        이미지 링크 불러오기
       </Button>
     </div>
   );

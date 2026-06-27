@@ -247,7 +247,15 @@
 
 /* Responsive: collapse side panels on mobile */
 @media (max-width: 768px) {
-  .wsBody { flex-direction: column; }
+  .workspace {
+    height: 100dvh;
+  }
+
+  .wsBody {
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }
 
 @media (max-width: 480px) {
