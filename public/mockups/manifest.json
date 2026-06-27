@@ -1,34 +1,70 @@
 {
   "mockups": [
     {
+      "id": "detail-page-panels",
+      "label": "Detail Page Panels",
+      "category": "상세페이지 목업",
+      "src": "mockups/overlays/ecommerce/detail-page-panels.png"
+    },
+    {
+      "id": "multi-device-app-showcase",
+      "label": "App Device Showcase",
+      "category": "앱 목업",
+      "src": "mockups/overlays/app/multi-device-app-showcase.png"
+    },
+    {
+      "id": "desktop-laptop-website",
+      "label": "Website Desktop",
+      "category": "웹사이트 목업",
+      "src": "mockups/overlays/web/desktop-laptop-website.png"
+    },
+    {
+      "id": "gallery-poster-wall",
+      "label": "Gallery Poster",
+      "category": "포스터 목업",
+      "src": "mockups/overlays/poster/gallery-poster-wall.png"
+    },
+    {
+      "id": "wide-transit-banner",
+      "label": "Wide Banner",
+      "category": "배너/광고 목업",
+      "src": "mockups/overlays/banner/wide-transit-banner.png"
+    },
+    {
+      "id": "square-ad-cards",
+      "label": "Square Ad Cards",
+      "category": "소셜 광고 목업",
+      "src": "mockups/overlays/social/square-ad-cards.png"
+    },
+    {
       "id": "outdoor-shelter-ad",
       "label": "Outdoor Shelter",
       "category": "실사 광고 목업",
-      "src": "mockups/overlays/outdoor-shelter-ad.png"
+      "src": "mockups/overlays/ads/outdoor-shelter-ad.png"
     },
     {
       "id": "city-building-billboard",
       "label": "City Billboard",
       "category": "실사 광고 목업",
-      "src": "mockups/overlays/city-building-billboard.png"
+      "src": "mockups/overlays/ads/city-building-billboard.png"
     },
     {
       "id": "round-storefront-sign",
       "label": "Round Sign",
       "category": "간판 목업",
-      "src": "mockups/overlays/round-storefront-sign.png"
+      "src": "mockups/overlays/signage/round-storefront-sign.png"
     },
     {
       "id": "sample-mobile-portrait",
       "label": "Mobile Portrait",
       "category": "샘플 목업",
-      "src": "mockups/overlays/sample-mobile-portrait.png"
+      "src": "mockups/overlays/samples/sample-mobile-portrait.png"
     },
     {
       "id": "sample-desktop-studio",
       "label": "Desktop Studio",
       "category": "샘플 목업",
-      "src": "mockups/overlays/sample-desktop-studio.png"
+      "src": "mockups/overlays/samples/sample-desktop-studio.png"
     }
   ]
 }

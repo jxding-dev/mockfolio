@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { AppMode, UploadedImage } from '../../types';
 import type { DevicePreset } from '../../types';
 import { DEVICE_PRESETS } from '../../data/devices';
@@ -54,7 +54,7 @@ export function EditorLeftPanel({
   onPreviewUrl, onPreviewRefresh, onOpenPreview, previewReady = false,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { handleInputChange } = useImageUpload({ onSuccess: onImageChange, onError });
+  const { handleInputChange, loadImageUrl } = useImageUpload({ onSuccess: onImageChange, onError });
 
   const byCategory = (cat: DevicePreset['category']) =>
     DEVICE_PRESETS.filter((d) => d.category === cat);
@@ -106,8 +106,9 @@ export function EditorLeftPanel({
           </button>
         )}
         <p className={styles.hint}>
-          이미지를 넣어 목업으로 합성하거나, Inspect 탭의 URL 모드에서 링크를 넣어 반응형을 확인하세요.
+          파일을 올리거나 직접 이미지 URL을 넣어 목업으로 합성하세요. 웹페이지 URL 검수는 Inspect 탭의 URL 모드를 사용하세요.
         </p>
+        <ImageUrlInput onLoad={loadImageUrl} placeholder="https://example.com/screenshot.png" />
         <input
           ref={inputRef}
           type="file"
@@ -214,7 +215,7 @@ function ImageSlot({
   onError: (msg: string) => void;
 }) {
   const ref = useRef<HTMLInputElement>(null);
-  const { handleInputChange } = useImageUpload({ onSuccess: onChange, onError });
+  const { handleInputChange, loadImageUrl } = useImageUpload({ onSuccess: onChange, onError });
 
   return (
     <div>
@@ -242,6 +243,43 @@ function ImageSlot({
         className={styles.hidden}
         onChange={handleInputChange}
       />
+      <ImageUrlInput onLoad={loadImageUrl} placeholder={`${label} 이미지 URL`} compact />
+    </div>
+  );
+}
+
+function ImageUrlInput({
+  onLoad,
+  placeholder,
+  compact = false,
+}: {
+  onLoad: (url: string) => Promise<boolean>;
+  placeholder: string;
+  compact?: boolean;
+}) {
+  const [value, setValue] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLoad = async () => {
+    setLoading(true);
+    const ok = await onLoad(value);
+    if (ok) setValue('');
+    setLoading(false);
+  };
+
+  return (
+    <div className={`${styles.linkLoader} ${compact ? styles.linkLoaderCompact : ''}`}>
+      <input
+        className={styles.linkInput}
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        placeholder={placeholder}
+        inputMode="url"
+        aria-label="이미지 URL"
+      />
+      <Button size="sm" variant="secondary" onClick={handleLoad} loading={loading} disabled={!value.trim()}>
+        링크 불러오기
+      </Button>
     </div>
   );
 }

@@ -117,6 +117,38 @@
 
 .hidden { display: none; }
 
+.linkLoader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.linkLoaderCompact {
+  margin-top: var(--space-2);
+}
+
+.linkInput {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  font-size: var(--text-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.linkInput::placeholder { color: var(--text-tertiary); }
+
+.linkInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
 /* ── Device ───────────────────────────────── */
 .deviceGroup {
   display: flex;
