@@ -69,17 +69,20 @@ npm run preview   # 빌드 미리보기
 
 ```text
 src/
-  pages/        Landing.tsx · Editor.tsx · Pricing.tsx
+  pages/        Landing.tsx · Editor.tsx · Pricing.tsx · NotFound.tsx
   components/
-    layout/     EditorTopBar · EditorLeftPanel · EditorCanvas · EditorRightPanel · Header
+    layout/     EditorTopBar · EditorLeftPanel · EditorCanvas · EditorRightPanel · Header · Footer
     inspector/  UrlPreview            # iframe URL 미리보기
     mockup/     DeviceFrame · CompareSlider · MockupComposer
-    ui/         Button · Modal · Toggle · Slider · ErrorBoundary
+    landing/    ReviewsSlider         # 후기 캐러셀
+    ui/         Button · Modal · Toggle · Slider · Badge · ErrorBoundary
   data/         editorSettings.ts(+normalize) · devices · frames · backgrounds · mockups · plans
-  hooks/        useImageUpload · useLocalStorage · useMockupAssets
+  hooks/        useImageUpload · useLocalStorage · useMockupAssets · useReveal
   utils/        exportPng · mediaExport(GIF·합성) · urlPreview
   types/        index.ts
   styles/       tokens.css · reset.css
+  **/*.test.ts  보안 검증 함수 단위 테스트 (vitest)
+public/         manifest.webmanifest · robots.txt · sitemap.xml · favicon.svg
 public/mockups/ manifest.json · overlays/{ecommerce,app,web,poster,banner,social,ads,signage,samples}/
 ```
 
@@ -117,3 +120,36 @@ public/mockups/ manifest.json · overlays/{ecommerce,app,web,poster,banner,socia
 - 외부 이미지 URL은 CORS 허용된 직접 이미지 파일만 불러올 수 있다.
 - 이미지는 메모리 기반이라 새로고침 시 사라진다. (`localStorage`엔 UI 설정만)
 - Pro/Studio의 다중 프로젝트·고배율 export·협업 기능은 Coming Soon UI만 존재.
+- 랜딩의 **후기(`Landing.tsx`의 `REVIEWS`)와 요금(`data/plans.ts`)은 플레이스홀더**다. 정식 출시 전 실제 후기/확정 가격으로 교체할 것.
+
+---
+
+## 8. 다음 작업 — Codex 로드맵
+
+> 비즈니스 모델: 가입 시 **30일 무료 체험**, 핵심 내보내기 **첫 3회 평생 무료**, 그 외 **프리미엄 SaaS**. 현재 프론트는 이 메시지를 보여주지만 **인증·결제·사용량 게이팅은 미구현(Coming Soon)** 이다.
+
+### 8.1 최우선: 로그인 + 결제 연동 (실서비스화)
+작업 순서와 보안 원칙:
+
+1. **로컬 우선 원칙 유지.** 이미지 처리·목업 합성·export는 계속 브라우저에서만 한다. 백엔드는 **계정·구독 상태·사용량**만 다룬다. 이미지 픽셀을 서버로 보내지 말 것.
+2. **인증**: 직접 구현하지 말고 검증된 제공자 사용 (예: Supabase Auth / Clerk / Auth.js). 토큰은 메모리 또는 httpOnly 쿠키에 두고 **localStorage에 토큰 저장 금지**(XSS 탈취 방지).
+3. **결제**: 국내 PG(토스페이먼츠/포트원) 또는 Stripe. **결제 비밀키·웹훅 시크릿은 절대 프론트에 두지 말 것** — 서버(서버리스 함수 등)에서만 사용. 프론트엔 공개 키만.
+4. **사용량 게이팅("첫 3회 무료")은 반드시 서버에서 집계·검증.** `localStorage` 카운터는 사용자가 지울 수 있어 신뢰 불가 — UX 힌트로만 쓰고, 실제 제한은 서버 권위 데이터로 enforce.
+5. 백엔드 도입 시 **CSP의 `connect-src`에 API 도메인만 명시적으로 추가**(현재 `https:` 광역 → 좁히기). 그리고 README §6의 보안 헤더를 호스팅 엣지에 적용. PG 콜백을 위해 필요한 최소 `frame-src`/`form-action`만 연다.
+6. 인증·결제는 **데이터 처리 모델을 바꾸므로** 도입 전 별도 보안/프라이버시 검토(README §6).
+
+게이팅 지점(코드): export는 `Editor.tsx`의 `handleExport`/`handleCompositeExport`/`handleGifExport`에서 일어난다. 무료 횟수 체크는 여기서 서버 상태를 확인해 감싼다.
+
+### 8.2 프론트 업그레이드 백로그 (우선순위 순)
+- **다크 모드**: `tokens.css`가 이미 라이트 토큰 구조라 `[data-theme="dark"]` 오버라이드 + 토글만 추가하면 됨.
+- **실제 OG 이미지**: 현재 `og:image`가 favicon.svg → 1200×630 PNG 제작해 `public/`에 넣고 메타 교체.
+- **온보딩/툴팁 투어**(첫 진입), **키보드 단축키**(zoom, 모드 전환).
+- **i18n(EN)**: 문자열이 JSX에 하드코딩됨 → 리소스 분리 후 영어 추가(해외 SaaS 확장).
+- 디바이스 프리셋·프레임·배경 추가(`data/`만 수정하면 확장됨).
+- **분석**: 프라이버시 존중형(Plausible 등) — 단, 이미지/입력은 절대 수집 금지.
+- **테스트 확장**: 현재 보안 순수함수 17개. 컴포넌트/플로우는 Playwright E2E로 확장 권장(업로드→목업→export, 결제 게이팅).
+
+### 8.3 코드 규칙 (지킬 것)
+- 에디터 상태는 `EditorSettings` 한 객체 + `patch(key,value)`. 새 설정은 `editorSettings.ts`(타입·기본값·`normalizeEditorSettings`)에 함께 추가 → 패널은 `settings`/`patch`만 받는다.
+- 스타일은 CSS Modules + `tokens.css` 변수. 애니메이션은 항상 `prefers-reduced-motion` 분기.
+- TS strict 유지, 새 검증/정규화 로직엔 `*.test.ts` 추가. push 전 `lint → test → build` 통과(CI도 강제).
