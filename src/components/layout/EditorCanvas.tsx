@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback } from 'react';
 import type { AppMode, UploadedImage, FrameId, FrameColor, BgStyle } from '../../types';
 import type { DevicePreset } from '../../types';
+import type { EditorSettings } from '../../data/editorSettings';
 import { DEVICE_PRESETS } from '../../data/devices';
 import { getBackground } from '../../data/backgrounds';
 import { DeviceFrame } from '../mockup/DeviceFrame';
@@ -18,41 +19,14 @@ interface GuideOptions {
 }
 
 interface Props {
+  settings: EditorSettings;
   image: UploadedImage | null;
-  activeMode: AppMode;
-  selectedDeviceId: string;
-  fitMode?: 'fit' | 'fill' | 'original';
-  inspectOrientation?: 'portrait' | 'landscape';
-  guides?: GuideOptions;
-  shadowIntensity?: number;
-  frameCornerRadius?: number;
-  mockupScale?: number;
-  mockupOffsetX?: number;
-  mockupOffsetY?: number;
-  exportRef?: React.RefObject<HTMLDivElement | null>;
-  transparentBg?: boolean;
-  // Mockup
-  frameId?: FrameId;
-  frameColor?: FrameColor;
-  bgStyle?: BgStyle;
-  mockupTitle?: string;
-  mockupSubtitle?: string;
-  mockupTags?: string;
-  mockupTextPosition?: 'top' | 'bottom' | 'none';
-  showMockupDate?: boolean;
-  mockupTextColor?: string;
-  // Compare
   beforeImage?: UploadedImage | null;
   afterImage?: UploadedImage | null;
-  compareOrientation?: 'horizontal' | 'vertical';
+  exportRef?: React.RefObject<HTMLDivElement | null>;
   autoSlide?: boolean;
-  inspectSource?: 'image' | 'url';
-  previewUrl?: string;
-  previewWidth?: number;
-  previewHeight?: number;
   urlRefreshKey?: number;
   selectedMockup?: MockupAsset | null;
-  compositeTransform?: { x: number; y: number; scale: number; stretchX: number; stretchY: number; rotation: number; skewX: number; skewY: number };
   onCompositePositionChange?: (x: number, y: number) => void;
 }
 
@@ -61,41 +35,32 @@ const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.1;
 
 export function EditorCanvas({
+  settings,
   image,
-  activeMode,
-  selectedDeviceId,
-  fitMode = 'fit',
-  inspectOrientation = 'portrait',
-  guides = {},
-  shadowIntensity = 60,
-  frameCornerRadius = 8,
-  mockupScale = 1,
-  mockupOffsetX = 0,
-  mockupOffsetY = 0,
-  exportRef,
-  transparentBg = false,
-  frameId = 'browser',
-  frameColor = 'light',
-  bgStyle = 'soft-gradient',
-  mockupTitle = '',
-  mockupSubtitle = '',
-  mockupTags = '',
-  mockupTextPosition = 'none',
-  showMockupDate = false,
-  mockupTextColor = '#1A1D24',
   beforeImage = null,
   afterImage = null,
-  compareOrientation = 'horizontal',
+  exportRef,
   autoSlide = false,
-  inspectSource = 'image',
-  previewUrl = '',
-  previewWidth = 390,
-  previewHeight = 844,
   urlRefreshKey = 0,
   selectedMockup = null,
-  compositeTransform = { x: 0, y: 0, scale: 1, stretchX: 1, stretchY: 1, rotation: 0, skewX: 0, skewY: 0 },
   onCompositePositionChange,
 }: Props) {
+  const {
+    activeMode, selectedDeviceId, fitMode, inspectOrientation,
+    showGuides, showGrid, showCenter, showMargins,
+    shadowIntensity, frameCornerRadius, mockupScale, mockupOffsetX, mockupOffsetY,
+    transparentBg, frameId, frameColor, bgStyle,
+    mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
+    compareOrientation, inspectSource, previewUrl, previewWidth, previewHeight,
+    compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY,
+  } = settings;
+  const guides: GuideOptions = { showGuides, showGrid, showCenter, showMargins };
+  const compositeTransform = {
+    x: compositeX, y: compositeY, scale: compositeScale,
+    stretchX: compositeStretchX, stretchY: compositeStretchY,
+    rotation: compositeRotation, skewX: compositeSkewX, skewY: compositeSkewY,
+  };
+
   const [zoom, setZoom] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 

@@ -116,15 +116,14 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     [setSettings]
   );
 
+  // Only the fields Editor itself reads (handlers, top bar, left panel, URL flow).
+  // The mockup/inspect/export/compare option fields are consumed inside the panels
+  // via the whole `settings` object + `patch`.
   const {
     projectName, activeMode, selectedDeviceId,
-    fitMode, inspectOrientation, showGuides, showGrid, showCenter, showMargins,
     inspectSource, urlInput, previewUrl, previewWidth, previewHeight,
-    frameId, frameColor, bgStyle, shadowIntensity, frameCornerRadius,
-    mockupScale, mockupOffsetX, mockupOffsetY,
-    mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
-    compareOrientation, exportScale, transparentBg,
-    selectedMockupId, compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY,
+    compareOrientation, exportScale, selectedMockupId,
+    compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY,
   } = settings;
 
   // Transient (not persisted): images + UI status
@@ -186,6 +185,12 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
       setExportLoading(false);
     }
   }, [compositeRotation, compositeScale, compositeSkewX, compositeSkewY, compositeStretchX, compositeStretchY, compositeX, compositeY, image, projectName, selectedMockup]);
+
+  const handleCompositeReset = useCallback(() => {
+    patch('compositeX', 0); patch('compositeY', 0); patch('compositeScale', 1);
+    patch('compositeStretchX', 1); patch('compositeStretchY', 1);
+    patch('compositeRotation', 0); patch('compositeSkewX', 0); patch('compositeSkewY', 0);
+  }, [patch]);
 
   const handleGifExport = useCallback(async () => {
     if (!beforeImage || !afterImage) return;
@@ -271,125 +276,35 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
         />
 
         <EditorCanvas
+          settings={settings}
           image={image}
-          activeMode={activeMode}
-          selectedDeviceId={selectedDeviceId}
-          fitMode={fitMode}
-          inspectOrientation={inspectOrientation}
-          guides={{ showGuides, showGrid, showCenter, showMargins }}
-          shadowIntensity={shadowIntensity}
-          frameCornerRadius={frameCornerRadius}
-          mockupScale={mockupScale}
-          mockupOffsetX={mockupOffsetX}
-          mockupOffsetY={mockupOffsetY}
-          exportRef={exportRef}
-          transparentBg={transparentBg}
-          frameId={frameId}
-          frameColor={frameColor}
-          bgStyle={bgStyle}
-          mockupTitle={mockupTitle}
-          mockupSubtitle={mockupSubtitle}
-          mockupTags={mockupTags}
-          mockupTextPosition={mockupTextPosition}
-          showMockupDate={showMockupDate}
-          mockupTextColor={mockupTextColor}
           beforeImage={beforeImage}
           afterImage={afterImage}
-          compareOrientation={compareOrientation}
-          inspectSource={inspectSource}
-          previewUrl={previewUrl}
-          previewWidth={previewWidth}
-          previewHeight={previewHeight}
+          exportRef={exportRef}
+          autoSlide={autoSlide}
           urlRefreshKey={urlRefreshKey}
           selectedMockup={selectedMockup}
-          compositeTransform={{ x: compositeX, y: compositeY, scale: compositeScale, stretchX: compositeStretchX, stretchY: compositeStretchY, rotation: compositeRotation, skewX: compositeSkewX, skewY: compositeSkewY }}
           onCompositePositionChange={(x, y) => { patch('compositeX', x); patch('compositeY', y); }}
-          autoSlide={autoSlide}
         />
 
         <EditorRightPanel
-          activeMode={activeMode}
+          settings={settings}
+          patch={patch}
           image={image}
-          fitMode={fitMode}
-          onFitModeChange={(v) => patch('fitMode', v)}
-          inspectOrientation={inspectOrientation}
-          onInspectOrientationChange={(v) => patch('inspectOrientation', v)}
-          showGuides={showGuides}
-          showGrid={showGrid}
-          showCenter={showCenter}
-          showMargins={showMargins}
-          onGuidesChange={(v) => patch('showGuides', v)}
-          onGridChange={(v) => patch('showGrid', v)}
-          onCenterChange={(v) => patch('showCenter', v)}
-          onMarginsChange={(v) => patch('showMargins', v)}
-          frameId={frameId}
-          onFrameChange={(v) => patch('frameId', v)}
-          frameColor={frameColor}
-          onFrameColorChange={(v) => patch('frameColor', v)}
-          bgStyle={bgStyle}
-          onBgStyleChange={(v) => patch('bgStyle', v)}
-          shadowIntensity={shadowIntensity}
-          onShadowChange={(v) => patch('shadowIntensity', v)}
-          frameCornerRadius={frameCornerRadius}
-          onCornerRadiusChange={(v) => patch('frameCornerRadius', v)}
-          mockupScale={mockupScale}
-          onMockupScaleChange={(v) => patch('mockupScale', v)}
-          mockupOffsetX={mockupOffsetX}
-          onMockupOffsetXChange={(v) => patch('mockupOffsetX', v)}
-          mockupOffsetY={mockupOffsetY}
-          onMockupOffsetYChange={(v) => patch('mockupOffsetY', v)}
-          mockupTitle={mockupTitle}
-          onMockupTitleChange={(v) => patch('mockupTitle', v)}
-          mockupSubtitle={mockupSubtitle}
-          onMockupSubtitleChange={(v) => patch('mockupSubtitle', v)}
-          mockupTags={mockupTags}
-          onMockupTagsChange={(v) => patch('mockupTags', v)}
-          mockupTextPosition={mockupTextPosition}
-          onMockupTextPositionChange={(v) => patch('mockupTextPosition', v)}
-          showMockupDate={showMockupDate}
-          onShowMockupDateChange={(v) => patch('showMockupDate', v)}
-          mockupTextColor={mockupTextColor}
-          onMockupTextColorChange={(v) => patch('mockupTextColor', v)}
-          compareOrientation={compareOrientation}
-          onCompareOrientationChange={(v) => patch('compareOrientation', v)}
-          exportScale={exportScale}
-          onExportScaleChange={(v) => patch('exportScale', v)}
-          transparentBg={transparentBg}
-          onTransparentBgChange={(v) => patch('transparentBg', v)}
-          onExport={handleExport}
-          exportLoading={exportLoading}
-          exportMessage={exportMessage}
-          mockupAssets={mockupAssets}
-          mockupsLoading={mockupsLoading}
-          selectedMockupId={selectedMockupId}
-          onSelectedMockupChange={(id) => patch('selectedMockupId', id)}
-          compositeX={compositeX}
-          compositeY={compositeY}
-          compositeScale={compositeScale}
-          compositeStretchX={compositeStretchX}
-          compositeStretchY={compositeStretchY}
-          compositeRotation={compositeRotation}
-          compositeSkewX={compositeSkewX}
-          compositeSkewY={compositeSkewY}
-          onCompositeXChange={(value) => patch('compositeX', value)}
-          onCompositeYChange={(value) => patch('compositeY', value)}
-          onCompositeScaleChange={(value) => patch('compositeScale', value)}
-          onCompositeStretchXChange={(value) => patch('compositeStretchX', value)}
-          onCompositeStretchYChange={(value) => patch('compositeStretchY', value)}
-          onCompositeRotationChange={(value) => patch('compositeRotation', value)}
-          onCompositeSkewXChange={(value) => patch('compositeSkewX', value)}
-          onCompositeSkewYChange={(value) => patch('compositeSkewY', value)}
-          onCompositeReset={() => {
-            patch('compositeX', 0); patch('compositeY', 0); patch('compositeScale', 1); patch('compositeStretchX', 1); patch('compositeStretchY', 1); patch('compositeRotation', 0); patch('compositeSkewX', 0); patch('compositeSkewY', 0);
-          }}
-          onCompositeExport={handleCompositeExport}
-          autoSlide={autoSlide}
-          onAutoSlideChange={setAutoSlide}
-          onGifExport={handleGifExport}
-          gifLoading={gifLoading}
-          gifMessage={gifMessage}
           beforeImage={beforeImage}
           afterImage={afterImage}
+          mockupAssets={mockupAssets}
+          mockupsLoading={mockupsLoading}
+          exportLoading={exportLoading}
+          exportMessage={exportMessage}
+          gifLoading={gifLoading}
+          gifMessage={gifMessage}
+          autoSlide={autoSlide}
+          onAutoSlideChange={setAutoSlide}
+          onExport={handleExport}
+          onCompositeExport={handleCompositeExport}
+          onCompositeReset={handleCompositeReset}
+          onGifExport={handleGifExport}
         />
       </div>
     </div>
