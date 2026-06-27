@@ -4,7 +4,8 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, 'codex/**']
+    # main is covered by deploy.yml (lint + audit + build); avoid duplicate runs here.
+    branches: ['codex/**']
 
 permissions:
   contents: read

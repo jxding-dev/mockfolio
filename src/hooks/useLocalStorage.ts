@@ -10,12 +10,17 @@ export function useLocalStorage<T>(key: string, initialValue: T, normalize?: (va
     }
   });
 
+  // Debounced write: avoids a synchronous localStorage write on every keystroke
+  // or slider-drag frame. The latest value still lands ~200ms after activity stops.
   useEffect(() => {
-    try {
-      window.localStorage.setItem(key, JSON.stringify(storedValue));
-    } catch {
-      // Quota exceeded — silently ignore
-    }
+    const timer = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(storedValue));
+      } catch {
+        // Quota exceeded — silently ignore
+      }
+    }, 200);
+    return () => window.clearTimeout(timer);
   }, [key, storedValue]);
 
   const setValue = (value: T | ((prev: T) => T)) => {

@@ -130,7 +130,7 @@ export function EditorRightPanel({
       {activeMode === 'inspect'  && <InspectProps {...{ showGuides, showGrid, showCenter, showMargins, onGuidesChange, onGridChange, onCenterChange, onMarginsChange, fitMode, onFitModeChange, inspectOrientation, onInspectOrientationChange }} />}
       {activeMode === 'mockup'   && <MockupProps  {...{ image, onExport, exportLoading, exportMessage, frameId, onFrameChange, frameColor, onFrameColorChange, bgStyle, onBgStyleChange, shadowIntensity, onShadowChange, frameCornerRadius, onCornerRadiusChange, mockupScale, onMockupScaleChange, mockupOffsetX, onMockupOffsetXChange, mockupOffsetY, onMockupOffsetYChange, mockupTitle, onMockupTitleChange, mockupSubtitle, onMockupSubtitleChange, mockupTags, onMockupTagsChange, mockupTextPosition, onMockupTextPositionChange, showMockupDate, onShowMockupDateChange, mockupTextColor, onMockupTextColorChange, mockupAssets, mockupsLoading, selectedMockupId, onSelectedMockupChange, compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY, onCompositeXChange, onCompositeYChange, onCompositeScaleChange, onCompositeStretchXChange, onCompositeStretchYChange, onCompositeRotationChange, onCompositeSkewXChange, onCompositeSkewYChange, onCompositeReset, onCompositeExport }} />}
       {activeMode === 'compare'  && <CompareProps {...{ compareOrientation, onCompareOrientationChange, autoSlide, onAutoSlideChange, onGifExport, gifLoading, gifMessage, beforeImage, afterImage }} />}
-      {activeMode === 'export'   && <ExportProps  {...{ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading, exportMessage }} />}
+      {activeMode === 'export'   && <ExportProps  {...{ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading, exportMessage, selectedMockupId }} />}
     </aside>
   );
 }
@@ -454,41 +454,55 @@ function CompareProps({ compareOrientation, onCompareOrientationChange, autoSlid
 }
 
 /* ── Export Props ─────────────────────────── */
-function ExportProps({ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading, exportMessage }: Omit<Props, 'activeMode'>) {
+function ExportProps({ image, exportScale, onExportScaleChange, transparentBg, onTransparentBgChange, onExport, exportLoading, exportMessage, selectedMockupId }: Omit<Props, 'activeMode'>) {
   const scales = [1, 2] as const;
+  // When a custom PNG mockup is selected, export goes through the composite canvas,
+  // which ignores scale/transparency — so don't show those (misleading) controls.
+  const isComposite = Boolean(selectedMockupId);
 
   return (
     <>
-      <RSection title="해상도">
-        <div className={styles.scaleRow}>
-          {scales.map((s) => (
-            <button
-              key={s}
-              className={`${styles.scaleBtn} ${exportScale === s ? styles.scaleBtnActive : ''}`}
-              onClick={() => onExportScaleChange?.(s)}
-            >
-              <span className={styles.scaleName}>{s}×</span>
-              <span className={styles.scaleSub}>
-                {s === 1 ? '표준' : s === 2 ? 'Retina' : 'Ultra HD'}
-              </span>
-            </button>
-          ))}
-        </div>
-      </RSection>
-
-      <RSection title="옵션">
-        <Toggle label="투명 배경" value={transparentBg ?? false} onChange={v => onTransparentBgChange?.(v)} />
-      </RSection>
-
-      {image && (
-        <RSection title="출력 크기">
-          <div className={styles.outputInfo}>
-            <span>예상 크기</span>
-            <span className={styles.outputVal}>
-              {image.width * (exportScale ?? 2)} × {image.height * (exportScale ?? 2)}px
-            </span>
-          </div>
+      {isComposite ? (
+        <RSection title="커스텀 목업 내보내기">
+          <p className={styles.hint}>
+            선택한 PNG 목업과 사용자 이미지를 합성한 결과를 원본 해상도로 저장합니다.
+            해상도·투명 배경 옵션은 합성 저장에는 적용되지 않습니다.
+          </p>
         </RSection>
+      ) : (
+        <>
+          <RSection title="해상도">
+            <div className={styles.scaleRow}>
+              {scales.map((s) => (
+                <button
+                  key={s}
+                  className={`${styles.scaleBtn} ${exportScale === s ? styles.scaleBtnActive : ''}`}
+                  onClick={() => onExportScaleChange?.(s)}
+                >
+                  <span className={styles.scaleName}>{s}×</span>
+                  <span className={styles.scaleSub}>
+                    {s === 1 ? '표준' : 'Retina'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </RSection>
+
+          <RSection title="옵션">
+            <Toggle label="투명 배경" value={transparentBg ?? false} onChange={v => onTransparentBgChange?.(v)} />
+          </RSection>
+
+          {image && (
+            <RSection title="출력 크기">
+              <div className={styles.outputInfo}>
+                <span>예상 크기</span>
+                <span className={styles.outputVal}>
+                  {image.width * (exportScale ?? 2)} × {image.height * (exportScale ?? 2)}px
+                </span>
+              </div>
+            </RSection>
+          )}
+        </>
       )}
 
       <div className={styles.exportFooter}>

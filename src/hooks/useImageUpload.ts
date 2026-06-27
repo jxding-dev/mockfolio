@@ -23,6 +23,34 @@ function normalizeImageUrl(value: string): string | null {
   }
 }
 
+/**
+ * Reads a response body into a Blob, aborting once `maxBytes` is exceeded.
+ * Returns null if the limit is hit. Falls back to response.blob() when the
+ * body stream is unavailable (still bounded by the earlier content-length check).
+ */
+async function readLimitedBlob(response: Response, maxBytes: number, contentType: string): Promise<Blob | null> {
+  if (!response.body) {
+    const blob = await response.blob();
+    return blob.size > maxBytes ? null : blob;
+  }
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) {
+      received += value.length;
+      if (received > maxBytes) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+    }
+  }
+  return new Blob(chunks as BlobPart[], contentType ? { type: contentType } : undefined);
+}
+
 function fileNameFromUrl(url: string): string {
   try {
     const parsed = new URL(url);
@@ -129,7 +157,13 @@ export function useImageUpload({ onSuccess, onError }: UseImageUploadOptions) {
           onError?.('이미지 링크의 파일 크기가 너무 큽니다. 최대 20MB까지 가능합니다.');
           return false;
         }
-        const blob = await response.blob();
+        // Stream the body and abort as soon as it exceeds the limit, so a server
+        // that omits Content-Length can't force us to buffer an oversized file.
+        const blob = await readLimitedBlob(response, MAX_FILE_SIZE, contentType);
+        if (!blob) {
+          onError?.('이미지 링크의 파일 크기가 너무 큽니다. 최대 20MB까지 가능합니다.');
+          return false;
+        }
         if (!ALLOWED_TYPES.includes(blob.type)) {
           onError?.('지원하지 않는 이미지 링크입니다. PNG, JPG, WebP만 가능합니다.');
           return false;

@@ -228,7 +228,7 @@ function CanvasContent({
   compositeTransform: { x: number; y: number; scale: number; stretchX: number; stretchY: number; rotation: number; skewX: number; skewY: number };
   onCompositePositionChange?: (x: number, y: number) => void;
 }) {
-  if (activeMode === 'inspect' || activeMode === 'compare') {
+  if (activeMode === 'inspect') {
     return (
       <InspectView
         image={image}
