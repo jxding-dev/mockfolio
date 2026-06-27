@@ -27,6 +27,21 @@ export interface UploadedImage {
   uploadedAt: number;
 }
 
+// ── Mockup item (one framed image in the multi-image scene) ──
+// Transient (holds a dataUrl), so it is not persisted to localStorage.
+export interface MockupItem {
+  id: string;
+  dataUrl: string;
+  name: string;
+  width: number;
+  height: number;
+  frameId: FrameId;
+  frameColor: FrameColor;
+  x: number;             // % offset from scene center (-50..50-ish)
+  y: number;
+  scale: number;         // 0.3 .. 1.6
+}
+
 // ── Mockup ───────────────────────────────────────────────────
 export type FrameId =
   | 'none'

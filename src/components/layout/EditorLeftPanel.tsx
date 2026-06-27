@@ -77,6 +77,13 @@ export function EditorLeftPanel({
             onChange={(img) => onAfterChange?.(img)} onRemove={onAfterRemove}
             onError={onError}
           />
+          {image && (
+            <div className={styles.useCurrentRow}>
+              <span className={styles.useCurrentLabel}>현재 이미지를</span>
+              <button className={styles.useCurrentBtn} onClick={() => onBeforeChange?.(image)}>Before로</button>
+              <button className={styles.useCurrentBtn} onClick={() => onAfterChange?.(image)}>After로</button>
+            </div>
+          )}
         </Section>
       ) : (
       /* ── Image Section ─────────────────── */
@@ -106,9 +113,11 @@ export function EditorLeftPanel({
           </button>
         )}
         <p className={styles.hint}>
-          파일 업로드 또는 이미지 링크를 넣어 목업에 합성하세요. 웹페이지 검수는 아래 URL 모드를 사용하세요.
+          {activeMode === 'inspect'
+            ? '이미지를 올려 검수하거나, 아래 "웹페이지 URL"로 사이트를 바로 확인하세요.'
+            : '이 이미지가 목업 장면의 첫 번째로 들어갑니다. 여러 장은 오른쪽 패널 "이미지 추가"로 넣으세요.'}
         </p>
-        <ImageUrlInput onLoad={loadImageUrl} placeholder="https://example.com/screenshot.png" />
+        <ImageUrlInput onLoad={loadImageUrl} placeholder="이미지 파일 URL (https://…/img.png)" />
         <input
           ref={inputRef}
           type="file"
@@ -125,7 +134,7 @@ export function EditorLeftPanel({
           <Section title="미리보기">
             <div className={styles.previewModeRow}>
               <button className={`${styles.previewModeBtn} ${inspectSource === 'image' ? styles.previewModeBtnActive : ''}`} onClick={() => onInspectSourceChange?.('image')}>이미지</button>
-              <button className={`${styles.previewModeBtn} ${inspectSource === 'url' ? styles.previewModeBtnActive : ''}`} onClick={() => onInspectSourceChange?.('url')}>URL</button>
+              <button className={`${styles.previewModeBtn} ${inspectSource === 'url' ? styles.previewModeBtnActive : ''}`} onClick={() => onInspectSourceChange?.('url')}>웹페이지 URL</button>
             </div>
             {inspectSource === 'url' && (
               <>

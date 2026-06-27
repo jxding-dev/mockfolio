@@ -379,6 +379,136 @@
   box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
+/* ── Mockup item list ─────────────────────── */
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: var(--space-2);
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 6px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  cursor: pointer;
+  transition: all var(--ease-fast);
+}
+
+.itemRow:hover { border-color: var(--border-strong); }
+
+.itemRowActive {
+  border-color: var(--accent) !important;
+  background: var(--accent-subtle) !important;
+}
+
+.itemThumb {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-muted);
+  flex-shrink: 0;
+}
+
+.itemName {
+  flex: 1;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemRemove {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all var(--ease-fast);
+}
+
+.itemRemove:hover { background: var(--error-subtle); color: var(--error); }
+
+.hiddenInput { display: none; }
+
+/* ── Collapsible secondary section ────────── */
+.collapseHead {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px var(--space-4) 8px;
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.collapseChevron { transition: transform var(--ease-base); font-size: 14px; }
+.collapseChevronOpen { transform: rotate(180deg); color: var(--accent); }
+
+.backToFrames {
+  font-size: var(--text-xs);
+  color: var(--accent);
+  cursor: pointer;
+  padding: 2px 0;
+  font-weight: var(--weight-medium);
+}
+
+.backToFrames:hover { text-decoration: underline; }
+
+/* ── Export summary + filename ────────────── */
+.exportSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-2);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-muted);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.summaryVal { color: var(--text-primary); font-weight: var(--weight-medium); }
+
+.fileNamePreview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-2);
+}
+
+.fileNameIcon { flex-shrink: 0; font-size: 14px; }
+
+.fileNameText {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ── Hint ─────────────────────────────────── */
 .hint {
   font-size: var(--text-xs);

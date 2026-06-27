@@ -1,12 +1,10 @@
 import { useRef, useState, useCallback } from 'react';
-import type { AppMode, UploadedImage, FrameId, FrameColor, BgStyle } from '../../types';
-import type { DevicePreset } from '../../types';
+import type { UploadedImage, DevicePreset, MockupItem } from '../../types';
 import type { EditorSettings } from '../../data/editorSettings';
 import { DEVICE_PRESETS } from '../../data/devices';
-import { getBackground } from '../../data/backgrounds';
-import { DeviceFrame } from '../mockup/DeviceFrame';
 import { CompareSlider } from '../mockup/CompareSlider';
 import { MockupComposer } from '../mockup/MockupComposer';
+import { MockupScene } from '../mockup/MockupScene';
 import { UrlPreview } from '../inspector/UrlPreview';
 import type { MockupAsset } from '../../data/mockups';
 import styles from './EditorCanvas.module.css';
@@ -28,6 +26,11 @@ interface Props {
   urlRefreshKey?: number;
   selectedMockup?: MockupAsset | null;
   onCompositePositionChange?: (x: number, y: number) => void;
+  // Multi-image mockup
+  mockupItems?: MockupItem[];
+  selectedMockupItemId?: string | null;
+  onMockupItemSelect?: (id: string) => void;
+  onMockupItemMove?: (id: string, x: number, y: number) => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -44,16 +47,24 @@ export function EditorCanvas({
   urlRefreshKey = 0,
   selectedMockup = null,
   onCompositePositionChange,
+  mockupItems = [],
+  selectedMockupItemId = null,
+  onMockupItemSelect,
+  onMockupItemMove,
 }: Props) {
   const {
     activeMode, selectedDeviceId, fitMode, inspectOrientation,
     showGuides, showGrid, showCenter, showMargins,
-    shadowIntensity, frameCornerRadius, mockupScale, mockupOffsetX, mockupOffsetY,
-    transparentBg, frameId, frameColor, bgStyle,
+    shadowIntensity, frameCornerRadius,
+    transparentBg, bgStyle,
     mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
     compareOrientation, inspectSource, previewUrl, previewWidth, previewHeight,
     compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY,
   } = settings;
+  const sceneText = {
+    title: mockupTitle, subtitle: mockupSubtitle, tags: mockupTags,
+    showDate: showMockupDate, textPosition: mockupTextPosition, textColor: mockupTextColor,
+  };
   const guides: GuideOptions = { showGuides, showGrid, showCenter, showMargins };
   const compositeTransform = {
     x: compositeX, y: compositeY, scale: compositeScale,
@@ -78,7 +89,12 @@ export function EditorCanvas({
   const resetZoom = () => setZoom(1);
 
   const isCompare = activeMode === 'compare';
-  const hasContent = isCompare ? (!!beforeImage || !!afterImage) : showingUrlPreview ? Boolean(previewUrl) : !!image;
+  const isSceneMode = (activeMode === 'mockup' || activeMode === 'export') && !selectedMockup;
+  const isComposite = (activeMode === 'mockup' || activeMode === 'export') && !!selectedMockup;
+  const hasContent = isCompare ? (!!beforeImage || !!afterImage)
+    : showingUrlPreview ? Boolean(previewUrl)
+    : isSceneMode ? mockupItems.length > 0
+    : !!image;
 
   return (
     <div className={styles.wrap}>
@@ -102,35 +118,31 @@ export function EditorCanvas({
               <UrlEmptyState />
             )}
           </div>
-        ) : image ? (
+        ) : isSceneMode ? (
+          mockupItems.length > 0 ? (
+            <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
+              <MockupScene
+                items={mockupItems}
+                selectedId={selectedMockupItemId}
+                bgStyle={bgStyle}
+                shadowIntensity={shadowIntensity}
+                frameCornerRadius={frameCornerRadius}
+                transparentBg={transparentBg}
+                text={sceneText}
+                exportRef={exportRef}
+                interactive={activeMode === 'mockup'}
+                onSelect={onMockupItemSelect}
+                onMove={onMockupItemMove}
+              />
+            </div>
+          ) : <EmptyState />
+        ) : isComposite && image ? (
           <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
-            <CanvasContent
-              image={image}
-              device={device}
-              activeMode={activeMode}
-              fitMode={fitMode}
-              inspectOrientation={inspectOrientation}
-              guides={guides}
-              shadowIntensity={shadowIntensity}
-              frameCornerRadius={frameCornerRadius}
-              mockupScale={mockupScale}
-              mockupOffsetX={mockupOffsetX}
-              mockupOffsetY={mockupOffsetY}
-              exportRef={exportRef}
-              transparentBg={transparentBg}
-              frameId={frameId}
-              frameColor={frameColor}
-              bgStyle={bgStyle}
-              mockupTitle={mockupTitle}
-              mockupSubtitle={mockupSubtitle}
-              mockupTags={mockupTags}
-              mockupTextPosition={mockupTextPosition}
-              showMockupDate={showMockupDate}
-              mockupTextColor={mockupTextColor}
-              selectedMockup={selectedMockup}
-              compositeTransform={compositeTransform}
-              onCompositePositionChange={onCompositePositionChange}
-            />
+            <MockupComposer image={image} mockup={selectedMockup} transform={compositeTransform} onPositionChange={onCompositePositionChange ?? (() => {})} />
+          </div>
+        ) : activeMode === 'inspect' && image ? (
+          <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
+            <InspectView image={image} device={device} fitMode={fitMode} orientation={inspectOrientation} guides={guides} />
           </div>
         ) : (
           <EmptyState />
@@ -157,109 +169,6 @@ export function EditorCanvas({
       )}
     </div>
   );
-}
-
-/* ── Canvas content (mode-aware) ──────────── */
-function CanvasContent({
-  image, device, activeMode, fitMode, inspectOrientation, guides,
-  shadowIntensity, frameCornerRadius, mockupScale, mockupOffsetX, mockupOffsetY, exportRef, transparentBg,
-  frameId, frameColor, bgStyle,
-  mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
-  selectedMockup, compositeTransform, onCompositePositionChange,
-}: {
-  image: UploadedImage;
-  device: DevicePreset;
-  activeMode: AppMode;
-  fitMode: 'fit' | 'fill' | 'original';
-  inspectOrientation: 'portrait' | 'landscape';
-  guides: GuideOptions;
-  shadowIntensity: number;
-  frameCornerRadius: number;
-  mockupScale: number;
-  mockupOffsetX: number;
-  mockupOffsetY: number;
-  exportRef?: React.RefObject<HTMLDivElement | null>;
-  transparentBg: boolean;
-  frameId: FrameId;
-  frameColor: FrameColor;
-  bgStyle: BgStyle;
-  mockupTitle: string;
-  mockupSubtitle: string;
-  mockupTags: string;
-  mockupTextPosition: 'top' | 'bottom' | 'none';
-  showMockupDate: boolean;
-  mockupTextColor: string;
-  selectedMockup: MockupAsset | null;
-  compositeTransform: { x: number; y: number; scale: number; stretchX: number; stretchY: number; rotation: number; skewX: number; skewY: number };
-  onCompositePositionChange?: (x: number, y: number) => void;
-}) {
-  if (activeMode === 'inspect') {
-    return (
-      <InspectView
-        image={image}
-        device={device}
-        fitMode={fitMode}
-        orientation={inspectOrientation}
-        guides={guides}
-      />
-    );
-  }
-
-  if (activeMode === 'mockup') {
-    if (selectedMockup) {
-      return <MockupComposer image={image} mockup={selectedMockup} transform={compositeTransform} onPositionChange={onCompositePositionChange ?? (() => {})} />;
-    }
-    return (
-      <MockupView
-        image={image}
-        shadowIntensity={shadowIntensity}
-        frameCornerRadius={frameCornerRadius}
-        scale={mockupScale}
-        offsetX={mockupOffsetX}
-        offsetY={mockupOffsetY}
-        exportRef={exportRef}
-        transparentBg={transparentBg}
-        frameId={frameId}
-        frameColor={frameColor}
-        bgStyle={bgStyle}
-        title={mockupTitle}
-        subtitle={mockupSubtitle}
-        tags={mockupTags}
-        textPosition={mockupTextPosition}
-        showDate={showMockupDate}
-        textColor={mockupTextColor}
-      />
-    );
-  }
-
-  if (activeMode === 'export') {
-    if (selectedMockup) {
-      return <MockupComposer image={image} mockup={selectedMockup} transform={compositeTransform} onPositionChange={onCompositePositionChange ?? (() => {})} />;
-    }
-    return (
-      <ExportView
-        image={image}
-        shadowIntensity={shadowIntensity}
-        frameCornerRadius={frameCornerRadius}
-        scale={mockupScale}
-        offsetX={mockupOffsetX}
-        offsetY={mockupOffsetY}
-        exportRef={exportRef}
-        transparentBg={transparentBg}
-        frameId={frameId}
-        frameColor={frameColor}
-        bgStyle={bgStyle}
-        title={mockupTitle}
-        subtitle={mockupSubtitle}
-        tags={mockupTags}
-        textPosition={mockupTextPosition}
-        showDate={showMockupDate}
-        textColor={mockupTextColor}
-      />
-    );
-  }
-
-  return null;
 }
 
 /* ── Inspect View ─────────────────────────── */
@@ -323,85 +232,6 @@ function InspectView({
     </div>
   );
 }
-
-/* ── Mockup View ──────────────────────────── */
-function MockupView({
-  image, shadowIntensity, frameCornerRadius, scale, offsetX, offsetY, exportRef, transparentBg,
-  frameId, frameColor, bgStyle,
-  title, subtitle, tags, textPosition, showDate, textColor,
-}: {
-  image: UploadedImage;
-  shadowIntensity: number;
-  frameCornerRadius: number;
-  scale: number;
-  offsetX: number;
-  offsetY: number;
-  exportRef?: React.RefObject<HTMLDivElement | null>;
-  transparentBg: boolean;
-  frameId: FrameId;
-  frameColor: FrameColor;
-  bgStyle: BgStyle;
-  title: string;
-  subtitle: string;
-  tags: string;
-  textPosition: 'top' | 'bottom' | 'none';
-  showDate: boolean;
-  textColor: string;
-}) {
-  const bg = getBackground(bgStyle);
-  const shadowAlpha = shadowIntensity / 100;
-  const shadow = `0 ${24 + shadowIntensity * 0.4}px ${48 + shadowIntensity}px rgba(0,0,0,${(shadowAlpha * 0.6).toFixed(2)})`;
-
-  const subColor = `${textColor}B3`;
-  const hasText = textPosition !== 'none' && (title || subtitle || tags || showDate);
-  const dateLabel = new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date());
-
-  const tagList = tags.split(',').map((t) => t.trim()).filter(Boolean);
-
-  const textBlock = hasText ? (
-    <div className={styles.mockupText} style={{ color: textColor }}>
-      {title && <div className={styles.mockupTitle}>{title}</div>}
-      {subtitle && <div className={styles.mockupSubtitle} style={{ color: subColor }}>{subtitle}</div>}
-      {tagList.length > 0 && (
-        <div className={styles.mockupTags}>
-          {tagList.map((t, i) => (
-            <span key={i} className={styles.mockupTag} style={{
-              borderColor: bg.dark ? 'rgba(255,255,255,0.25)' : 'rgba(26,29,36,0.18)',
-              color: subColor,
-            }}>{t}</span>
-          ))}
-        </div>
-      )}
-      {showDate && <div className={styles.mockupDate} style={{ color: subColor }}>{dateLabel}</div>}
-    </div>
-  ) : null;
-
-  return (
-    <div
-      ref={exportRef as React.RefObject<HTMLDivElement>}
-      className={styles.mockupScene}
-      style={{ background: transparentBg ? 'transparent' : bg.css }}
-    >
-      {textPosition === 'top' && textBlock}
-      <div
-        className={styles.mockupFrameWrap}
-        style={{ filter: `drop-shadow(${shadow})`, transform: `translate(${offsetX}px, ${offsetY}px) scale(${scale})` }}
-      >
-        <DeviceFrame
-          frameId={frameId}
-          frameColor={frameColor}
-          imageUrl={image.dataUrl}
-          imageAlt={image.name}
-          cornerRadius={frameCornerRadius}
-        />
-      </div>
-      {textPosition === 'bottom' && textBlock}
-    </div>
-  );
-}
-
-/* ── Export View ──────────────────────────── */
-const ExportView = MockupView;
 
 /* ── Empty State ──────────────────────────── */
 function EmptyState() {

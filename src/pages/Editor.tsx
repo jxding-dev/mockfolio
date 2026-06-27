@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import type { UploadedImage } from '../types';
+import type { UploadedImage, MockupItem } from '../types';
 import { DEFAULT_EDITOR_SETTINGS, normalizeEditorSettings, type EditorSettings } from '../data/editorSettings';
+import { DEVICE_PRESETS } from '../data/devices';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useMockupAssets } from '../hooks/useMockupAssets';
@@ -139,8 +140,69 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   const [initialSourceApplied, setInitialSourceApplied] = useState(false);
   const { assets: mockupAssets, loading: mockupsLoading } = useMockupAssets();
 
+  // ── Multi-image mockup scene (transient: holds dataUrls) ──
+  const [mockupItems, setMockupItems] = useState<MockupItem[]>([]);
+  const [selectedMockupItemId, setSelectedMockupItemId] = useState<string | null>(null);
+
+  const makeMockupItem = useCallback((img: UploadedImage, offset: number): MockupItem => ({
+    id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    dataUrl: img.dataUrl,
+    name: img.name,
+    width: img.width,
+    height: img.height,
+    frameId: settings.frameId,
+    frameColor: settings.frameColor,
+    x: offset * 7,
+    y: offset * 5,
+    scale: offset === 0 ? 1 : 0.82,
+  }), [settings.frameId, settings.frameColor]);
+
+  // Seed the scene with the main image the first time Mockup/Export opens.
+  useEffect(() => {
+    if ((activeMode === 'mockup' || activeMode === 'export') && image && mockupItems.length === 0) {
+      const first = makeMockupItem(image, 0);
+      setMockupItems([first]);
+      setSelectedMockupItemId(first.id);
+    }
+  }, [activeMode, image, mockupItems.length, makeMockupItem]);
+
+  const { handleFilesMultiple: addMockupFiles } = useImageUpload({
+    onSuccess: (img) => {
+      setMockupItems((prev) => {
+        const item = makeMockupItem(img, prev.length);
+        setSelectedMockupItemId(item.id);
+        return [...prev, item];
+      });
+    },
+    onError: setError,
+  });
+
+  const updateMockupItem = useCallback((id: string, patchItem: Partial<MockupItem>) => {
+    setMockupItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...patchItem } : it)));
+  }, []);
+  const removeMockupItem = useCallback((id: string) => {
+    setMockupItems((prev) => {
+      const next = prev.filter((it) => it.id !== id);
+      setSelectedMockupItemId((sel) => (sel === id ? (next[next.length - 1]?.id ?? null) : sel));
+      return next;
+    });
+  }, []);
+  const moveMockupItem = useCallback((id: string, x: number, y: number) => updateMockupItem(id, { x, y }), [updateMockupItem]);
+
   const exportRef = useRef<HTMLDivElement | null>(null);
   const selectedMockup = mockupAssets.find((asset) => asset.id === selectedMockupId) ?? null;
+
+  // Auto-pick a device preset matching the uploaded image's aspect ratio
+  // (desktop screenshot → desktop preset, portrait → mobile, ~square → tablet).
+  const lastSizedImageId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!image || image.id === lastSizedImageId.current) return;
+    lastSizedImageId.current = image.id;
+    const ratio = image.width / image.height;
+    const category = ratio > 1.3 ? 'desktop' : ratio < 0.85 ? 'mobile' : 'tablet';
+    const preset = DEVICE_PRESETS.find((d) => d.category === category);
+    if (preset) patch('selectedDeviceId', preset.id);
+  }, [image, patch]);
 
   useEffect(() => {
     if (initialSourceApplied) return;
@@ -285,6 +347,10 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
           urlRefreshKey={urlRefreshKey}
           selectedMockup={selectedMockup}
           onCompositePositionChange={(x, y) => { patch('compositeX', x); patch('compositeY', y); }}
+          mockupItems={mockupItems}
+          selectedMockupItemId={selectedMockupItemId}
+          onMockupItemSelect={(id) => setSelectedMockupItemId(id || null)}
+          onMockupItemMove={moveMockupItem}
         />
 
         <EditorRightPanel
@@ -305,6 +371,12 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
           onCompositeExport={handleCompositeExport}
           onCompositeReset={handleCompositeReset}
           onGifExport={handleGifExport}
+          mockupItems={mockupItems}
+          selectedMockupItemId={selectedMockupItemId}
+          onAddMockupImages={addMockupFiles}
+          onSelectMockupItem={setSelectedMockupItemId}
+          onUpdateMockupItem={updateMockupItem}
+          onRemoveMockupItem={removeMockupItem}
         />
       </div>
     </div>

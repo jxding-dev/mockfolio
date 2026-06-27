@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { UploadedImage, FrameColor } from '../../types';
+import { useRef, useState } from 'react';
+import type { UploadedImage, FrameColor, MockupItem } from '../../types';
 import type { EditorSettings } from '../../data/editorSettings';
 import { FRAMES } from '../../data/frames';
 import { BACKGROUNDS } from '../../data/backgrounds';
@@ -30,6 +30,13 @@ interface Props {
   onCompositeExport: () => void;
   onCompositeReset: () => void;
   onGifExport: () => void;
+  // Multi-image mockup scene
+  mockupItems: MockupItem[];
+  selectedMockupItemId: string | null;
+  onAddMockupImages: (files: FileList | File[]) => void;
+  onSelectMockupItem: (id: string | null) => void;
+  onUpdateMockupItem: (id: string, patch: Partial<MockupItem>) => void;
+  onRemoveMockupItem: (id: string) => void;
 }
 
 export function EditorRightPanel(props: Props) {
@@ -120,93 +127,115 @@ const FRAME_COLORS: { id: FrameColor; label: string; swatch: string }[] = [
   { id: 'silver', label: '실버',   swatch: '#c8ccd2' },
 ];
 
-function MockupProps({ settings: s, patch, image, exportLoading, exportMessage, mockupAssets, mockupsLoading, onExport, onCompositeExport, onCompositeReset }: Props) {
-  const mockupGroups = mockupAssets.reduce<Record<string, MockupAsset[]>>((groups, asset) => {
-    const category = asset.category || '기본 목업';
-    groups[category] = [...(groups[category] ?? []), asset];
-    return groups;
-  }, {});
+function MockupProps({
+  settings: s, patch, exportLoading, exportMessage, mockupAssets, mockupsLoading,
+  onCompositeExport, onCompositeReset,
+  mockupItems, selectedMockupItemId, onAddMockupImages, onSelectMockupItem, onUpdateMockupItem, onRemoveMockupItem,
+}: Props) {
+  const addRef = useRef<HTMLInputElement>(null);
+  const selected = mockupItems.find((it) => it.id === selectedMockupItemId) ?? null;
+  const isComposite = Boolean(s.selectedMockupId);
 
+  /* ── Custom PNG mockup mode (overlay composite) ── */
+  if (isComposite) {
+    return (
+      <>
+        <RSection title="커스텀 PNG 목업">
+          <button className={styles.backToFrames} onClick={() => patch('selectedMockupId', '')}>← 기본 프레임으로 돌아가기</button>
+          <p className={styles.hint}>사용자 이미지는 목업 PNG 뒤에 배치되고, 투명하게 뚫린 영역으로만 보입니다.</p>
+        </RSection>
+        <RSection title="이미지 합성">
+          <Slider label="X 위치" value={s.compositeX} min={-100} max={100} unit="%" onChange={value => patch('compositeX', value)} />
+          <Slider label="Y 위치" value={s.compositeY} min={-100} max={100} unit="%" onChange={value => patch('compositeY', value)} />
+          <Slider label="Scale" value={Math.round(s.compositeScale * 100)} min={10} max={300} unit="%" onChange={value => patch('compositeScale', value / 100)} />
+          <Slider label="가로 늘림" value={Math.round(s.compositeStretchX * 100)} min={25} max={400} unit="%" onChange={value => patch('compositeStretchX', value / 100)} />
+          <Slider label="세로 늘림" value={Math.round(s.compositeStretchY * 100)} min={25} max={400} unit="%" onChange={value => patch('compositeStretchY', value / 100)} />
+          <Slider label="Rotate" value={s.compositeRotation} min={-180} max={180} unit="°" onChange={value => patch('compositeRotation', value)} />
+          <Slider label="X 비틀기" value={s.compositeSkewX} min={-60} max={60} unit="°" onChange={value => patch('compositeSkewX', value)} />
+          <Slider label="Y 비틀기" value={s.compositeSkewY} min={-60} max={60} unit="°" onChange={value => patch('compositeSkewY', value)} />
+          <Button variant="secondary" size="sm" fullWidth onClick={onCompositeReset}>조정 초기화</Button>
+        </RSection>
+        <div className={styles.exportFooter}>
+          <Button variant="primary" size="lg" fullWidth loading={exportLoading} onClick={onCompositeExport}>합성 PNG 저장</Button>
+          <p className={styles.exportNote}>합성 결과만 PNG로 저장됩니다.</p>
+          {exportMessage && <p className={styles.exportMessage} role="status">{exportMessage}</p>}
+        </div>
+      </>
+    );
+  }
+
+  /* ── Default multi-frame scene mode ── */
   return (
     <>
-      <RSection title="커스텀 PNG 목업">
-        {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets.length ? (
-          <div className={styles.mockupCategoryList}>
-            {Object.entries(mockupGroups).map(([category, assets]) => (
-              <div key={category} className={styles.mockupCategory}>
-                <div className={styles.mockupCategoryTitle}>{category}</div>
-                <div className={styles.mockupAssetGrid}>
-                  {assets.map((asset) => (
-                    <button
-                      key={asset.id}
-                      className={`${styles.frameBtn} ${s.selectedMockupId === asset.id ? styles.frameBtnActive : ''}`}
-                      onClick={() => patch('selectedMockupId', asset.id)}
-                    >
-                      {asset.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-            <button className={`${styles.frameBtn} ${!s.selectedMockupId ? styles.frameBtnActive : ''}`} onClick={() => patch('selectedMockupId', '')}>기본 프레임</button>
-          </div>
-        ) : <p className={styles.hint}>public/mockups에 PNG와 manifest를 추가하면 여기에서 선택할 수 있습니다.</p>}
-        <p className={styles.hint}>사용자 이미지는 목업 PNG 뒤에 배치되고, 투명하게 뚫린 영역으로만 보입니다.</p>
+      <RSection title={`이미지 (${mockupItems.length}장)`}>
+        <div className={styles.itemList}>
+          {mockupItems.map((it) => (
+            <div
+              key={it.id}
+              className={`${styles.itemRow} ${selectedMockupItemId === it.id ? styles.itemRowActive : ''}`}
+              onClick={() => onSelectMockupItem(it.id)}
+            >
+              <img src={it.dataUrl} alt={it.name} className={styles.itemThumb} />
+              <span className={styles.itemName}>{it.name}</span>
+              <button className={styles.itemRemove} onClick={(e) => { e.stopPropagation(); onRemoveMockupItem(it.id); }} aria-label="이미지 제거">✕</button>
+            </div>
+          ))}
+        </div>
+        <Button variant="secondary" size="sm" fullWidth onClick={() => addRef.current?.click()}>+ 이미지 추가</Button>
+        <input
+          ref={addRef}
+          type="file"
+          accept="image/png,image/jpeg,image/jpg,image/webp"
+          multiple
+          className={styles.hiddenInput}
+          onChange={(e) => { if (e.target.files) onAddMockupImages(e.target.files); e.target.value = ''; }}
+        />
+        <p className={styles.hint}>이미지를 여러 장 올려 한 장면에 배치하고, 캔버스에서 드래그해 위치를 잡으세요.</p>
       </RSection>
 
-      {s.selectedMockupId && (
+      {selected ? (
         <>
-          <RSection title="이미지 합성">
-            <Slider label="X 위치" value={s.compositeX} min={-100} max={100} unit="%" onChange={value => patch('compositeX', value)} />
-            <Slider label="Y 위치" value={s.compositeY} min={-100} max={100} unit="%" onChange={value => patch('compositeY', value)} />
-            <Slider label="Scale" value={Math.round(s.compositeScale * 100)} min={10} max={300} unit="%" onChange={value => patch('compositeScale', value / 100)} />
-            <Slider label="가로 늘림" value={Math.round(s.compositeStretchX * 100)} min={25} max={400} unit="%" onChange={value => patch('compositeStretchX', value / 100)} />
-            <Slider label="세로 늘림" value={Math.round(s.compositeStretchY * 100)} min={25} max={400} unit="%" onChange={value => patch('compositeStretchY', value / 100)} />
-            <Slider label="Rotate" value={s.compositeRotation} min={-180} max={180} unit="°" onChange={value => patch('compositeRotation', value)} />
-            <Slider label="X 비틀기" value={s.compositeSkewX} min={-60} max={60} unit="°" onChange={value => patch('compositeSkewX', value)} />
-            <Slider label="Y 비틀기" value={s.compositeSkewY} min={-60} max={60} unit="°" onChange={value => patch('compositeSkewY', value)} />
-            <Button variant="secondary" size="sm" fullWidth onClick={onCompositeReset}>조정 초기화</Button>
+          <RSection title="프레임 (선택 이미지)">
+            <div className={styles.frameGrid}>
+              {FRAMES.map((f) => (
+                <button
+                  key={f.id}
+                  className={`${styles.frameBtn} ${selected.frameId === f.id ? styles.frameBtnActive : ''}`}
+                  onClick={() => onUpdateMockupItem(selected.id, { frameId: f.id })}
+                  title={f.description}
+                >
+                  <span className={styles.frameIcon}>{f.icon}</span>
+                  <span className={styles.frameLabel}>{f.label}</span>
+                </button>
+              ))}
+            </div>
           </RSection>
-          <div className={styles.exportFooter}>
-            <Button variant="primary" size="lg" fullWidth loading={exportLoading} disabled={!image} onClick={onCompositeExport}>합성 PNG 저장</Button>
-            <p className={styles.exportNote}>{image ? '사용자 이미지와 목업을 합성해서만 저장합니다.' : '이미지를 업로드해야 저장할 수 있어요.'}</p>
-            {exportMessage && <p className={styles.exportMessage} role="status">{exportMessage}</p>}
-          </div>
+
+          <RSection title="프레임 색상 (선택 이미지)">
+            <div className={styles.swatchRow}>
+              {FRAME_COLORS.map((c) => (
+                <button
+                  key={c.id}
+                  className={`${styles.swatch} ${selected.frameColor === c.id ? styles.swatchActive : ''}`}
+                  onClick={() => onUpdateMockupItem(selected.id, { frameColor: c.id })}
+                  title={c.label}
+                >
+                  <span className={styles.swatchDot} style={{ background: c.swatch }} />
+                  <span className={styles.swatchLabel}>{c.label}</span>
+                </button>
+              ))}
+            </div>
+          </RSection>
+
+          <RSection title="크기 (선택 이미지)">
+            <Slider label="크기" value={Math.round(selected.scale * 100)} min={40} max={160} unit="%" onChange={v => onUpdateMockupItem(selected.id, { scale: v / 100 })} />
+          </RSection>
         </>
+      ) : (
+        <RSection title="프레임">
+          <p className={styles.hint}>위 목록에서 이미지를 선택하면 프레임·색상·크기를 조절할 수 있습니다.</p>
+        </RSection>
       )}
-
-      {!s.selectedMockupId && <>
-      <RSection title="프레임">
-        <div className={styles.frameGrid}>
-          {FRAMES.map((f) => (
-            <button
-              key={f.id}
-              className={`${styles.frameBtn} ${s.frameId === f.id ? styles.frameBtnActive : ''}`}
-              onClick={() => patch('frameId', f.id)}
-              title={f.description}
-            >
-              <span className={styles.frameIcon}>{f.icon}</span>
-              <span className={styles.frameLabel}>{f.label}</span>
-            </button>
-          ))}
-        </div>
-      </RSection>
-
-      <RSection title="프레임 색상">
-        <div className={styles.swatchRow}>
-          {FRAME_COLORS.map((c) => (
-            <button
-              key={c.id}
-              className={`${styles.swatch} ${s.frameColor === c.id ? styles.swatchActive : ''}`}
-              onClick={() => patch('frameColor', c.id)}
-              title={c.label}
-            >
-              <span className={styles.swatchDot} style={{ background: c.swatch }} />
-              <span className={styles.swatchLabel}>{c.label}</span>
-            </button>
-          ))}
-        </div>
-      </RSection>
 
       <RSection title="배경">
         <div className={styles.bgGrid}>
@@ -230,12 +259,6 @@ function MockupProps({ settings: s, patch, image, exportLoading, exportMessage, 
 
       <RSection title="모서리">
         <Slider label="둥글기" value={s.frameCornerRadius} min={0} max={40} unit="px" onChange={v => patch('frameCornerRadius', v)} />
-      </RSection>
-
-      <RSection title="배치">
-        <Slider label="크기" value={Math.round(s.mockupScale * 100)} min={60} max={130} unit="%" onChange={v => patch('mockupScale', v / 100)} />
-        <Slider label="가로 위치" value={s.mockupOffsetX} min={-160} max={160} unit="px" onChange={v => patch('mockupOffsetX', v)} />
-        <Slider label="세로 위치" value={s.mockupOffsetY} min={-160} max={160} unit="px" onChange={v => patch('mockupOffsetY', v)} />
       </RSection>
 
       <RSection title="텍스트 오버레이">
@@ -263,17 +286,42 @@ function MockupProps({ settings: s, patch, image, exportLoading, exportMessage, 
           </div>
         )}
       </RSection>
+
+      <CollapsibleSection title="커스텀 PNG 목업 (직접 만든 PNG)">
+        {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets.length ? (
+          <div className={styles.mockupCategoryList}>
+            {Object.entries(mockupAssets.reduce<Record<string, MockupAsset[]>>((g, a) => { const c = a.category || '기본 목업'; g[c] = [...(g[c] ?? []), a]; return g; }, {})).map(([category, assets]) => (
+              <div key={category} className={styles.mockupCategory}>
+                <div className={styles.mockupCategoryTitle}>{category}</div>
+                <div className={styles.mockupAssetGrid}>
+                  {assets.map((asset) => (
+                    <button key={asset.id} className={styles.frameBtn} onClick={() => patch('selectedMockupId', asset.id)}>{asset.label}</button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : <p className={styles.hint}>public/mockups에 PNG와 manifest를 추가하면 여기에서 선택할 수 있습니다.</p>}
+      </CollapsibleSection>
+
       <div className={styles.exportFooter}>
-        <Button variant="primary" size="lg" fullWidth loading={exportLoading} disabled={!image} onClick={onExport}>
-          목업 PNG 저장
-        </Button>
-        <p className={styles.exportNote}>
-          {!image ? '이미지를 업로드해야 저장할 수 있어요.' : '현재 목업 화면을 PNG로 저장합니다.'}
-        </p>
-        {exportMessage && <p className={styles.exportMessage} role="status">{exportMessage}</p>}
+        <p className={styles.exportNote}>저장은 <strong>Export 탭</strong>에서 해상도·투명 배경을 정한 뒤 진행합니다.</p>
       </div>
-      </>}
     </>
+  );
+}
+
+/* ── Collapsible section (secondary content) ── */
+function CollapsibleSection({ title, children }: { title: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={styles.section}>
+      <button className={styles.collapseHead} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
+        <span>{title}</span>
+        <span className={`${styles.collapseChevron} ${open ? styles.collapseChevronOpen : ''}`}>⌄</span>
+      </button>
+      {open && <div className={styles.sectionBody}>{children}</div>}
+    </div>
   );
 }
 
@@ -315,19 +363,26 @@ function CompareProps({ settings: s, patch, autoSlide, onAutoSlideChange, onGifE
 }
 
 /* ── Export Props ─────────────────────────── */
-function ExportProps({ settings: s, patch, image, onExport, exportLoading, exportMessage }: Props) {
+function safeFileLabel(name: string): string {
+  const cleaned = name.trim().replace(/\s+/g, '-').replace(/[\\/:*?"<>|]/g, '');
+  return cleaned || 'project';
+}
+
+function ExportProps({ settings: s, patch, image, mockupItems, onExport, exportLoading, exportMessage }: Props) {
   const scales = [1, 2] as const;
-  // When a custom PNG mockup is selected, export goes through the composite canvas,
-  // which ignores scale/transparency — so don't show those (misleading) controls.
   const isComposite = Boolean(s.selectedMockupId);
+  const canExport = isComposite ? !!image : mockupItems.length > 0;
+  const fileName = isComposite
+    ? `mockfolio-${safeFileLabel(s.projectName)}-mockup.png`
+    : `mockfolio-${safeFileLabel(s.projectName)}-${new Date().toISOString().slice(0, 10)}.png`;
 
   return (
     <>
       {isComposite ? (
         <RSection title="커스텀 목업 내보내기">
           <p className={styles.hint}>
-            선택한 PNG 목업과 사용자 이미지를 합성한 결과를 원본 해상도로 저장합니다.
-            해상도·투명 배경 옵션은 합성 저장에는 적용되지 않습니다.
+            선택한 PNG 목업과 사용자 이미지를 합성한 결과를 <strong>원본 해상도</strong>로 저장합니다.
+            해상도·투명 배경 옵션은 합성 저장에 적용되지 않습니다.
           </p>
         </RSection>
       ) : (
@@ -351,26 +406,29 @@ function ExportProps({ settings: s, patch, image, onExport, exportLoading, expor
             <Toggle label="투명 배경" value={s.transparentBg} onChange={v => patch('transparentBg', v)} />
           </RSection>
 
-          {image && (
-            <RSection title="출력 크기">
-              <div className={styles.outputInfo}>
-                <span>예상 크기</span>
-                <span className={styles.outputVal}>
-                  {image.width * s.exportScale} × {image.height * s.exportScale}px
-                </span>
-              </div>
-            </RSection>
-          )}
+          <RSection title="내보낼 내용">
+            <div className={styles.exportSummary}>
+              <div className={styles.summaryRow}><span>이미지</span><span className={styles.summaryVal}>{mockupItems.length}장</span></div>
+              <div className={styles.summaryRow}><span>배경</span><span className={styles.summaryVal}>{s.transparentBg ? '투명' : BACKGROUNDS.find(b => b.id === s.bgStyle)?.label}</span></div>
+              <div className={styles.summaryRow}><span>해상도</span><span className={styles.summaryVal}>{s.exportScale}× (Retina)</span></div>
+              <div className={styles.summaryRow}><span>형식</span><span className={styles.summaryVal}>PNG</span></div>
+            </div>
+            <p className={styles.hint}>구성한 장면(프레임·배경·텍스트 포함) 전체가 한 장의 PNG로 저장됩니다.</p>
+          </RSection>
         </>
       )}
 
       <div className={styles.exportFooter}>
+        <div className={styles.fileNamePreview}>
+          <span className={styles.fileNameIcon}>🖼</span>
+          <span className={styles.fileNameText}>{fileName}</span>
+        </div>
         <Button
           variant="primary"
           size="lg"
           fullWidth
           loading={exportLoading}
-          disabled={!image}
+          disabled={!canExport}
           onClick={onExport}
           icon={
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -382,7 +440,7 @@ function ExportProps({ settings: s, patch, image, onExport, exportLoading, expor
           PNG 저장
         </Button>
         <p className={styles.exportNote}>
-          {!image ? '이미지를 먼저 업로드하세요.' : '다운로드 폴더에 저장됩니다.'}
+          {!canExport ? '먼저 Mockup 탭에서 이미지를 추가하세요.' : '다운로드 폴더에 저장됩니다.'}
         </p>
         {exportMessage && <p className={styles.exportMessage} role="status">{exportMessage}</p>}
       </div>

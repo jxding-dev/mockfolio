@@ -123,6 +123,14 @@ export function useImageUpload({ onSuccess, onError }: UseImageUploadOptions) {
     [processFile]
   );
 
+  // Processes every file (mockup mode can place several images at once).
+  const handleFilesMultiple = useCallback(
+    (files: FileList | File[]) => {
+      Array.from(files).forEach(processFile);
+    },
+    [processFile]
+  );
+
   const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) handleFiles(event.target.files);
     event.target.value = '';
@@ -191,5 +199,5 @@ export function useImageUpload({ onSuccess, onError }: UseImageUploadOptions) {
     [processDataUrl, onError]
   );
 
-  return { handleFiles, handleInputChange, loadImageUrl };
+  return { handleFiles, handleFilesMultiple, handleInputChange, loadImageUrl };
 }
