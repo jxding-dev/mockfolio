@@ -31,53 +31,26 @@
 
 .desc strong { color: var(--accent); font-weight: var(--weight-semibold); }
 
-/* ── Billing toggle ──────────────────────────── */
-.billingToggle {
-  display: inline-flex;
-  gap: 2px;
-  background: var(--bg-muted);
-  border-radius: var(--radius-full);
-  padding: 4px;
+.securityStrip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
   margin-top: var(--space-2);
 }
 
-.billingBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 8px 18px;
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--ease-fast);
-}
-
-.billingActive {
-  background: var(--bg-base);
-  color: var(--text-primary);
-  font-weight: var(--weight-semibold);
-  box-shadow: var(--shadow-sm);
-}
-
-.billingSave {
-  font-size: 10px;
-  font-weight: var(--weight-semibold);
-  color: var(--success);
-  background: var(--success-subtle);
-  padding: 1px 7px;
-  border-radius: var(--radius-full);
-}
-
-.priceNote {
+.securityStrip span {
   font-size: var(--text-xs);
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  padding: 6px 10px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
   align-items: start;
 }
@@ -100,11 +73,14 @@
 
 /* Coming-soon plans stay fully presented (the badge signals status); only the
    feature checks are muted so they still read as a premium, sellable tier. */
-.disabled .checkYes { color: var(--text-tertiary); }
+.disabled .checkYes { color: var(--accent); }
 
 .featured {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent), var(--shadow-lg);
+  background:
+    radial-gradient(circle at 85% 10%, var(--accent-subtle) 0%, transparent 34%),
+    var(--bg-base);
 }
 
 .featuredTag {
@@ -154,6 +130,16 @@
   line-height: var(--leading-normal);
 }
 
+.planNote {
+  font-size: var(--text-xs);
+  color: var(--accent);
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent-muted);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  line-height: var(--leading-normal);
+}
+
 .features {
   flex: 1;
   display: flex;
@@ -171,6 +157,57 @@
 
 .checkYes { color: var(--success); font-weight: var(--weight-semibold); flex-shrink: 0; }
 .checkNo  { color: var(--text-tertiary); flex-shrink: 0; }
+
+/* ── Launch plan ─────────────────────────────── */
+.launchPlan {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: var(--space-6);
+  align-items: center;
+  padding: var(--space-6);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(135deg, var(--bg-subtle), var(--bg-base));
+  box-shadow: var(--shadow-sm);
+}
+
+.launchPlan h2 {
+  margin-top: var(--space-3);
+  font-size: var(--text-xl);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.launchPlan p {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-loose);
+}
+
+.launchPlan ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--bg-base);
+  border: 1px solid var(--border-muted);
+}
+
+.launchPlan li {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.launchPlan li::before {
+  content: '•';
+  color: var(--accent);
+  font-weight: var(--weight-bold);
+  margin-right: var(--space-2);
+}
 
 /* ── Notice ──────────────────────────────────── */
 .notice {
@@ -213,7 +250,8 @@
 
 /* ── Responsive ──────────────────────────────── */
 @media (max-width: 900px) {
-  .grid { grid-template-columns: 1fr; max-width: 440px; margin: 0 auto; width: 100%; }
+  .grid { grid-template-columns: 1fr; max-width: 520px; margin: 0 auto; width: 100%; }
+  .launchPlan { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {

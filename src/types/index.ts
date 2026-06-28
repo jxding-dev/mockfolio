@@ -71,16 +71,18 @@ export type BgStyle =
   | 'glass-panel';
 
 // ── Plan ─────────────────────────────────────────────────────
-export type PlanId = 'free' | 'pro' | 'studio';
+export type PlanId = 'free' | 'thirty-day';
 
 export interface Plan {
   id: PlanId;
   name: string;
-  monthly: number;          // KRW per month, billed monthly (0 = free)
-  annual: number;           // KRW per month, billed annually
+  price: number;            // KRW per 30-day cycle (0 = free)
+  period: string;
   description: string;
   features: string[];
-  available: boolean;
+  available: boolean;       // false = Coming Soon (auth/payment added later)
   highlighted?: boolean;
+  badge?: string;
+  note?: string;
   cta: string;
 }

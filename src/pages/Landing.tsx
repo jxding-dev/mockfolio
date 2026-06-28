@@ -29,9 +29,9 @@ const REVIEWS: Review[] = [
 ];
 
 const FAQS: { q: string; a: string }[] = [
-  { q: '정말 무료인가요?', a: '핵심 기능은 지금 바로 로그인 없이 무료로 쓸 수 있습니다. 정식 출시 후 가입하면 30일 무료 체험이 제공되고, 핵심 내보내기 첫 3회는 평생 무료입니다.' },
+  { q: '정말 무료인가요?', a: '네. 현재 공개된 핵심 기능은 로그인과 결제 없이 무료로 사용할 수 있습니다. 정식 결제 연동 후에는 30일 이용권을 별도로 제공합니다.' },
   { q: '업로드한 이미지는 안전한가요?', a: '모든 이미지는 브라우저 안에서만 처리됩니다. 외부 서버로 전송하지 않고, AI 학습에도 사용하지 않습니다.' },
-  { q: '결제는 어떻게 하나요?', a: '유료 플랜과 결제는 곧 제공될 예정입니다. 지금은 무료 기능을 자유롭게 사용하세요.' },
+  { q: '결제는 어떻게 하나요?', a: '아직 실제 결제는 연결하지 않았습니다. 향후 로그인과 결제 서버를 분리해 30일 이용권 ₩9,900 구조로 제공할 예정입니다.' },
   { q: '상업적으로 사용할 수 있나요?', a: '네. 직접 만든 목업 결과물은 포트폴리오·제안서 등 상업적 용도로 자유롭게 사용할 수 있습니다.' },
 ];
 
@@ -302,19 +302,19 @@ export function Landing() {
         <div className={styles.heroInner}>
           <div className={`${styles.heroText} ${styles.heroEnter}`}>
             <span className={styles.heroBadgeWrap}>
-              <Badge variant="accent">가입하면 30일 무료 · 핵심 기능 첫 3회 평생 무료</Badge>
+              <Badge variant="accent">무료 사용 가능 · 30일 이용권 ₩9,900 준비 중</Badge>
             </span>
 
             <h1 className={styles.heroTitle}>
-              반응형 검수부터<br />
-              <span className={styles.heroAccent}>포트폴리오 목업</span><br />
-              제작까지, 한 번에.
+              내 작업물을<br />
+              <span className={styles.heroAccent}>실제 서비스처럼</span><br />
+              보여주는 목업 툴.
             </h1>
 
             <p className={styles.heroDesc}>
-              웹/앱 화면 캡처를 업로드하고 다양한 디바이스 크기로 확인한 뒤,
-              프리미엄 목업 이미지로 내보내세요.<br />
-              <strong>서버 없이, 100% 로컬.</strong>
+              웹사이트, 앱, 상세페이지, 포스터, 배너 이미지를 업로드하고
+              반응형 검수와 실사형 목업 합성을 한 화면에서 처리하세요.<br />
+              <strong>서버 업로드 없이 브라우저에서만 처리합니다.</strong>
             </p>
 
             <div className={styles.heroCtas}>
@@ -331,18 +331,18 @@ export function Landing() {
 
             <div className={styles.heroStats}>
               <div className={styles.heroStat}>
-                <span className={styles.heroStatNum}>8종</span>
-                <span className={styles.heroStatLabel}>디바이스 프리셋</span>
+                <span className={styles.heroStatNum}>51종</span>
+                <span className={styles.heroStatLabel}>목업 오버레이</span>
               </div>
               <div className={styles.heroStatDivider} />
               <div className={styles.heroStat}>
-                <span className={styles.heroStatNum}>6종</span>
-                <span className={styles.heroStatLabel}>목업 프레임</span>
+                <span className={styles.heroStatNum}>4종</span>
+                <span className={styles.heroStatLabel}>URL 프리셋</span>
               </div>
               <div className={styles.heroStatDivider} />
               <div className={styles.heroStat}>
-                <span className={styles.heroStatNum}>2×</span>
-                <span className={styles.heroStatLabel}>Retina Export</span>
+                <span className={styles.heroStatNum}>₩9,900</span>
+                <span className={styles.heroStatLabel}>30일권 예정가</span>
               </div>
             </div>
           </div>
@@ -358,18 +358,42 @@ export function Landing() {
         <Reveal>
           <div className={styles.sectionLabel}>주요 기능</div>
           <h2 className={styles.sectionTitle}>
-            디자이너와 개발자를 위한<br />올인원 검수 + 목업 툴
+            검수, 합성, 저장까지<br />작업 흐름을 끊지 않는 제작 도구
           </h2>
         </Reveal>
 
         <div className={styles.featureGrid}>
           {[
-            { number: '01', icon: '📐', title: 'Responsive Inspect', desc: '360px부터 1920px까지 8가지 디바이스 프리셋으로 UI 레이아웃 깨짐을 즉시 확인합니다. 안전영역, 8px 그리드, 중앙선 가이드를 켜고 끄며 세밀하게 검수하세요.', tags: ['8종 프리셋', '가이드라인', '방향 전환', 'Before/After'], accent: '#6366F1' },
-            { number: '02', icon: '🖼', title: 'Portfolio Mockup', desc: 'iPhone, 브라우저, MacBook 프레임에 화면을 넣고 배경, 그림자, 텍스트를 자유롭게 조절합니다. CSS/SVG 기반 프레임으로 추후 커스텀 목업도 추가 가능합니다.', tags: ['6종 프레임', '배경 커스텀', '그림자 조절', '텍스트 오버레이'], accent: '#8B5CF6' },
-            { number: '03', icon: '💾', title: 'PNG Export', desc: 'Retina 2× 해상도로 포트폴리오에 바로 쓸 수 있는 고화질 PNG 파일을 저장합니다. 배경 포함/제외, 투명 배경을 선택해 다양한 용도로 활용하세요.', tags: ['1× / 2× 해상도', '투명 배경', '파일명 자동 생성', '즉시 다운로드'], accent: '#06B6D4' },
+            { number: '01', icon: '📐', title: 'Responsive Inspect', desc: 'Mobile, Tablet, Desktop, Wide 크기로 URL과 업로드 이미지를 빠르게 확인합니다. iframe 차단 안내와 새 창 열기까지 포함해 검수 중 오류처럼 보이지 않게 처리했습니다.', tags: ['URL 미리보기', '직접 크기 입력', '새로고침', '새 창 확인'], accent: '#6366F1' },
+            { number: '02', icon: '🖼', title: 'Commercial Mockup', desc: '앱, 웹, 상세페이지, 포스터, 간판, 전광판, 배너 작업물을 실사형 목업에 합성합니다. 여러 이미지 레이어를 겹치고 위치·크기·회전·왜곡을 조절할 수 있습니다.', tags: ['51종 오버레이', '레이어 합성', '고급 변형', '카테고리 분류'], accent: '#8B5CF6' },
+            { number: '03', icon: '💾', title: 'Local Export', desc: '업로드 파일은 브라우저 안에서만 처리하고, 합성된 결과만 PNG/GIF로 저장합니다. 서버 업로드, AI 연결, 결제 정보 저장 없이 안전하게 시작할 수 있습니다.', tags: ['PNG 저장', 'GIF 저장', 'No AI', 'Local First'], accent: '#06B6D4' },
           ].map((f, i) => (
             <Reveal key={f.number} delay={i * 90}>
               <FeatureCard {...f} />
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ── ADVANTAGES ───────────────────────── */}
+      <section className={styles.advantageSection}>
+        <Reveal>
+          <div className={styles.sectionLabelCenter}>서비스 강점</div>
+          <h2 className={styles.sectionTitleCenter}>포트폴리오용 툴이 아니라, 실제 판매 가능한 제작 흐름으로</h2>
+        </Reveal>
+        <div className={styles.advantageGrid}>
+          {[
+            { title: '다양한 작업자 대응', desc: '웹 제작자, 앱 개발자, 상세페이지 디자이너, 광고·배너·포스터 작업자가 같은 에디터에서 결과물을 만들 수 있습니다.' },
+            { title: '목업 자산 확장 구조', desc: 'public/mockups manifest 기반으로 카테고리와 파일을 분리해, 직접 제작한 목업을 계속 추가하기 쉽습니다.' },
+            { title: '상업 서비스 준비', desc: '무료 사용과 30일 이용권만 남겨 가격 구조를 단순화했습니다. 결제 연동 전에는 실제 과금 코드가 없습니다.' },
+            { title: '로컬 우선 보안', desc: '업로드 이미지를 외부 서버로 보내지 않는 구조라 초기 서비스 단계에서도 개인정보 리스크를 줄일 수 있습니다.' },
+          ].map((item, i) => (
+            <Reveal key={item.title} delay={i * 70}>
+              <article className={styles.advantageCard}>
+                <span className={styles.advantageNum}>{String(i + 1).padStart(2, '0')}</span>
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+              </article>
             </Reveal>
           ))}
         </div>
@@ -379,7 +403,7 @@ export function Landing() {
       <section className={styles.stepsSection}>
         <div className={styles.stepsLeft}>
           <div className={styles.sectionLabel}>사용 방법</div>
-          <h2 className={styles.sectionTitle}>4단계로 완성하는<br />포트폴리오 목업</h2>
+          <h2 className={styles.sectionTitle}>4단계로 완성하는<br />상업용 목업 이미지</h2>
           <p className={styles.stepsDesc}>
             복잡한 설정 없이 이미지를 올리는 순간부터<br />
             바로 시작할 수 있습니다.
@@ -391,10 +415,10 @@ export function Landing() {
 
         <div className={styles.stepsRight}>
           {[
-            { n: '01', title: '스크린샷 업로드', desc: 'PNG, JPG, WebP 파일을 드래그하거나 클릭해서 업로드합니다. 서버로 전송되지 않습니다.' },
-            { n: '02', title: '반응형 검수', desc: '모바일, 태블릿, 데스크탑 크기로 전환하며 레이아웃을 확인하고 가이드를 활용합니다.' },
-            { n: '03', title: '목업 디자인', desc: '디바이스 프레임, 배경 스타일, 그림자 강도, 텍스트 오버레이를 자유롭게 조절합니다.' },
-            { n: '04', title: 'PNG 저장', desc: '포트폴리오용 고해상도 PNG 파일을 바로 다운로드합니다.' },
+            { n: '01', title: '작업물 업로드', desc: '웹·앱 화면, 상세페이지, 포스터, 배너 이미지를 드래그하거나 클릭해서 올립니다. 서버로 전송되지 않습니다.' },
+            { n: '02', title: 'URL 또는 이미지 검수', desc: '프리셋 크기와 직접 입력 크기로 레이아웃을 확인하고, iframe 차단 사이트는 새 창에서 검수합니다.' },
+            { n: '03', title: '목업 합성', desc: '카테고리별 목업을 고르고 여러 이미지 레이어를 위치, 크기, 회전, 왜곡까지 조절합니다.' },
+            { n: '04', title: 'PNG/GIF 저장', desc: '합성된 결과만 다운로드합니다. 목업 원본 단독 저장 흐름은 제공하지 않습니다.' },
           ].map((s) => (
             <div key={s.n} className={styles.stepItem}>
               <div className={styles.stepNum}>{s.n}</div>
@@ -422,7 +446,7 @@ export function Landing() {
       <section className={styles.section}>
         <Reveal>
           <div className={styles.sectionLabel}>요금제</div>
-          <h2 className={styles.sectionTitle}>가입하면 30일 무료, 첫 3회는 평생 무료</h2>
+          <h2 className={styles.sectionTitle}>무료 사용 + 30일 이용권, 두 가지만 남겼습니다</h2>
         </Reveal>
 
         <div className={styles.planRow}>
@@ -435,9 +459,9 @@ export function Landing() {
               </div>
               <Badge variant="success">지금 사용 가능</Badge>
             </div>
-            <p className={styles.planDesc}>개인 포트폴리오 작업에 필요한 핵심 기능</p>
+            <p className={styles.planDesc}>로그인 없이 바로 쓰는 핵심 제작 기능</p>
             <ul className={styles.planList}>
-              {['반응형 검수 8종 디바이스', '기본 목업 프레임 6종', 'Before/After 비교', 'PNG Export 1× / 2×', '로컬 처리 (서버 전송 없음)'].map(f => (
+              {['반응형 검수와 URL 미리보기', '목업 이미지 레이어 합성', 'Before/After 비교와 GIF 저장', 'PNG 결과 저장', '로컬 처리 (서버 전송 없음)'].map(f => (
                 <li key={f}><span className={styles.checkOn}>✓</span>{f}</li>
               ))}
             </ul>
@@ -446,38 +470,30 @@ export function Landing() {
             </Button>
           </div>
 
-          {/* Pro + Studio */}
+          {/* 30-day pass */}
           <div className={styles.planComboCol}>
-            {[
-              {
-                name: 'Pro',
-                price: '₩9,900',
-                features: ['멀티 이미지 프로젝트', 'Export 3× / 4×', '브랜드 키트', '워터마크 제거', '프로젝트 히스토리'],
-              },
-              {
-                name: 'Studio',
-                price: '₩29,900',
-                features: ['팀 공유 및 협업', '클라우드 저장', '클라이언트 리뷰 링크', 'PDF 리포트', '브랜드 템플릿 관리'],
-              },
-            ].map((p) => (
-              <div key={p.name} className={`${styles.planCard} ${styles.planCardSoon}`}>
-                <div className={styles.planHead}>
-                  <div>
-                    <div className={styles.planName}>{p.name}</div>
-                    <div className={styles.planPrice}>{p.price} <span>/mo</span></div>
-                  </div>
-                  <Badge variant="outline">Coming Soon</Badge>
+            <div className={`${styles.planCard} ${styles.planCardSoon}`}>
+              <div className={styles.planHead}>
+                <div>
+                  <div className={styles.planName}>30일 이용권</div>
+                  <div className={styles.planPrice}>₩9,900 <span>/ 30일</span></div>
                 </div>
-                <ul className={styles.planList}>
-                  {p.features.map(f => (
-                    <li key={f}><span className={styles.checkOff}>–</span>{f}</li>
-                  ))}
-                </ul>
-                <Button variant="secondary" fullWidth onClick={() => setComingSoon(true)}>
-                  준비 중
-                </Button>
+                <Badge variant="outline">결제 준비 중</Badge>
               </div>
-            ))}
+              <p className={styles.planDesc}>로그인·결제 연동 후 제공할 상업용 확장 플랜입니다.</p>
+              <ul className={styles.planList}>
+                {['Free의 모든 기능', '상업용 목업 카테고리 확장', '여러 이미지 레이어 합성', '프로젝트 저장/관리 준비', '실제 결제는 아직 미연동'].map(f => (
+                  <li key={f}><span className={styles.checkOff}>–</span>{f}</li>
+                ))}
+              </ul>
+              <Button variant="secondary" fullWidth onClick={() => setComingSoon(true)}>
+                출시 준비 안내 보기
+              </Button>
+            </div>
+            <div className={styles.planGuard}>
+              결제 버튼처럼 보이더라도 현재 단계에서는 카드 정보나 개인정보를 받지 않습니다.
+              정식 출시 전까지 무료 기능만 실제 동작합니다.
+            </div>
           </div>
         </div>
       </section>
@@ -502,8 +518,8 @@ export function Landing() {
         <div className={styles.finalCtaInner}>
           <div className={styles.finalCtaGlow} />
           <Reveal>
-            <h2 className={styles.finalCtaTitle}>지금 바로, 무료로 시작하세요</h2>
-            <p className={styles.finalCtaDesc}>설치도 가입도 필요 없습니다. 이미지를 올리는 순간 바로 작업이 시작됩니다.</p>
+            <h2 className={styles.finalCtaTitle}>지금은 무료로 열어두고, 제품 완성도부터 올립니다</h2>
+            <p className={styles.finalCtaDesc}>설치도 가입도 필요 없습니다. 이미지를 올리는 순간 반응형 검수와 목업 합성을 바로 시작할 수 있습니다.</p>
             <div className={styles.finalCtaActions}>
               <Button variant="primary" size="lg" onClick={() => navigate('/editor')}>
                 무료로 에디터 열기
@@ -535,7 +551,7 @@ export function Landing() {
       <Modal open={comingSoon} onClose={() => setComingSoon(false)} title="준비 중입니다">
         <div className={styles.comingSoonModal}>
           <div className={styles.csEmoji}>📬</div>
-          <p>유료 플랜은 현재 개발 중입니다.<br />지금은 로그인 없이 무료 기능을 사용하세요.</p>
+          <p>30일 이용권 결제는 아직 연결하지 않았습니다.<br />지금은 로그인 없이 무료 기능만 사용할 수 있습니다.</p>
           <Button variant="primary" fullWidth onClick={() => setComingSoon(false)}>
             확인
           </Button>
