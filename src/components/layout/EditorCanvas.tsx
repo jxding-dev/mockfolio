@@ -25,7 +25,6 @@ interface Props {
   autoSlide?: boolean;
   urlRefreshKey?: number;
   selectedMockup?: MockupAsset | null;
-  onCompositePositionChange?: (x: number, y: number) => void;
   // Multi-image mockup
   mockupItems?: MockupItem[];
   selectedMockupItemId?: string | null;
@@ -46,7 +45,6 @@ export function EditorCanvas({
   autoSlide = false,
   urlRefreshKey = 0,
   selectedMockup = null,
-  onCompositePositionChange,
   mockupItems = [],
   selectedMockupItemId = null,
   onMockupItemSelect,
@@ -59,19 +57,12 @@ export function EditorCanvas({
     transparentBg, bgStyle,
     mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
     compareOrientation, inspectSource, previewUrl, previewWidth, previewHeight,
-    compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY,
   } = settings;
   const sceneText = {
     title: mockupTitle, subtitle: mockupSubtitle, tags: mockupTags,
     showDate: showMockupDate, textPosition: mockupTextPosition, textColor: mockupTextColor,
   };
   const guides: GuideOptions = { showGuides, showGrid, showCenter, showMargins };
-  const compositeTransform = {
-    x: compositeX, y: compositeY, scale: compositeScale,
-    stretchX: compositeStretchX, stretchY: compositeStretchY,
-    rotation: compositeRotation, skewX: compositeSkewX, skewY: compositeSkewY,
-  };
-
   const [zoom, setZoom] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -125,6 +116,7 @@ export function EditorCanvas({
   const hasContent = isCompare ? (!!beforeImage || !!afterImage)
     : showingUrlPreview ? Boolean(previewUrl)
     : isSceneMode ? mockupItems.length > 0
+    : isComposite ? mockupItems.length > 0
     : !!image;
 
   return (
@@ -167,9 +159,15 @@ export function EditorCanvas({
               />
             </div>
           ) : <EmptyState />
-        ) : isComposite && image ? (
+        ) : isComposite && mockupItems.length > 0 ? (
           <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
-            <MockupComposer image={image} mockup={selectedMockup} transform={compositeTransform} onPositionChange={onCompositePositionChange ?? (() => {})} />
+            <MockupComposer
+              items={mockupItems}
+              selectedId={selectedMockupItemId}
+              mockup={selectedMockup}
+              onSelect={(id) => onMockupItemSelect?.(id ?? '')}
+              onPositionChange={onMockupItemMove ?? (() => {})}
+            />
           </div>
         ) : activeMode === 'inspect' && image ? (
           <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>

@@ -14,27 +14,39 @@
 
 .imageLayer {
   position: absolute;
-  inset: 0;
-  z-index: 1;
-  overflow: hidden;
-  cursor: grab;
-  touch-action: none;
-}
-
-.dragging { cursor: grabbing; }
-
-.userImage {
-  position: absolute;
-  display: block;
   max-width: none;
   height: auto;
+  cursor: grab;
+  touch-action: none;
   transform-origin: center;
+  line-height: 0;
+}
+
+.imageLayerSelected::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
   pointer-events: none;
+  box-shadow: 0 0 0 4px var(--accent-subtle);
+}
+
+.imageLayerLocked {
+  cursor: not-allowed;
+}
+
+.userImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
 }
 
 .mockupImage {
   position: relative;
-  z-index: 2;
+  z-index: 1000;
   display: block;
   width: 100%;
   height: auto;

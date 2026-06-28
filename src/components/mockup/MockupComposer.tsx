@@ -1,74 +1,93 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import type { MockupAsset } from '../../data/mockups';
-import type { UploadedImage } from '../../types';
+import type { MockupItem } from '../../types';
 import styles from './MockupComposer.module.css';
 
-interface Transform {
-  x: number;
-  y: number;
-  scale: number;
-  stretchX: number;
-  stretchY: number;
-  rotation: number;
-  skewX: number;
-  skewY: number;
-}
-
 interface Props {
-  image: UploadedImage;
+  items: MockupItem[];
+  selectedId: string | null;
   mockup: MockupAsset;
-  transform: Transform;
-  onPositionChange: (x: number, y: number) => void;
+  onSelect: (id: string | null) => void;
+  onPositionChange: (id: string, x: number, y: number) => void;
 }
 
-export function MockupComposer({ image, mockup, transform, onPositionChange }: Props) {
-  const stageRef = useRef<HTMLDivElement>(null);
-  const [dragging, setDragging] = useState(false);
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
-  const updatePosition = (clientX: number, clientY: number) => {
+export function MockupComposer({ items, selectedId, mockup, onSelect, onPositionChange }: Props) {
+  const stageRef = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ id: string; startX: number; startY: number; baseX: number; baseY: number } | null>(null);
+
+  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>, item: MockupItem) => {
+    if (item.locked) return;
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    onSelect(item.id);
+    drag.current = {
+      id: item.id,
+      startX: event.clientX,
+      startY: event.clientY,
+      baseX: item.x,
+      baseY: item.y,
+    };
+  };
+
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const current = drag.current;
     const rect = stageRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = Math.max(-100, Math.min(100, ((clientX - rect.left) / rect.width - 0.5) * 100));
-    const y = Math.max(-100, Math.min(100, ((clientY - rect.top) / rect.height - 0.5) * 100));
-    onPositionChange(Number(x.toFixed(1)), Number(y.toFixed(1)));
+    if (!current || !rect) return;
+
+    const x = current.baseX + ((event.clientX - current.startX) / rect.width) * 100;
+    const y = current.baseY + ((event.clientY - current.startY) / rect.height) * 100;
+    onPositionChange(current.id, Number(clamp(x, -120, 120).toFixed(1)), Number(clamp(y, -120, 120).toFixed(1)));
+  };
+
+  const onPointerUp = () => {
+    drag.current = null;
   };
 
   return (
     <div className={styles.wrap}>
-      <div className={styles.stage} ref={stageRef} onContextMenu={(event) => event.preventDefault()}>
-        <div
-          className={`${styles.imageLayer} ${dragging ? styles.dragging : ''}`}
-          onPointerDown={(event) => {
-            event.currentTarget.setPointerCapture(event.pointerId);
-            setDragging(true);
-            updatePosition(event.clientX, event.clientY);
-          }}
-          onPointerMove={(event) => dragging && updatePosition(event.clientX, event.clientY)}
-          onPointerUp={() => setDragging(false)}
-          onPointerCancel={() => setDragging(false)}
-        >
-          <img
-            src={image.dataUrl}
-            alt="합성할 사용자 이미지"
-            className={styles.userImage}
+      <div
+        className={styles.stage}
+        ref={stageRef}
+        onClick={() => onSelect(null)}
+        onContextMenu={(event) => event.preventDefault()}
+      >
+        {items.map((item, index) => item.visible && (
+          <div
+            key={item.id}
+            className={`${styles.imageLayer} ${selectedId === item.id ? styles.imageLayerSelected : ''} ${item.locked ? styles.imageLayerLocked : ''}`}
             style={{
-              left: `${50 + transform.x}%`,
-              top: `${50 + transform.y}%`,
-              width: `${transform.scale * 100}%`,
-              transform: `translate(-50%, -50%) rotate(${transform.rotation}deg) skew(${transform.skewX}deg, ${transform.skewY}deg) scale(${transform.stretchX}, ${transform.stretchY})`,
+              left: `${50 + item.x}%`,
+              top: `${50 + item.y}%`,
+              width: `${item.scale * 100}%`,
+              opacity: item.opacity,
+              zIndex: index + 1,
+              transform: `translate(-50%, -50%) rotate(${item.rotation}deg) skew(${item.skewX}deg, ${item.skewY}deg) scale(${item.stretchX}, ${item.stretchY})`,
             }}
-            draggable={false}
-          />
-        </div>
+            onPointerDown={(event) => onPointerDown(event, item)}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+            title={item.locked ? '잠긴 레이어입니다.' : item.name}
+          >
+            <img
+              src={item.dataUrl}
+              alt={item.name}
+              className={styles.userImage}
+              draggable={false}
+            />
+          </div>
+        ))}
         <img
           src={mockup.src}
-          alt="선택한 목업 프레임"
+          alt={mockup.label}
           className={styles.mockupImage}
           draggable={false}
           onContextMenu={(event) => event.preventDefault()}
         />
       </div>
-      <p className={styles.hint}>이미지를 드래그해서 위치를 조정할 수 있습니다.</p>
+      <p className={styles.hint}>이미지를 여러 장 올린 뒤 레이어를 선택해 드래그로 위치를 조정할 수 있습니다.</p>
     </div>
   );
 }

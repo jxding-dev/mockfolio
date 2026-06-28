@@ -124,7 +124,6 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     projectName, activeMode, selectedDeviceId,
     inspectSource, urlInput, previewUrl, previewWidth, previewHeight,
     compareOrientation, exportScale, selectedMockupId,
-    compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY,
   } = settings;
 
   // Reflects the debounced localStorage write so the top bar can show a real time.
@@ -162,6 +161,14 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     x: offset * 7,
     y: offset * 5,
     scale: offset === 0 ? 1 : 0.82,
+    stretchX: 1,
+    stretchY: 1,
+    rotation: 0,
+    skewX: 0,
+    skewY: 0,
+    opacity: 1,
+    visible: true,
+    locked: false,
   }), [settings.frameId, settings.frameColor]);
 
   // Seed the scene with the main image the first time Mockup/Export opens.
@@ -195,6 +202,33 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     });
   }, []);
   const moveMockupItem = useCallback((id: string, x: number, y: number) => updateMockupItem(id, { x, y }), [updateMockupItem]);
+  const duplicateMockupItem = useCallback((id: string) => {
+    setMockupItems((prev) => {
+      const index = prev.findIndex((it) => it.id === id);
+      if (index < 0) return prev;
+      const source = prev[index];
+      const copy: MockupItem = {
+        ...source,
+        id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        name: `${source.name} copy`,
+        x: Math.min(120, source.x + 4),
+        y: Math.min(120, source.y + 4),
+        locked: false,
+      };
+      setSelectedMockupItemId(copy.id);
+      return [...prev.slice(0, index + 1), copy, ...prev.slice(index + 1)];
+    });
+  }, []);
+  const reorderMockupItem = useCallback((id: string, direction: 'forward' | 'backward') => {
+    setMockupItems((prev) => {
+      const index = prev.findIndex((it) => it.id === id);
+      const target = direction === 'forward' ? index + 1 : index - 1;
+      if (index < 0 || target < 0 || target >= prev.length) return prev;
+      const next = [...prev];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }, []);
 
   const exportRef = useRef<HTMLDivElement | null>(null);
   const selectedMockup = mockupAssets.find((asset) => asset.id === selectedMockupId) ?? null;
@@ -247,33 +281,37 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   }, [patch, urlInput]);
 
   const handleCompositeExport = useCallback(async () => {
-    if (!selectedMockup || !image) return;
+    if (!selectedMockup) return;
+    if (!mockupItems.some((item) => item.visible)) {
+      setExportMessage('보이는 이미지 레이어가 있어야 PNG를 저장할 수 있습니다.');
+      return;
+    }
     setExportLoading(true);
     setExportMessage(null);
     try {
-      await exportMockupComposite(image.dataUrl, selectedMockup.src, {
-        x: compositeX,
-        y: compositeY,
-        scale: compositeScale,
-        stretchX: compositeStretchX,
-        stretchY: compositeStretchY,
-        rotation: compositeRotation,
-        skewX: compositeSkewX,
-        skewY: compositeSkewY,
-      }, projectName);
+      await exportMockupComposite(mockupItems, selectedMockup.src, projectName);
       setExportMessage('합성된 PNG 파일을 저장했습니다.');
     } catch {
       setExportMessage('목업 PNG를 저장하지 못했습니다. 목업 파일을 확인해주세요.');
     } finally {
       setExportLoading(false);
     }
-  }, [compositeRotation, compositeScale, compositeSkewX, compositeSkewY, compositeStretchX, compositeStretchY, compositeX, compositeY, image, projectName, selectedMockup]);
+  }, [mockupItems, projectName, selectedMockup]);
 
   const handleCompositeReset = useCallback(() => {
-    patch('compositeX', 0); patch('compositeY', 0); patch('compositeScale', 1);
-    patch('compositeStretchX', 1); patch('compositeStretchY', 1);
-    patch('compositeRotation', 0); patch('compositeSkewX', 0); patch('compositeSkewY', 0);
-  }, [patch]);
+    if (!selectedMockupItemId) return;
+    updateMockupItem(selectedMockupItemId, {
+      x: 0,
+      y: 0,
+      scale: 1,
+      stretchX: 1,
+      stretchY: 1,
+      rotation: 0,
+      skewX: 0,
+      skewY: 0,
+      opacity: 1,
+    });
+  }, [selectedMockupItemId, updateMockupItem]);
 
   const handleGifExport = useCallback(async () => {
     if (!beforeImage || !afterImage) return;
@@ -367,7 +405,6 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
           autoSlide={autoSlide}
           urlRefreshKey={urlRefreshKey}
           selectedMockup={selectedMockup}
-          onCompositePositionChange={(x, y) => { patch('compositeX', x); patch('compositeY', y); }}
           mockupItems={mockupItems}
           selectedMockupItemId={selectedMockupItemId}
           onMockupItemSelect={(id) => setSelectedMockupItemId(id || null)}
@@ -398,6 +435,8 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
           onSelectMockupItem={setSelectedMockupItemId}
           onUpdateMockupItem={updateMockupItem}
           onRemoveMockupItem={removeMockupItem}
+          onDuplicateMockupItem={duplicateMockupItem}
+          onReorderMockupItem={reorderMockupItem}
         />
       </div>
     </div>

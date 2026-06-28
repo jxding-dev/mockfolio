@@ -46,7 +46,7 @@ export function MockupScene({
   const dateLabel = new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date());
 
   const onPointerDown = (e: React.PointerEvent, item: MockupItem) => {
-    if (!interactive) return;
+    if (!interactive || item.locked) return;
     onSelect?.(item.id);
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     drag.current = { id: item.id, startX: e.clientX, startY: e.clientY, baseX: item.x, baseY: item.y };
@@ -85,14 +85,15 @@ export function MockupScene({
       {text.textPosition === 'top' && textBlock}
 
       <div ref={sceneRef} className={styles.stage} onClick={(e) => { if (e.target === e.currentTarget) onSelect?.(''); }}>
-        {items.map((item) => (
+        {items.filter((item) => item.visible).map((item) => (
           <div
             key={item.id}
             className={`${styles.item} ${interactive ? styles.itemInteractive : ''} ${selectedId === item.id && interactive ? styles.itemSelected : ''}`}
             style={{
               left: `calc(50% + ${item.x}%)`,
               top: `calc(50% + ${item.y}%)`,
-              transform: `translate(-50%, -50%) scale(${item.scale})`,
+              transform: `translate(-50%, -50%) rotate(${item.rotation}deg) skew(${item.skewX}deg, ${item.skewY}deg) scale(${item.scale * item.stretchX}, ${item.scale * item.stretchY})`,
+              opacity: item.opacity,
               filter: `drop-shadow(${shadow})`,
             }}
             onPointerDown={(e) => onPointerDown(e, item)}

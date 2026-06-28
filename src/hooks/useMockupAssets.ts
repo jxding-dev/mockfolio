@@ -18,7 +18,14 @@ export function safeMockupSource(value: string): string | null {
   return normalized;
 }
 
-function isMockupAsset(value: unknown): value is { id: string; label: string; src: string; category?: string } {
+function isMockupAsset(value: unknown): value is {
+  id: string;
+  label: string;
+  src: string;
+  category?: string;
+  description?: string;
+  tags?: unknown;
+} {
   return typeof value === 'object' && value !== null
     && typeof (value as Record<string, unknown>).id === 'string'
     && typeof (value as Record<string, unknown>).label === 'string'
@@ -44,6 +51,10 @@ export function useMockupAssets() {
             label: asset.label.slice(0, 80),
             src: `${base}${safeSource}`,
             category: typeof asset.category === 'string' ? asset.category.slice(0, 40) : '기본 목업',
+            description: typeof asset.description === 'string' ? asset.description.slice(0, 160) : undefined,
+            tags: Array.isArray(asset.tags)
+              ? asset.tags.filter((tag): tag is string => typeof tag === 'string').slice(0, 6).map((tag) => tag.slice(0, 24))
+              : undefined,
           }] : [];
         }));
       })

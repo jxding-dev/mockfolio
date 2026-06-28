@@ -113,6 +113,8 @@ python scripts/generate_mockup_overlays.py
 
 실사형 목업은 `public/mockups/overlays/realistic/{signage,ads,banner,devices,poster}/` 아래에 둔다. 원본 생성물의 사용자 삽입 영역은 마젠타(`#ff00ff`)로 만들고, `python scripts/key_out_mockup_slots.py <input> <output>`으로 해당 영역만 투명 처리한다. 이 스크립트는 로컬 후처리용 Pillow가 필요하다.
 
+커스텀 PNG 목업 합성은 `MockupItem[]` 레이어 배열을 사용한다. 각 이미지 레이어는 위치·크기·회전·비틀기·늘림·투명도·숨김·잠금 값을 따로 가지며, 저장 시 보이는 레이어들을 먼저 그리고 마지막에 목업 PNG 오버레이를 그린다.
+
 ---
 
 ## 6. 배포 · 보안 헤더

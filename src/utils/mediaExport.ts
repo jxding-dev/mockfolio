@@ -1,15 +1,5 @@
 import { GIFEncoder, applyPalette, quantize } from 'gifenc';
-
-interface ImageTransform {
-  x: number;
-  y: number;
-  scale: number;
-  stretchX: number;
-  stretchY: number;
-  rotation: number;
-  skewX: number;
-  skewY: number;
-}
+import type { MockupItem } from '../types';
 
 type ComparisonOrientation = 'horizontal' | 'vertical';
 
@@ -36,34 +26,44 @@ function loadImage(source: string): Promise<HTMLImageElement> {
   });
 }
 
-function drawComposite(context: CanvasRenderingContext2D, user: HTMLImageElement, mockup: HTMLImageElement, transform: ImageTransform) {
-  const width = mockup.naturalWidth;
-  const height = mockup.naturalHeight;
-  const imageWidth = width * transform.scale;
-  const imageHeight = imageWidth * (user.naturalHeight / user.naturalWidth);
-  const centerX = width * (0.5 + transform.x / 100);
-  const centerY = height * (0.5 + transform.y / 100);
-  const skewXRadians = (transform.skewX * Math.PI) / 180;
-  const skewYRadians = (transform.skewY * Math.PI) / 180;
+function drawCompositeLayer(
+  context: CanvasRenderingContext2D,
+  user: HTMLImageElement,
+  layer: MockupItem,
+  width: number,
+  height: number,
+) {
+  if (!layer.visible || layer.opacity <= 0) return;
 
-  context.clearRect(0, 0, width, height);
+  const imageWidth = width * layer.scale;
+  const imageHeight = imageWidth * (user.naturalHeight / user.naturalWidth);
+  const centerX = width * (0.5 + layer.x / 100);
+  const centerY = height * (0.5 + layer.y / 100);
+  const skewXRadians = (layer.skewX * Math.PI) / 180;
+  const skewYRadians = (layer.skewY * Math.PI) / 180;
+
   context.save();
+  context.globalAlpha = Math.max(0, Math.min(1, layer.opacity));
   context.translate(centerX, centerY);
-  context.rotate((transform.rotation * Math.PI) / 180);
+  context.rotate((layer.rotation * Math.PI) / 180);
   context.transform(1, Math.tan(skewYRadians), Math.tan(skewXRadians), 1, 0, 0);
-  context.scale(transform.stretchX, transform.stretchY);
+  context.scale(layer.stretchX, layer.stretchY);
   context.drawImage(user, -imageWidth / 2, -imageHeight / 2, imageWidth, imageHeight);
   context.restore();
-  context.drawImage(mockup, 0, 0, width, height);
 }
 
 export async function exportMockupComposite(
-  userSource: string,
+  layers: MockupItem[],
   mockupSource: string,
-  transform: ImageTransform,
   projectName: string,
 ) {
-  const [user, mockup] = await Promise.all([loadImage(userSource), loadImage(mockupSource)]);
+  const visibleLayers = layers.filter((layer) => layer.visible);
+  if (visibleLayers.length === 0) throw new Error('저장할 이미지 레이어가 없습니다.');
+
+  const [mockup, ...userImages] = await Promise.all([
+    loadImage(mockupSource),
+    ...visibleLayers.map((layer) => loadImage(layer.dataUrl)),
+  ]);
   if (!mockup.naturalWidth || !mockup.naturalHeight) throw new Error('목업 크기를 확인할 수 없습니다.');
 
   const canvas = document.createElement('canvas');
@@ -71,7 +71,12 @@ export async function exportMockupComposite(
   canvas.height = mockup.naturalHeight;
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Canvas를 시작할 수 없습니다.');
-  drawComposite(context, user, mockup, transform);
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  visibleLayers.forEach((layer, index) => {
+    const userImage = userImages[index];
+    if (userImage) drawCompositeLayer(context, userImage, layer, canvas.width, canvas.height);
+  });
+  context.drawImage(mockup, 0, 0, canvas.width, canvas.height);
 
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('PNG를 생성하지 못했습니다.');

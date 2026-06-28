@@ -37,6 +37,8 @@ interface Props {
   onSelectMockupItem: (id: string | null) => void;
   onUpdateMockupItem: (id: string, patch: Partial<MockupItem>) => void;
   onRemoveMockupItem: (id: string) => void;
+  onDuplicateMockupItem: (id: string) => void;
+  onReorderMockupItem: (id: string, direction: 'forward' | 'backward') => void;
 }
 
 export function EditorRightPanel(props: Props) {
@@ -138,13 +140,16 @@ const FRAME_COLORS: { id: FrameColor; label: string; swatch: string }[] = [
 ];
 
 function MockupProps({
-  settings: s, patch, image, exportLoading, exportMessage, mockupAssets, mockupsLoading,
+  settings: s, patch, exportLoading, exportMessage, mockupAssets, mockupsLoading,
   onCompositeExport, onCompositeReset,
   mockupItems, selectedMockupItemId, onAddMockupImages, onSelectMockupItem, onUpdateMockupItem, onRemoveMockupItem,
+  onDuplicateMockupItem, onReorderMockupItem,
 }: Props) {
   const addRef = useRef<HTMLInputElement>(null);
   const selected = mockupItems.find((it) => it.id === selectedMockupItemId) ?? null;
   const isComposite = Boolean(s.selectedMockupId);
+  const selectedMockupAsset = mockupAssets.find((asset) => asset.id === s.selectedMockupId) ?? null;
+  const visibleLayerCount = mockupItems.filter((item) => item.visible).length;
 
   /* ── Custom PNG mockup mode (overlay composite) ── */
   if (isComposite) {
@@ -152,22 +157,75 @@ function MockupProps({
       <>
         <RSection title="커스텀 PNG 목업">
           <button className={styles.backToFrames} onClick={() => patch('selectedMockupId', '')}>← 기본 프레임으로 돌아가기</button>
-          <p className={styles.hint}>사용자 이미지는 목업 PNG 뒤에 배치되고, 투명하게 뚫린 영역으로만 보입니다.</p>
+          {selectedMockupAsset && (
+            <div className={styles.selectedMockupCard}>
+              <div className={styles.mockupThumbWrap}>
+                <img src={selectedMockupAsset.src} alt={selectedMockupAsset.label} className={styles.mockupThumb} draggable={false} />
+              </div>
+              <div className={styles.selectedMockupInfo}>
+                <strong>{selectedMockupAsset.label}</strong>
+                <span>{selectedMockupAsset.description ?? '투명하게 뚫린 영역 뒤로 이미지 레이어가 합성됩니다.'}</span>
+              </div>
+            </div>
+          )}
+          <p className={styles.hint}>여러 이미지를 목업 PNG 뒤에 레이어로 겹쳐 배치할 수 있습니다.</p>
         </RSection>
-        <RSection title="이미지 합성">
-          <Slider label="X 위치" value={s.compositeX} min={-100} max={100} unit="%" onChange={value => patch('compositeX', value)} />
-          <Slider label="Y 위치" value={s.compositeY} min={-100} max={100} unit="%" onChange={value => patch('compositeY', value)} />
-          <Slider label="Scale" value={Math.round(s.compositeScale * 100)} min={10} max={300} unit="%" onChange={value => patch('compositeScale', value / 100)} />
-          <Slider label="가로 늘림" value={Math.round(s.compositeStretchX * 100)} min={25} max={400} unit="%" onChange={value => patch('compositeStretchX', value / 100)} />
-          <Slider label="세로 늘림" value={Math.round(s.compositeStretchY * 100)} min={25} max={400} unit="%" onChange={value => patch('compositeStretchY', value / 100)} />
-          <Slider label="Rotate" value={s.compositeRotation} min={-180} max={180} unit="°" onChange={value => patch('compositeRotation', value)} />
-          <Slider label="X 비틀기" value={s.compositeSkewX} min={-60} max={60} unit="°" onChange={value => patch('compositeSkewX', value)} />
-          <Slider label="Y 비틀기" value={s.compositeSkewY} min={-60} max={60} unit="°" onChange={value => patch('compositeSkewY', value)} />
-          <Button variant="secondary" size="sm" fullWidth onClick={onCompositeReset}>조정 초기화</Button>
+
+        <RSection title={`이미지 레이어 (${mockupItems.length}장)`}>
+          <LayerList
+            items={mockupItems}
+            selectedId={selectedMockupItemId}
+            onSelect={onSelectMockupItem}
+            onUpdate={onUpdateMockupItem}
+            onRemove={onRemoveMockupItem}
+          />
+          <Button variant="secondary" size="sm" fullWidth onClick={() => addRef.current?.click()}>+ 이미지 추가</Button>
+          <input
+            ref={addRef}
+            type="file"
+            accept="image/png,image/jpeg,image/jpg,image/webp"
+            multiple
+            className={styles.hiddenInput}
+            onChange={(e) => { if (e.target.files) onAddMockupImages(e.target.files); e.target.value = ''; }}
+          />
+          <p className={styles.hint}>이미지를 여러 장 추가하고 캔버스에서 선택한 레이어를 드래그하세요.</p>
         </RSection>
+
+        {selected ? (
+          <>
+            <RSection title="선택 레이어 빠른 작업">
+              <div className={styles.layerActionGrid}>
+                <button className={styles.layerActionBtn} onClick={() => onUpdateMockupItem(selected.id, { x: 0, y: 0 })}>가운데</button>
+                <button className={styles.layerActionBtn} onClick={() => onDuplicateMockupItem(selected.id)}>복제</button>
+                <button className={styles.layerActionBtn} onClick={() => onReorderMockupItem(selected.id, 'forward')}>앞으로</button>
+                <button className={styles.layerActionBtn} onClick={() => onReorderMockupItem(selected.id, 'backward')}>뒤로</button>
+              </div>
+            </RSection>
+
+            <RSection title="선택 레이어 조정">
+              <Slider label="X 위치" value={selected.x} min={-120} max={120} unit="%" onChange={value => onUpdateMockupItem(selected.id, { x: value })} />
+              <Slider label="Y 위치" value={selected.y} min={-120} max={120} unit="%" onChange={value => onUpdateMockupItem(selected.id, { y: value })} />
+              <Slider label="크기" value={Math.round(selected.scale * 100)} min={10} max={300} unit="%" onChange={value => onUpdateMockupItem(selected.id, { scale: value / 100 })} />
+              <Slider label="회전" value={selected.rotation} min={-180} max={180} unit="°" onChange={value => onUpdateMockupItem(selected.id, { rotation: value })} />
+              <Slider label="투명도" value={Math.round(selected.opacity * 100)} min={0} max={100} unit="%" onChange={value => onUpdateMockupItem(selected.id, { opacity: value / 100 })} />
+              <CollapsibleSection title="고급 변형">
+                <Slider label="가로 늘림" value={Math.round(selected.stretchX * 100)} min={25} max={400} unit="%" onChange={value => onUpdateMockupItem(selected.id, { stretchX: value / 100 })} />
+                <Slider label="세로 늘림" value={Math.round(selected.stretchY * 100)} min={25} max={400} unit="%" onChange={value => onUpdateMockupItem(selected.id, { stretchY: value / 100 })} />
+                <Slider label="X 비틀기" value={selected.skewX} min={-60} max={60} unit="°" onChange={value => onUpdateMockupItem(selected.id, { skewX: value })} />
+                <Slider label="Y 비틀기" value={selected.skewY} min={-60} max={60} unit="°" onChange={value => onUpdateMockupItem(selected.id, { skewY: value })} />
+              </CollapsibleSection>
+              <Button variant="secondary" size="sm" fullWidth onClick={onCompositeReset}>선택 레이어 초기화</Button>
+            </RSection>
+          </>
+        ) : (
+          <RSection title="선택 레이어">
+            <p className={styles.hint}>레이어를 선택하면 위치, 크기, 회전, 비틀기 값을 조정할 수 있습니다.</p>
+          </RSection>
+        )}
+
         <div className={styles.exportFooter}>
-          <Button variant="primary" size="lg" fullWidth loading={exportLoading} disabled={!image} onClick={onCompositeExport}>합성 PNG 저장</Button>
-          <p className={styles.exportNote}>{image ? '합성 결과만 PNG로 저장됩니다.' : '먼저 이미지를 업로드해야 합성 PNG를 저장할 수 있습니다.'}</p>
+          <Button variant="primary" size="lg" fullWidth loading={exportLoading} disabled={visibleLayerCount === 0} onClick={onCompositeExport}>합성 PNG 저장</Button>
+          <p className={styles.exportNote}>{visibleLayerCount > 0 ? '보이는 이미지 레이어와 목업 PNG가 합성되어 저장됩니다.' : '먼저 이미지를 추가하거나 숨김을 해제해야 저장할 수 있습니다.'}</p>
           {exportMessage && <p className={styles.exportMessage} role="status">{exportMessage}</p>}
         </div>
       </>
@@ -297,7 +355,7 @@ function MockupProps({
         )}
       </RSection>
 
-      <CollapsibleSection title="커스텀 PNG 목업 (직접 만든 PNG)">
+      <CollapsibleSection title="커스텀 PNG 목업 선택" defaultOpen>
         {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets.length ? (
           <div className={styles.mockupCategoryList}>
             {Object.entries(mockupAssets.reduce<Record<string, MockupAsset[]>>((g, a) => { const c = a.category || '기본 목업'; g[c] = [...(g[c] ?? []), a]; return g; }, {})).map(([category, assets]) => (
@@ -305,7 +363,12 @@ function MockupProps({
                 <div className={styles.mockupCategoryTitle}>{category}</div>
                 <div className={styles.mockupAssetGrid}>
                   {assets.map((asset) => (
-                    <button key={asset.id} className={styles.frameBtn} onClick={() => patch('selectedMockupId', asset.id)}>{asset.label}</button>
+                    <MockupAssetCard
+                      key={asset.id}
+                      asset={asset}
+                      active={s.selectedMockupId === asset.id}
+                      onSelect={() => patch('selectedMockupId', asset.id)}
+                    />
                   ))}
                 </div>
               </div>
@@ -321,9 +384,89 @@ function MockupProps({
   );
 }
 
+function LayerList({
+  items,
+  selectedId,
+  onSelect,
+  onUpdate,
+  onRemove,
+}: {
+  items: MockupItem[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
+  onUpdate: (id: string, patch: Partial<MockupItem>) => void;
+  onRemove: (id: string) => void;
+}) {
+  if (items.length === 0) {
+    return <p className={styles.hint}>이미지를 추가하면 여기에서 레이어를 관리할 수 있습니다.</p>;
+  }
+
+  return (
+    <div className={styles.itemList}>
+      {items.map((it, index) => (
+        <div
+          key={it.id}
+          className={`${styles.itemRow} ${selectedId === it.id ? styles.itemRowActive : ''} ${!it.visible ? styles.itemRowMuted : ''}`}
+          onClick={() => onSelect(it.id)}
+        >
+          <span className={styles.itemIndex}>{index + 1}</span>
+          <img src={it.dataUrl} alt={it.name} className={styles.itemThumb} />
+          <span className={styles.itemName} title={it.name}>{it.name}</span>
+          <button
+            className={styles.itemMiniBtn}
+            onClick={(e) => { e.stopPropagation(); onUpdate(it.id, { visible: !it.visible }); }}
+            aria-label={it.visible ? '레이어 숨기기' : '레이어 보이기'}
+            title={it.visible ? '숨기기' : '보이기'}
+          >
+            {it.visible ? '눈' : '숨김'}
+          </button>
+          <button
+            className={styles.itemMiniBtn}
+            onClick={(e) => { e.stopPropagation(); onUpdate(it.id, { locked: !it.locked }); }}
+            aria-label={it.locked ? '레이어 잠금 해제' : '레이어 잠금'}
+            title={it.locked ? '잠금 해제' : '잠금'}
+          >
+            {it.locked ? '잠김' : '열림'}
+          </button>
+          <button className={styles.itemRemove} onClick={(e) => { e.stopPropagation(); onRemove(it.id); }} aria-label="이미지 제거">×</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MockupAssetCard({ asset, active, onSelect }: { asset: MockupAsset; active: boolean; onSelect: () => void }) {
+  return (
+    <button
+      className={`${styles.mockupAssetCard} ${active ? styles.mockupAssetCardActive : ''}`}
+      onClick={onSelect}
+      title={asset.description ?? asset.label}
+    >
+      <span className={styles.mockupPreviewBox}>
+        <img
+          src={asset.src}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+          onContextMenu={(event) => event.preventDefault()}
+        />
+      </span>
+      <span className={styles.mockupCardTitle}>{asset.label}</span>
+      {asset.description && <span className={styles.mockupCardDesc}>{asset.description}</span>}
+      {asset.tags && asset.tags.length > 0 && (
+        <span className={styles.mockupTags}>
+          {asset.tags.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}
+        </span>
+      )}
+    </button>
+  );
+}
+
 /* ── Collapsible section (secondary content) ── */
-function CollapsibleSection({ title, children }: { title: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
+function CollapsibleSection({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <div className={styles.section}>
       <button className={styles.collapseHead} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
@@ -378,10 +521,10 @@ function safeFileLabel(name: string): string {
   return cleaned || 'project';
 }
 
-function ExportProps({ settings: s, patch, image, mockupItems, onExport, exportLoading, exportMessage }: Props) {
+function ExportProps({ settings: s, patch, mockupItems, onExport, exportLoading, exportMessage }: Props) {
   const scales = [1, 2] as const;
   const isComposite = Boolean(s.selectedMockupId);
-  const canExport = isComposite ? !!image : mockupItems.length > 0;
+  const canExport = mockupItems.some((item) => item.visible);
   const fileName = isComposite
     ? `mockfolio-${safeFileLabel(s.projectName)}-mockup.png`
     : `mockfolio-${safeFileLabel(s.projectName)}-${new Date().toISOString().slice(0, 10)}.png`;

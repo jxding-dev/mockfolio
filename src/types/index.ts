@@ -40,6 +40,14 @@ export interface MockupItem {
   x: number;             // % offset from scene center (-50..50-ish)
   y: number;
   scale: number;         // 0.3 .. 1.6
+  stretchX: number;
+  stretchY: number;
+  rotation: number;
+  skewX: number;
+  skewY: number;
+  opacity: number;
+  visible: boolean;
+  locked: boolean;
 }
 
 // ── Mockup ───────────────────────────────────────────────────

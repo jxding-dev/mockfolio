@@ -3,4 +3,6 @@ export interface MockupAsset {
   label: string;
   src: string;
   category?: string;
+  description?: string;
+  tags?: string[];
 }
