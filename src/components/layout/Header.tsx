@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { Badge } from '../ui/Badge';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import styles from './Header.module.css';
 
 export function Header() {
@@ -38,6 +39,7 @@ export function Header() {
 
           {/* Actions */}
           <div className={styles.actions}>
+            <ThemeToggle />
             <Button className={styles.loginButton} variant="ghost" size="sm" onClick={() => setComingSoon(true)}>
               로그인
             </Button>

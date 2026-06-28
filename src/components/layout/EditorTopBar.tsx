@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { AppMode } from '../../types';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import styles from './EditorTopBar.module.css';
 
 interface Props {
@@ -91,6 +92,7 @@ export function EditorTopBar({
 
         {/* Right: login */}
         <div className={styles.right}>
+          <ThemeToggle />
           <Button variant="ghost" size="sm" onClick={() => setShowLogin(true)}>
             로그인
           </Button>

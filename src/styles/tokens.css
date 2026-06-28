@@ -4,6 +4,8 @@
    ============================================================ */
 
 :root {
+  color-scheme: light;
+
   /* ── Background ─────────────────────────────────────── */
   --bg-base:        #FFFFFF;
   --bg-subtle:      #F8FAFC;
@@ -121,8 +123,13 @@
   --z-toast:   500;
 }
 
-/* ── Dark Mode ───────────────────────────────────────────── */
+/* ── Dark Mode ───────────────────────────────────────────────
+   Values are duplicated in the prefers-color-scheme block below so that
+   system-dark users get the correct first paint with no flash (CSP blocks an
+   inline theme script). Keep the two dark blocks in sync.
+   ──────────────────────────────────────────────────────────── */
 [data-theme="dark"] {
+  color-scheme: dark;
   --bg-base:        #0F172A;
   --bg-subtle:      #131B2E;
   --bg-muted:       #1E293B;
@@ -145,10 +152,57 @@
   --accent-subtle:    rgba(99,102,241,0.15);
   --accent-muted:     rgba(99,102,241,0.30);
 
+  /* semantic subtles tuned for dark surfaces */
+  --success-subtle: rgba(16,185,129,0.16);
+  --warning-subtle: rgba(245,158,11,0.16);
+  --error-subtle:   rgba(239,68,68,0.16);
+  --info-subtle:    rgba(59,130,246,0.16);
+
   --shadow-xs:  0 1px 2px rgba(0,0,0,0.3);
   --shadow-sm:  0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
   --shadow-md:  0 4px 8px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
   --shadow-lg:  0 8px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
   --shadow-xl:  0 16px 40px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3);
   --shadow-2xl: 0 24px 64px rgba(0,0,0,0.6), 0 12px 24px rgba(0,0,0,0.4);
+}
+
+/* System-dark default (applies only until the user makes an explicit choice).
+   Mirror of [data-theme="dark"] — keep in sync. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg-base:        #0F172A;
+    --bg-subtle:      #131B2E;
+    --bg-muted:       #1E293B;
+    --bg-canvas:      #0D1424;
+
+    --surface-raised:   #1E293B;
+    --surface-overlay:  #1E293B;
+    --surface-sunken:   #131B2E;
+
+    --border-default: rgba(255,255,255,0.08);
+    --border-muted:   rgba(255,255,255,0.05);
+    --border-strong:  rgba(255,255,255,0.16);
+
+    --text-primary:   #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-tertiary:  #475569;
+    --text-disabled:  #334155;
+    --text-inverse:   #0F172A;
+
+    --accent-subtle:    rgba(99,102,241,0.15);
+    --accent-muted:     rgba(99,102,241,0.30);
+
+    --success-subtle: rgba(16,185,129,0.16);
+    --warning-subtle: rgba(245,158,11,0.16);
+    --error-subtle:   rgba(239,68,68,0.16);
+    --info-subtle:    rgba(59,130,246,0.16);
+
+    --shadow-xs:  0 1px 2px rgba(0,0,0,0.3);
+    --shadow-sm:  0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md:  0 4px 8px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+    --shadow-lg:  0 8px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+    --shadow-xl:  0 16px 40px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3);
+    --shadow-2xl: 0 24px 64px rgba(0,0,0,0.6), 0 12px 24px rgba(0,0,0,0.4);
+  }
 }

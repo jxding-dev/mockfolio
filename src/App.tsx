@@ -6,6 +6,7 @@ import { Editor } from './pages/Editor';
 import { Pricing } from './pages/Pricing';
 import { NotFound } from './pages/NotFound';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import { ThemeProvider } from './hooks/useTheme';
 
 function AppShell() {
   const { pathname } = useLocation();
@@ -26,5 +27,9 @@ function AppShell() {
 }
 
 export default function App() {
-  return <BrowserRouter><AppShell /></BrowserRouter>;
+  return (
+    <ThemeProvider>
+      <BrowserRouter><AppShell /></BrowserRouter>
+    </ThemeProvider>
+  );
 }

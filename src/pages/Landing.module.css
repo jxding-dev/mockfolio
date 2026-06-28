@@ -888,7 +888,7 @@
 
 .planCardFree {
   border-color: var(--accent-muted);
-  background: linear-gradient(160deg, #FAFAFE 0%, #EEF2FF 100%);
+  background: linear-gradient(160deg, var(--bg-base) 0%, var(--accent-subtle) 100%);
   box-shadow: var(--shadow-md);
 }
 
