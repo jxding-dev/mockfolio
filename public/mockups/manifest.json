@@ -65,6 +65,126 @@
       "label": "Desktop Studio",
       "category": "샘플 목업",
       "src": "mockups/overlays/samples/sample-desktop-studio.png"
+    },
+    {
+      "id": "ios-phone-desk-premium",
+      "label": "iOS Phone Desk",
+      "category": "앱 목업",
+      "src": "mockups/overlays/app/ios-phone-desk-premium.png"
+    },
+    {
+      "id": "android-phone-gradient-card",
+      "label": "Android Gradient Card",
+      "category": "앱 목업",
+      "src": "mockups/overlays/app/android-phone-gradient-card.png"
+    },
+    {
+      "id": "tablet-dashboard-studio",
+      "label": "Tablet Dashboard",
+      "category": "앱 목업",
+      "src": "mockups/overlays/app/tablet-dashboard-studio.png"
+    },
+    {
+      "id": "dual-mobile-app-showcase",
+      "label": "Dual Mobile Apps",
+      "category": "앱 목업",
+      "src": "mockups/overlays/app/dual-mobile-app-showcase.png"
+    },
+    {
+      "id": "desktop-monitor-clean-office",
+      "label": "Desktop Monitor",
+      "category": "웹사이트 목업",
+      "src": "mockups/overlays/web/desktop-monitor-clean-office.png"
+    },
+    {
+      "id": "laptop-website-hero-angle",
+      "label": "Laptop Website Hero",
+      "category": "웹사이트 목업",
+      "src": "mockups/overlays/web/laptop-website-hero-angle.png"
+    },
+    {
+      "id": "browser-window-saas-dashboard",
+      "label": "SaaS Browser",
+      "category": "웹사이트 목업",
+      "src": "mockups/overlays/web/browser-window-saas-dashboard.png"
+    },
+    {
+      "id": "ultrawide-dashboard-wall",
+      "label": "Ultrawide Dashboard",
+      "category": "웹사이트 목업",
+      "src": "mockups/overlays/web/ultrawide-dashboard-wall.png"
+    },
+    {
+      "id": "commerce-long-detail-panels",
+      "label": "Long Detail Panels",
+      "category": "상세페이지 목업",
+      "src": "mockups/overlays/ecommerce/commerce-long-detail-panels.png"
+    },
+    {
+      "id": "product-page-card-gallery",
+      "label": "Product Page Gallery",
+      "category": "상세페이지 목업",
+      "src": "mockups/overlays/ecommerce/product-page-card-gallery.png"
+    },
+    {
+      "id": "subway-lightbox-poster",
+      "label": "Subway Lightbox",
+      "category": "포스터 목업",
+      "src": "mockups/overlays/poster/subway-lightbox-poster.png"
+    },
+    {
+      "id": "gallery-wall-poster-duo",
+      "label": "Gallery Poster Duo",
+      "category": "포스터 목업",
+      "src": "mockups/overlays/poster/gallery-wall-poster-duo.png"
+    },
+    {
+      "id": "street-billboard-wide",
+      "label": "Street Billboard Wide",
+      "category": "배너/광고 목업",
+      "src": "mockups/overlays/banner/street-billboard-wide.png"
+    },
+    {
+      "id": "metro-platform-banner",
+      "label": "Metro Platform Banner",
+      "category": "배너/광고 목업",
+      "src": "mockups/overlays/banner/metro-platform-banner.png"
+    },
+    {
+      "id": "social-square-card-stack",
+      "label": "Social Square Stack",
+      "category": "소셜 광고 목업",
+      "src": "mockups/overlays/social/social-square-card-stack.png"
+    },
+    {
+      "id": "vertical-story-phone-ad",
+      "label": "Story Phone Ad",
+      "category": "소셜 광고 목업",
+      "src": "mockups/overlays/social/vertical-story-phone-ad.png"
+    },
+    {
+      "id": "bus-stop-premium-panel",
+      "label": "Bus Stop Premium",
+      "category": "실사 광고 목업",
+      "src": "mockups/overlays/ads/bus-stop-premium-panel.png"
+    },
+    {
+      "id": "city-rooftop-billboard",
+      "label": "Rooftop Billboard",
+      "category": "실사 광고 목업",
+      "src": "mockups/overlays/ads/city-rooftop-billboard.png"
+    },
+    {
+      "id": "round-hanging-store-sign",
+      "label": "Round Hanging Sign",
+      "category": "간판 목업",
+      "src": "mockups/overlays/signage/round-hanging-store-sign.png"
+    },
+    {
+      "id": "magazine-spread-ad",
+      "label": "Magazine Spread",
+      "category": "프린트 목업",
+      "src": "mockups/overlays/print/magazine-spread-ad.png"
     }
   ]
 }

@@ -83,7 +83,8 @@ src/
   styles/       tokens.css · reset.css
   **/*.test.ts  보안 검증 함수 단위 테스트 (vitest)
 public/         manifest.webmanifest · robots.txt · sitemap.xml · favicon.svg
-public/mockups/ manifest.json · overlays/{ecommerce,app,web,poster,banner,social,ads,signage,samples}/
+public/mockups/ manifest.json · overlays/{ecommerce,app,web,poster,banner,social,ads,signage,print,samples}/
+scripts/        generate_mockup_overlays.py  # 자체 제작 투명 PNG 목업 재생성
 ```
 
 상태는 `Editor.tsx`의 `EditorSettings` 한 객체에 모이고 `patch(key, value)`로만 갱신한다. 새 옵션을 추가할 땐 `editorSettings.ts`의 타입·기본값·`normalizeEditorSettings`를 함께 갱신한다.
@@ -100,6 +101,14 @@ public/mockups/ manifest.json · overlays/{ecommerce,app,web,poster,banner,socia
 ```
 
 `src`는 반드시 `mockups/overlays/`로 시작. 외부 URL·`../`·절대경로는 런타임에서 차단된다.
+
+자체 제작 PNG 목업을 재생성하거나 manifest를 갱신하려면:
+
+```bash
+python scripts/generate_mockup_overlays.py
+```
+
+이 스크립트는 외부 이미지/유료 API 없이 표준 Python만 사용하며, 사용자 이미지 영역을 alpha 0으로 뚫은 PNG를 생성한다.
 
 ---
 
