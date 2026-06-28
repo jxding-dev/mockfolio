@@ -88,7 +88,7 @@ export function MockupScene({
         {items.filter((item) => item.visible).map((item) => (
           <div
             key={item.id}
-            className={`${styles.item} ${interactive ? styles.itemInteractive : ''} ${selectedId === item.id && interactive ? styles.itemSelected : ''}`}
+            className={`${styles.item} ${interactive && !item.locked ? styles.itemInteractive : ''} ${selectedId === item.id && interactive && items.filter((i) => i.visible).length > 1 ? styles.itemSelected : ''}`}
             style={{
               left: `calc(50% + ${item.x}%)`,
               top: `calc(50% + ${item.y}%)`,

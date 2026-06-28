@@ -35,14 +35,6 @@ export interface EditorSettings {
   exportScale: 1 | 2;
   transparentBg: boolean;
   selectedMockupId: string;
-  compositeX: number;
-  compositeY: number;
-  compositeScale: number;
-  compositeStretchX: number;
-  compositeStretchY: number;
-  compositeRotation: number;
-  compositeSkewX: number;
-  compositeSkewY: number;
 }
 
 export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
@@ -79,14 +71,6 @@ export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
   exportScale: 2,
   transparentBg: false,
   selectedMockupId: '',
-  compositeX: 0,
-  compositeY: 0,
-  compositeScale: 1,
-  compositeStretchX: 1,
-  compositeStretchY: 1,
-  compositeRotation: 0,
-  compositeSkewX: 0,
-  compositeSkewY: 0,
 };
 
 export const CHECKLIST_LENGTH = 5;
@@ -157,13 +141,5 @@ export function normalizeEditorSettings(value: unknown): EditorSettings {
     exportScale: enumValue(source.exportScale, [1, 2] as const, DEFAULT_EDITOR_SETTINGS.exportScale),
     transparentBg: booleanValue(source.transparentBg, DEFAULT_EDITOR_SETTINGS.transparentBg),
     selectedMockupId: textValue(source.selectedMockupId, DEFAULT_EDITOR_SETTINGS.selectedMockupId, 80),
-    compositeX: numberValue(source.compositeX, DEFAULT_EDITOR_SETTINGS.compositeX, -100, 100),
-    compositeY: numberValue(source.compositeY, DEFAULT_EDITOR_SETTINGS.compositeY, -100, 100),
-    compositeScale: numberValue(source.compositeScale, DEFAULT_EDITOR_SETTINGS.compositeScale, 0.1, 3),
-    compositeStretchX: numberValue(source.compositeStretchX, DEFAULT_EDITOR_SETTINGS.compositeStretchX, 0.25, 4),
-    compositeStretchY: numberValue(source.compositeStretchY, DEFAULT_EDITOR_SETTINGS.compositeStretchY, 0.25, 4),
-    compositeRotation: numberValue(source.compositeRotation, DEFAULT_EDITOR_SETTINGS.compositeRotation, -180, 180),
-    compositeSkewX: numberValue(source.compositeSkewX, DEFAULT_EDITOR_SETTINGS.compositeSkewX, -60, 60),
-    compositeSkewY: numberValue(source.compositeSkewY, DEFAULT_EDITOR_SETTINGS.compositeSkewY, -60, 60),
   };
 }

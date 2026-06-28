@@ -355,7 +355,7 @@ function MockupProps({
         )}
       </RSection>
 
-      <CollapsibleSection title="커스텀 PNG 목업 선택" defaultOpen>
+      <CollapsibleSection title="커스텀 PNG 목업 선택">
         {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets.length ? (
           <div className={styles.mockupCategoryList}>
             {Object.entries(mockupAssets.reduce<Record<string, MockupAsset[]>>((g, a) => { const c = a.category || '기본 목업'; g[c] = [...(g[c] ?? []), a]; return g; }, {})).map(([category, assets]) => (

@@ -9,10 +9,10 @@ describe('normalizeEditorSettings', () => {
   });
 
   it('clamps out-of-range numbers', () => {
-    const s = normalizeEditorSettings({ shadowIntensity: 9999, frameCornerRadius: -50, compositeScale: 100 });
+    const s = normalizeEditorSettings({ shadowIntensity: 9999, frameCornerRadius: -50, previewWidth: 99999 });
     expect(s.shadowIntensity).toBe(100);
     expect(s.frameCornerRadius).toBe(0);
-    expect(s.compositeScale).toBe(3);
+    expect(s.previewWidth).toBe(1920);
   });
 
   it('rejects invalid enum values and falls back', () => {
