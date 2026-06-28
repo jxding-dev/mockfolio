@@ -185,6 +185,126 @@
       "label": "Magazine Spread",
       "category": "프린트 목업",
       "src": "mockups/overlays/print/magazine-spread-ad.png"
+    },
+    {
+      "id": "real-storefront-hanging-sign",
+      "label": "Real Storefront Sign",
+      "category": "실사 간판 목업",
+      "src": "mockups/overlays/realistic/signage/real-storefront-hanging-sign.png"
+    },
+    {
+      "id": "real-round-cafe-sign",
+      "label": "Real Round Cafe Sign",
+      "category": "실사 간판 목업",
+      "src": "mockups/overlays/realistic/signage/real-round-cafe-sign.png"
+    },
+    {
+      "id": "real-restaurant-menu-board",
+      "label": "Real Menu Board",
+      "category": "실사 간판 목업",
+      "src": "mockups/overlays/realistic/signage/real-restaurant-menu-board.png"
+    },
+    {
+      "id": "real-city-building-billboard",
+      "label": "Real City Billboard",
+      "category": "실사 광고판 목업",
+      "src": "mockups/overlays/realistic/ads/real-city-building-billboard.png"
+    },
+    {
+      "id": "real-rooftop-led-billboard",
+      "label": "Real Rooftop LED",
+      "category": "실사 광고판 목업",
+      "src": "mockups/overlays/realistic/ads/real-rooftop-led-billboard.png"
+    },
+    {
+      "id": "real-bus-stop-lightbox",
+      "label": "Real Bus Stop Lightbox",
+      "category": "실사 광고판 목업",
+      "src": "mockups/overlays/realistic/ads/real-bus-stop-lightbox.png"
+    },
+    {
+      "id": "real-mall-digital-kiosk",
+      "label": "Real Mall Kiosk",
+      "category": "실사 광고판 목업",
+      "src": "mockups/overlays/realistic/ads/real-mall-digital-kiosk.png"
+    },
+    {
+      "id": "real-subway-platform-poster",
+      "label": "Real Subway Poster",
+      "category": "실사 포스터 목업",
+      "src": "mockups/overlays/realistic/poster/real-subway-platform-poster.png"
+    },
+    {
+      "id": "real-store-window-poster",
+      "label": "Real Store Window Poster",
+      "category": "실사 포스터 목업",
+      "src": "mockups/overlays/realistic/poster/real-store-window-poster.png"
+    },
+    {
+      "id": "real-highway-billboard-sunset",
+      "label": "Real Highway Billboard",
+      "category": "실사 배너 목업",
+      "src": "mockups/overlays/realistic/banner/real-highway-billboard-sunset.png"
+    },
+    {
+      "id": "real-event-booth-wide-banner",
+      "label": "Real Event Booth Banner",
+      "category": "실사 배너 목업",
+      "src": "mockups/overlays/realistic/banner/real-event-booth-wide-banner.png"
+    },
+    {
+      "id": "real-building-wall-banner",
+      "label": "Real Building Wall Banner",
+      "category": "실사 배너 목업",
+      "src": "mockups/overlays/realistic/banner/real-building-wall-banner.png"
+    },
+    {
+      "id": "real-led-stage-screen",
+      "label": "Real LED Stage Screen",
+      "category": "실사 배너 목업",
+      "src": "mockups/overlays/realistic/banner/real-led-stage-screen.png"
+    },
+    {
+      "id": "real-desktop-monitor-desk",
+      "label": "Real Desktop Monitor",
+      "category": "실사 디바이스 목업",
+      "src": "mockups/overlays/realistic/devices/real-desktop-monitor-desk.png"
+    },
+    {
+      "id": "real-laptop-cafe-table",
+      "label": "Real Laptop Cafe",
+      "category": "실사 디바이스 목업",
+      "src": "mockups/overlays/realistic/devices/real-laptop-cafe-table.png"
+    },
+    {
+      "id": "real-studio-monitor-imac",
+      "label": "Real Studio Monitor",
+      "category": "실사 디바이스 목업",
+      "src": "mockups/overlays/realistic/devices/real-studio-monitor-imac.png"
+    },
+    {
+      "id": "real-smartphone-in-hand",
+      "label": "Real Smartphone Hand",
+      "category": "실사 디바이스 목업",
+      "src": "mockups/overlays/realistic/devices/real-smartphone-in-hand.png"
+    },
+    {
+      "id": "real-phone-on-desk",
+      "label": "Real Phone Desk",
+      "category": "실사 디바이스 목업",
+      "src": "mockups/overlays/realistic/devices/real-phone-on-desk.png"
+    },
+    {
+      "id": "real-tablet-office-table",
+      "label": "Real Tablet Office",
+      "category": "실사 디바이스 목업",
+      "src": "mockups/overlays/realistic/devices/real-tablet-office-table.png"
+    },
+    {
+      "id": "real-dual-device-showcase",
+      "label": "Real Dual Device",
+      "category": "실사 디바이스 목업",
+      "src": "mockups/overlays/realistic/devices/real-dual-device-showcase.png"
     }
   ]
 }

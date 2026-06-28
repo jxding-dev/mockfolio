@@ -83,8 +83,9 @@ src/
   styles/       tokens.css · reset.css
   **/*.test.ts  보안 검증 함수 단위 테스트 (vitest)
 public/         manifest.webmanifest · robots.txt · sitemap.xml · favicon.svg
-public/mockups/ manifest.json · overlays/{ecommerce,app,web,poster,banner,social,ads,signage,print,samples}/
+public/mockups/ manifest.json · overlays/{ecommerce,app,web,poster,banner,social,ads,signage,print,samples,realistic}/
 scripts/        generate_mockup_overlays.py  # 자체 제작 투명 PNG 목업 재생성
+scripts/        key_out_mockup_slots.py      # 실사 목업의 #ff00ff 삽입면을 alpha로 변환
 ```
 
 상태는 `Editor.tsx`의 `EditorSettings` 한 객체에 모이고 `patch(key, value)`로만 갱신한다. 새 옵션을 추가할 땐 `editorSettings.ts`의 타입·기본값·`normalizeEditorSettings`를 함께 갱신한다.
@@ -109,6 +110,8 @@ python scripts/generate_mockup_overlays.py
 ```
 
 이 스크립트는 외부 이미지/유료 API 없이 표준 Python만 사용하며, 사용자 이미지 영역을 alpha 0으로 뚫은 PNG를 생성한다.
+
+실사형 목업은 `public/mockups/overlays/realistic/{signage,ads,banner,devices,poster}/` 아래에 둔다. 원본 생성물의 사용자 삽입 영역은 마젠타(`#ff00ff`)로 만들고, `python scripts/key_out_mockup_slots.py <input> <output>`으로 해당 영역만 투명 처리한다. 이 스크립트는 로컬 후처리용 Pillow가 필요하다.
 
 ---
 
