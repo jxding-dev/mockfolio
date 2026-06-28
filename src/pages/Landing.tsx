@@ -29,9 +29,9 @@ const REVIEWS: Review[] = [
 ];
 
 const FAQS: { q: string; a: string }[] = [
-  { q: '정말 무료인가요?', a: '네. 현재 공개된 핵심 기능은 로그인과 결제 없이 무료로 사용할 수 있습니다. 정식 결제 연동 후에는 30일 이용권을 별도로 제공합니다.' },
+  { q: '정말 무료인가요?', a: '네. Free 플랜은 URL Preview, 기본 목업, PNG 저장, 일부 프레임을 계속 무료로 제공합니다.' },
   { q: '업로드한 이미지는 안전한가요?', a: '모든 이미지는 브라우저 안에서만 처리됩니다. 외부 서버로 전송하지 않고, AI 학습에도 사용하지 않습니다.' },
-  { q: '결제는 어떻게 하나요?', a: '아직 실제 결제는 연결하지 않았습니다. 향후 로그인과 결제 서버를 분리해 30일 이용권 ₩9,900 구조로 제공할 예정입니다.' },
+  { q: '결제는 어떻게 하나요?', a: '아직 실제 결제는 연결하지 않았습니다. 향후 Supabase Auth와 Toss Payments를 붙여 Pro 월 9,900원 구조로 제공할 예정입니다.' },
   { q: '상업적으로 사용할 수 있나요?', a: '네. 직접 만든 목업 결과물은 포트폴리오·제안서 등 상업적 용도로 자유롭게 사용할 수 있습니다.' },
 ];
 
@@ -302,7 +302,7 @@ export function Landing() {
         <div className={styles.heroInner}>
           <div className={`${styles.heroText} ${styles.heroEnter}`}>
             <span className={styles.heroBadgeWrap}>
-              <Badge variant="accent">무료 사용 가능 · 30일 이용권 ₩9,900 준비 중</Badge>
+              <Badge variant="accent">Free available · Pro ₩9,900/mo 준비 중</Badge>
             </span>
 
             <h1 className={styles.heroTitle}>
@@ -342,7 +342,7 @@ export function Landing() {
               <div className={styles.heroStatDivider} />
               <div className={styles.heroStat}>
                 <span className={styles.heroStatNum}>₩9,900</span>
-                <span className={styles.heroStatLabel}>30일권 예정가</span>
+                <span className={styles.heroStatLabel}>Pro 월 예정가</span>
               </div>
             </div>
           </div>
@@ -399,6 +399,54 @@ export function Landing() {
         </div>
       </section>
 
+      {/* ── USE CASES ───────────────────────── */}
+      <section className={styles.useCaseSection}>
+        <Reveal>
+          <div className={styles.sectionLabelCenter}>실제 사용 예시</div>
+          <h2 className={styles.sectionTitleCenter}>작업물 종류가 달라도 같은 흐름으로 완성합니다</h2>
+        </Reveal>
+        <div className={styles.useCaseGrid}>
+          {[
+            { title: '웹사이트 제작자', desc: 'URL Preview로 반응형을 확인하고 데스크탑·노트북 목업으로 제안서 이미지를 만듭니다.' },
+            { title: '앱 개발자', desc: '모바일 화면을 여러 레이어로 배치하고 앱스토어/랜딩페이지용 이미지를 빠르게 제작합니다.' },
+            { title: '상세페이지 디자이너', desc: '긴 상세 이미지를 카테고리별 목업에 합성해 실제 판매 페이지처럼 보여줍니다.' },
+            { title: '광고·배너 작업자', desc: '전광판, 간판, 포스터, 배너 목업으로 캠페인 시안을 더 현실적으로 전달합니다.' },
+          ].map((item) => (
+            <Reveal key={item.title}>
+              <article className={styles.useCaseCard}>
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ── MOCKUP EXAMPLES ─────────────────── */}
+      <section className={styles.mockupExampleSection}>
+        <Reveal>
+          <div className={styles.sectionLabel}>목업 예시</div>
+          <h2 className={styles.sectionTitle}>실사형 목업부터 디바이스 목업까지</h2>
+        </Reveal>
+        <div className={styles.mockupExampleGrid}>
+          {[
+            { label: 'Signage', title: '매장 간판·전광판', tone: 'dark' },
+            { label: 'Device', title: '모바일·태블릿·데스크탑', tone: 'light' },
+            { label: 'Commerce', title: '상세페이지·제품 소개', tone: 'green' },
+          ].map((item) => (
+            <Reveal key={item.label}>
+              <article className={`${styles.mockupExampleCard} ${styles[`mockupTone${item.tone}`]}`}>
+                <span>{item.label}</span>
+                <h3>{item.title}</h3>
+                <div className={styles.mockupSlot}>
+                  <div />
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
       {/* ── HOW IT WORKS ─────────────────────── */}
       <section className={styles.stepsSection}>
         <div className={styles.stepsLeft}>
@@ -446,7 +494,7 @@ export function Landing() {
       <section className={styles.section}>
         <Reveal>
           <div className={styles.sectionLabel}>요금제</div>
-          <h2 className={styles.sectionTitle}>무료 사용 + 30일 이용권, 두 가지만 남겼습니다</h2>
+          <h2 className={styles.sectionTitle}>Free와 Pro, 운영하기 쉬운 두 가지 플랜</h2>
         </Reveal>
 
         <div className={styles.planRow}>
@@ -470,29 +518,29 @@ export function Landing() {
             </Button>
           </div>
 
-          {/* 30-day pass */}
+          {/* Pro */}
           <div className={styles.planComboCol}>
             <div className={`${styles.planCard} ${styles.planCardSoon}`}>
               <div className={styles.planHead}>
                 <div>
-                  <div className={styles.planName}>30일 이용권</div>
-                  <div className={styles.planPrice}>₩9,900 <span>/ 30일</span></div>
+                  <div className={styles.planName}>Pro</div>
+                  <div className={styles.planPrice}>₩9,900 <span>/ 월</span></div>
                 </div>
                 <Badge variant="outline">결제 준비 중</Badge>
               </div>
-              <p className={styles.planDesc}>로그인·결제 연동 후 제공할 상업용 확장 플랜입니다.</p>
+              <p className={styles.planDesc}>Supabase Auth와 Toss Payments 연결 후 제공할 상업용 플랜입니다.</p>
               <ul className={styles.planList}>
-                {['Free의 모든 기능', '상업용 목업 카테고리 확장', '여러 이미지 레이어 합성', '프로젝트 저장/관리 준비', '실제 결제는 아직 미연동'].map(f => (
+                {['모든 목업', 'Before / After GIF', '고화질 Export', 'Premium Mockups', '커스텀 PNG 목업', '향후 추가 기능 포함'].map(f => (
                   <li key={f}><span className={styles.checkOff}>–</span>{f}</li>
                 ))}
               </ul>
               <Button variant="secondary" fullWidth onClick={() => setComingSoon(true)}>
-                출시 준비 안내 보기
+                Upgrade 준비 보기
               </Button>
             </div>
             <div className={styles.planGuard}>
               결제 버튼처럼 보이더라도 현재 단계에서는 카드 정보나 개인정보를 받지 않습니다.
-              정식 출시 전까지 무료 기능만 실제 동작합니다.
+              정식 출시 전까지 결제와 구독 변경은 실제 동작하지 않습니다.
             </div>
           </div>
         </div>
@@ -551,7 +599,7 @@ export function Landing() {
       <Modal open={comingSoon} onClose={() => setComingSoon(false)} title="준비 중입니다">
         <div className={styles.comingSoonModal}>
           <div className={styles.csEmoji}>📬</div>
-          <p>30일 이용권 결제는 아직 연결하지 않았습니다.<br />지금은 로그인 없이 무료 기능만 사용할 수 있습니다.</p>
+          <p>Pro 결제는 아직 연결하지 않았습니다.<br />지금은 로그인 없이 Free 기능만 사용할 수 있습니다.</p>
           <Button variant="primary" fullWidth onClick={() => setComingSoon(false)}>
             확인
           </Button>

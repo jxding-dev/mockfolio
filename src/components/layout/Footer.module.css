@@ -43,11 +43,19 @@
   color: var(--text-tertiary);
 }
 
-.right {}
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
 
-.tag {
+.right a {
   font-size: var(--text-xs);
   color: var(--text-tertiary);
+}
+
+.right a:hover {
+  color: var(--text-primary);
 }
 
 @media (max-width: 768px) {

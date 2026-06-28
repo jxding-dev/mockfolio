@@ -1,0 +1,331 @@
+.authPage,
+.billingPage,
+.statusPage {
+  max-width: 1180px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-16) var(--space-6) var(--space-20);
+}
+
+.authPage {
+  display: grid;
+  grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: stretch;
+}
+
+.authCard,
+.authAside,
+.statusCard,
+.panel,
+.checkoutPanel,
+.projectCard {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  background: var(--bg-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.authCard {
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.authCard h1,
+.billingHero h1,
+.statusCard h1 {
+  font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+  letter-spacing: -0.04em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.form input {
+  height: 42px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+}
+
+.formMessage,
+.smallNote {
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+}
+
+.authLinks,
+.inlineActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.authLinks a,
+.panel a {
+  font-size: var(--text-sm);
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
+}
+
+.authAside {
+  padding: var(--space-8);
+  background:
+    linear-gradient(180deg, var(--bg-subtle), var(--bg-base));
+}
+
+.authAside span,
+.eyebrow {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.authAside h2 {
+  margin-top: var(--space-4);
+  font-size: var(--text-2xl);
+}
+
+.authAside ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  color: var(--text-secondary);
+}
+
+.authAside li::before {
+  content: '✓';
+  margin-right: var(--space-2);
+  color: var(--success);
+}
+
+.billingHero {
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-10);
+}
+
+.billingHero p,
+.statusCard p,
+.panel p,
+.checkoutPanel p,
+.dashboardHead p {
+  line-height: var(--leading-loose);
+}
+
+.billingGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.billingPlans {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.checkoutPanel,
+.panel {
+  padding: var(--space-6);
+}
+
+.checkoutPanel {
+  position: sticky;
+  top: calc(var(--header-h) + var(--space-4));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.codeBox {
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+}
+
+.statusPage {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - var(--header-h));
+}
+
+.statusCard {
+  max-width: 560px;
+  padding: var(--space-8);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  align-items: center;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: calc(100vh - var(--header-h));
+  background: var(--bg-subtle);
+  overflow-x: hidden;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: var(--space-6);
+  border-right: 1px solid var(--border-default);
+  background: var(--bg-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.sidebar h1 {
+  margin-top: var(--space-3);
+}
+
+.sidebar p {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sidebar nav a {
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.sidebar nav a:hover {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+}
+
+.dashboardContent {
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.dashboardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.projectGrid,
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.projectCard {
+  padding: var(--space-4);
+}
+
+.projectThumb {
+  height: 160px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(135deg, var(--bg-muted), var(--accent-subtle));
+  color: var(--text-tertiary);
+  font-weight: var(--weight-semibold);
+  margin-bottom: var(--space-4);
+}
+
+.projectCard h3,
+.panel h3,
+.checkoutPanel h2 {
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+@media (max-width: 980px) {
+  .authPage,
+  .billingGrid,
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    overflow: hidden;
+  }
+
+  .sidebar nav {
+    flex-direction: row;
+    overflow-x: auto;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .sidebar nav a {
+    flex: 0 0 auto;
+  }
+
+  .checkoutPanel {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .authPage,
+  .billingPage,
+  .statusPage {
+    padding: var(--space-10) var(--space-4) var(--space-16);
+  }
+
+  .billingPlans,
+  .projectGrid,
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboardContent {
+    padding: var(--space-4);
+  }
+
+  .dashboardHead {
+    flex-direction: column;
+  }
+}

@@ -1014,6 +1014,108 @@
 }
 
 /* ══════════════════════════════════════════════════════
+   USE CASES + MOCKUP EXAMPLES
+══════════════════════════════════════════════════════ */
+.useCaseSection,
+.mockupExampleSection {
+  max-width: var(--max-content-w);
+  margin: 0 auto;
+  padding: var(--space-20) var(--space-6);
+}
+
+.useCaseGrid,
+.mockupExampleGrid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.useCaseGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.useCaseCard {
+  padding: var(--space-5);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  background: var(--bg-base);
+  min-height: 190px;
+}
+
+.useCaseCard h3 {
+  font-size: var(--text-md);
+  margin-bottom: var(--space-3);
+}
+
+.useCaseCard p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-loose);
+}
+
+.mockupExampleGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mockupExampleCard {
+  min-height: 280px;
+  overflow: hidden;
+  padding: var(--space-5);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  background: var(--bg-base);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mockupExampleCard span {
+  width: fit-content;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.72);
+  color: #0F172A;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.mockupExampleCard h3 {
+  color: inherit;
+  font-size: var(--text-xl);
+}
+
+.mockupSlot {
+  height: 160px;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255,255,255,0.32);
+  background: rgba(255,255,255,0.18);
+  display: grid;
+  place-items: center;
+}
+
+.mockupSlot div {
+  width: 58%;
+  height: 72%;
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,0.86);
+  box-shadow: var(--shadow-sm);
+}
+
+.mockupTonedark {
+  background: linear-gradient(160deg, #111827, #334155);
+  color: white;
+}
+
+.mockupTonelight {
+  background: linear-gradient(160deg, #F8FAFC, #E2E8F0);
+  color: var(--text-primary);
+}
+
+.mockupTonegreen {
+  background: linear-gradient(160deg, #E9F7EF, #A7D7C5);
+  color: #123C2E;
+}
+
+/* ══════════════════════════════════════════════════════
    PRIVACY BANNER
 ══════════════════════════════════════════════════════ */
 .privacyBanner {
@@ -1248,6 +1350,7 @@
 @media (max-width: 1100px) {
   .featureGrid { grid-template-columns: 1fr 1fr; }
   .advantageGrid { grid-template-columns: 1fr 1fr; }
+  .useCaseGrid { grid-template-columns: 1fr 1fr; }
   .planRow { grid-template-columns: 1fr; max-width: 520px; }
 }
 
@@ -1261,6 +1364,7 @@
   .appPreview { max-width: 100%; }
   .apBody { grid-template-columns: 110px 1fr 100px; }
   .stepsSection { grid-template-columns: 1fr; gap: var(--space-8); }
+  .mockupExampleGrid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
@@ -1282,6 +1386,10 @@
   .advantageSection { padding: var(--space-12) var(--space-4); }
   .advantageGrid { grid-template-columns: 1fr; }
   .advantageCard { min-height: auto; }
+  .useCaseSection,
+  .mockupExampleSection { padding: var(--space-12) var(--space-4); }
+  .useCaseGrid { grid-template-columns: 1fr; }
+  .useCaseCard { min-height: auto; }
   .stepsSection { padding: var(--space-12) var(--space-4); }
   .privacyBanner { padding: var(--space-8) var(--space-4); }
   .privacyInner { flex-direction: column; gap: var(--space-3); }

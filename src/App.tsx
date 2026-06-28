@@ -4,6 +4,9 @@ import { Footer } from './components/layout/Footer';
 import { Landing } from './pages/Landing';
 import { Editor } from './pages/Editor';
 import { Pricing } from './pages/Pricing';
+import { AuthPage } from './pages/AuthPage';
+import { BillingPage } from './pages/BillingPage';
+import { Dashboard } from './pages/Dashboard';
 import { NotFound } from './pages/NotFound';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { ThemeProvider } from './hooks/useTheme';
@@ -19,6 +22,16 @@ function AppShell() {
         <Route path="/"        element={<Landing />} />
         <Route path="/editor"  element={<Editor />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/login" element={<AuthPage mode="login" />} />
+        <Route path="/signup" element={<AuthPage mode="signup" />} />
+        <Route path="/forgot-password" element={<AuthPage mode="forgot-password" />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/billing" element={<BillingPage view="upgrade" />} />
+        <Route path="/subscription" element={<BillingPage view="subscription" />} />
+        <Route path="/invoice" element={<BillingPage view="invoice" />} />
+        <Route path="/payment/success" element={<BillingPage view="success" />} />
+        <Route path="/payment/failure" element={<BillingPage view="failure" />} />
+        <Route path="/payment/cancel" element={<BillingPage view="cancel" />} />
         <Route path="*"        element={<NotFound />} />
       </Routes>
       {!isEditor && <Footer />}

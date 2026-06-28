@@ -71,12 +71,12 @@ export type BgStyle =
   | 'glass-panel';
 
 // ── Plan ─────────────────────────────────────────────────────
-export type PlanId = 'free' | 'thirty-day';
+export type PlanId = 'free' | 'pro';
 
 export interface Plan {
   id: PlanId;
   name: string;
-  price: number;            // KRW per 30-day cycle (0 = free)
+  price: number;            // KRW per month (0 = free)
   period: string;
   description: string;
   features: string[];
@@ -85,4 +85,12 @@ export interface Plan {
   badge?: string;
   note?: string;
   cta: string;
+}
+
+export interface SavedProject {
+  id: string;
+  name: string;
+  thumbnail?: string;
+  updatedAt: string;
+  ownerId?: string;
 }

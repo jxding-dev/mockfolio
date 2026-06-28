@@ -6,7 +6,7 @@ export function Footer() {
       <div className={styles.inner}>
         <div className={styles.left}>
           <span className={styles.brand}>Mockfolio</span>
-          <span className={styles.copy}>© {new Date().getFullYear()}. All rights reserved.</span>
+          <span className={styles.copy}>© {new Date().getFullYear()} Mockfolio. SaaS-ready mockup builder.</span>
         </div>
         <div className={styles.center}>
           <span className={styles.privacy}>
@@ -14,7 +14,9 @@ export function Footer() {
           </span>
         </div>
         <div className={styles.right}>
-          <span className={styles.tag}>Made with ☕ for designers</span>
+          <a href="#/pricing">Pricing</a>
+          <a href="#/billing">Billing</a>
+          <a href="#/dashboard">Dashboard</a>
         </div>
       </div>
     </footer>
