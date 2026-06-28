@@ -138,7 +138,7 @@ const FRAME_COLORS: { id: FrameColor; label: string; swatch: string }[] = [
 ];
 
 function MockupProps({
-  settings: s, patch, exportLoading, exportMessage, mockupAssets, mockupsLoading,
+  settings: s, patch, image, exportLoading, exportMessage, mockupAssets, mockupsLoading,
   onCompositeExport, onCompositeReset,
   mockupItems, selectedMockupItemId, onAddMockupImages, onSelectMockupItem, onUpdateMockupItem, onRemoveMockupItem,
 }: Props) {
@@ -166,8 +166,8 @@ function MockupProps({
           <Button variant="secondary" size="sm" fullWidth onClick={onCompositeReset}>조정 초기화</Button>
         </RSection>
         <div className={styles.exportFooter}>
-          <Button variant="primary" size="lg" fullWidth loading={exportLoading} onClick={onCompositeExport}>합성 PNG 저장</Button>
-          <p className={styles.exportNote}>합성 결과만 PNG로 저장됩니다.</p>
+          <Button variant="primary" size="lg" fullWidth loading={exportLoading} disabled={!image} onClick={onCompositeExport}>합성 PNG 저장</Button>
+          <p className={styles.exportNote}>{image ? '합성 결과만 PNG로 저장됩니다.' : '먼저 이미지를 업로드해야 합성 PNG를 저장할 수 있습니다.'}</p>
           {exportMessage && <p className={styles.exportMessage} role="status">{exportMessage}</p>}
         </div>
       </>

@@ -73,7 +73,7 @@ src/
   components/
     layout/     EditorTopBar · EditorLeftPanel · EditorCanvas · EditorRightPanel · Header · Footer
     inspector/  UrlPreview            # iframe URL 미리보기
-    mockup/     DeviceFrame · CompareSlider · MockupComposer
+    mockup/     DeviceFrame · CompareSlider · MockupComposer · MockupScene
     landing/    ReviewsSlider         # 후기 캐러셀
     ui/         Button · Modal · Toggle · Slider · Badge · ErrorBoundary
   data/         editorSettings.ts(+normalize) · devices · frames · backgrounds · mockups · plans
