@@ -28,6 +28,14 @@ describe('normalizeEditorSettings', () => {
     expect(normalizeEditorSettings({ mockupTextColor: 'javascript:1' }).mockupTextColor).toBe(DEFAULT_EDITOR_SETTINGS.mockupTextColor);
   });
 
+  it('normalizes the inspect checklist to exactly 5 booleans', () => {
+    expect(normalizeEditorSettings({ inspectChecklist: [true, 'x', 1, false] }).inspectChecklist)
+      .toEqual([true, false, false, false, false]);
+    expect(normalizeEditorSettings({ inspectChecklist: 'nope' }).inspectChecklist)
+      .toEqual([false, false, false, false, false]);
+    expect(normalizeEditorSettings({}).inspectChecklist).toHaveLength(5);
+  });
+
   it('caps long strings and coerces non-strings', () => {
     const long = 'a'.repeat(500);
     const s = normalizeEditorSettings({ projectName: long, urlInput: 123 });

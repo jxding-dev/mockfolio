@@ -100,21 +100,31 @@ function InspectProps({ settings: s, patch }: Props) {
       </RSection>
 
       <RSection title="체크리스트">
-        <CheckItem label="모바일 텍스트 크기 적절한가?" />
-        <CheckItem label="버튼 터치 영역 충분한가?" />
-        <CheckItem label="좌우 여백이 너무 좁지 않은가?" />
-        <CheckItem label="중요 콘텐츠가 접히지 않는가?" />
-        <CheckItem label="CTA 버튼이 잘 보이는가?" />
+        {CHECKLIST_LABELS.map((label, i) => (
+          <CheckItem
+            key={label}
+            label={label}
+            checked={s.inspectChecklist[i] ?? false}
+            onChange={(v) => patch('inspectChecklist', s.inspectChecklist.map((c, j) => (j === i ? v : c)))}
+          />
+        ))}
       </RSection>
     </>
   );
 }
 
-function CheckItem({ label }: { label: string }) {
-  const [checked, setChecked] = useState(false);
+const CHECKLIST_LABELS = [
+  '모바일 텍스트 크기 적절한가?',
+  '버튼 터치 영역 충분한가?',
+  '좌우 여백이 너무 좁지 않은가?',
+  '중요 콘텐츠가 접히지 않는가?',
+  'CTA 버튼이 잘 보이는가?',
+];
+
+function CheckItem({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className={styles.checkItem}>
-      <input type="checkbox" checked={checked} onChange={e => setChecked(e.target.checked)} className={styles.checkbox} />
+      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} className={styles.checkbox} />
       <span className={checked ? styles.checkLabelDone : styles.checkLabel}>{label}</span>
     </label>
   );

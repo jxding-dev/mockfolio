@@ -10,7 +10,12 @@ interface Props {
   onProjectNameChange: (name: string) => void;
   activeMode: AppMode;
   onModeChange: (mode: AppMode) => void;
-  saveState?: 'saved' | 'saving' | 'unsaved';
+  /** epoch ms of the last settings auto-save; shown as a clock time */
+  savedAt?: number;
+}
+
+function formatSavedTime(ts: number): string {
+  return new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(new Date(ts));
 }
 
 const TABS: { id: AppMode; label: string; icon: string }[] = [
@@ -25,7 +30,7 @@ export function EditorTopBar({
   onProjectNameChange,
   activeMode,
   onModeChange,
-  saveState = 'saved',
+  savedAt,
 }: Props) {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(projectName);
@@ -65,10 +70,8 @@ export function EditorTopBar({
             </button>
           )}
 
-          <div className={styles.saveState} data-state={saveState}>
-            {saveState === 'saved'   && '● 저장됨'}
-            {saveState === 'saving'  && '○ 저장 중...'}
-            {saveState === 'unsaved' && '○ 미저장'}
+          <div className={styles.saveState} data-state="saved" title="설정은 이 브라우저에 자동 저장됩니다">
+            {savedAt ? `● 자동 저장됨 · ${formatSavedTime(savedAt)}` : '● 자동 저장됨'}
           </div>
         </div>
 

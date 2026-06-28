@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import type { UploadedImage, DevicePreset, MockupItem } from '../../types';
 import type { EditorSettings } from '../../data/editorSettings';
 import { DEVICE_PRESETS } from '../../data/devices';
@@ -88,6 +88,37 @@ export function EditorCanvas({
   const zoomOut = () => setZoom((z) => Math.max(MIN_ZOOM, +(z - ZOOM_STEP).toFixed(2)));
   const resetZoom = () => setZoom(1);
 
+  // Fit the rendered scene to the visible canvas area.
+  const fitZoom = useCallback(() => {
+    const cont = containerRef.current;
+    const scene = cont?.firstElementChild as HTMLElement | null;
+    if (!cont || !scene) return;
+    const cr = cont.getBoundingClientRect();
+    const sr = scene.getBoundingClientRect();
+    setZoom((z) => {
+      const naturalW = sr.width / z;
+      const naturalH = sr.height / z;
+      if (!naturalW || !naturalH) return z;
+      const next = Math.min((cr.width - 64) / naturalW, (cr.height - 64) / naturalH);
+      return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, +next.toFixed(2)));
+    });
+  }, []);
+
+  // Keyboard zoom: + / - / 0 (ignored while typing in inputs)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomIn(); }
+      else if (e.key === '-' || e.key === '_') { e.preventDefault(); zoomOut(); }
+      else if (e.key === '0') { e.preventDefault(); resetZoom(); }
+      else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); fitZoom(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [fitZoom]);
+
   const isCompare = activeMode === 'compare';
   const isSceneMode = (activeMode === 'mockup' || activeMode === 'export') && !selectedMockup;
   const isComposite = (activeMode === 'mockup' || activeMode === 'export') && !!selectedMockup;
@@ -152,15 +183,16 @@ export function EditorCanvas({
       {/* zoom controls */}
       {hasContent && (
         <div className={styles.zoomBar}>
-          <button className={styles.zoomBtn} onClick={zoomOut} title="축소" disabled={zoom <= MIN_ZOOM}>
+          <button className={styles.zoomBtn} onClick={zoomOut} title="축소 (-)" disabled={zoom <= MIN_ZOOM}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
           </button>
-          <button className={styles.zoomVal} onClick={resetZoom} title="100% 초기화">
+          <button className={styles.zoomVal} onClick={resetZoom} title="100%로 초기화 (0)">
             {Math.round(zoom * 100)}%
           </button>
-          <button className={styles.zoomBtn} onClick={zoomIn} title="확대" disabled={zoom >= MAX_ZOOM}>
+          <button className={styles.zoomBtn} onClick={zoomIn} title="확대 (+)" disabled={zoom >= MAX_ZOOM}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
           </button>
+          <button className={styles.zoomFit} onClick={fitZoom} title="화면에 맞춤 (F)">맞춤</button>
           <div className={styles.zoomDivider} />
           <span className={styles.deviceInfo}>
             {isCompare ? 'Before / After' : `${device.label} · ${device.width}×${device.height}`}

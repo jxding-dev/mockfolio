@@ -127,6 +127,13 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     compositeX, compositeY, compositeScale, compositeStretchX, compositeStretchY, compositeRotation, compositeSkewX, compositeSkewY,
   } = settings;
 
+  // Reflects the debounced localStorage write so the top bar can show a real time.
+  const [savedAt, setSavedAt] = useState<number>(() => Date.now());
+  useEffect(() => {
+    const t = window.setTimeout(() => setSavedAt(Date.now()), 250);
+    return () => window.clearTimeout(t);
+  }, [settings]);
+
   // Transient (not persisted): images + UI status
   const [error, setError] = useState<string | null>(null);
   const [beforeImage, setBeforeImage] = useState<UploadedImage | null>(null);
@@ -191,6 +198,20 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
 
   const exportRef = useRef<HTMLDivElement | null>(null);
   const selectedMockup = mockupAssets.find((asset) => asset.id === selectedMockupId) ?? null;
+
+  // Keyboard: 1–4 switch modes (ignored while typing in inputs)
+  useEffect(() => {
+    const modes: EditorSettings['activeMode'][] = ['inspect', 'mockup', 'compare', 'export'];
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const idx = ['1', '2', '3', '4'].indexOf(e.key);
+      if (idx >= 0) patch('activeMode', modes[idx]);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [patch]);
 
   // Auto-pick a device preset matching the uploaded image's aspect ratio
   // (desktop screenshot → desktop preset, portrait → mobile, ~square → tablet).
@@ -294,7 +315,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
         onProjectNameChange={(v) => patch('projectName', v)}
         activeMode={activeMode}
         onModeChange={(v) => patch('activeMode', v)}
-        saveState="saved"
+        savedAt={savedAt}
       />
 
       {/* Error banner */}

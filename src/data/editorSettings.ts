@@ -11,6 +11,7 @@ export interface EditorSettings {
   showGrid: boolean;
   showCenter: boolean;
   showMargins: boolean;
+  inspectChecklist: boolean[];   // fixed length CHECKLIST_LENGTH
   inspectSource: 'image' | 'url';
   urlInput: string;
   previewUrl: string;
@@ -54,6 +55,7 @@ export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
   showGrid: false,
   showCenter: false,
   showMargins: false,
+  inspectChecklist: [false, false, false, false, false],
   inspectSource: 'image',
   urlInput: '',
   previewUrl: '',
@@ -86,6 +88,8 @@ export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
   compositeSkewX: 0,
   compositeSkewY: 0,
 };
+
+export const CHECKLIST_LENGTH = 5;
 
 const APP_MODES: AppMode[] = ['inspect', 'mockup', 'compare', 'export'];
 const FIT_MODES = ['fit', 'fill', 'original'] as const;
@@ -128,6 +132,8 @@ export function normalizeEditorSettings(value: unknown): EditorSettings {
     showGrid: booleanValue(source.showGrid, DEFAULT_EDITOR_SETTINGS.showGrid),
     showCenter: booleanValue(source.showCenter, DEFAULT_EDITOR_SETTINGS.showCenter),
     showMargins: booleanValue(source.showMargins, DEFAULT_EDITOR_SETTINGS.showMargins),
+    inspectChecklist: Array.from({ length: CHECKLIST_LENGTH }, (_, i) =>
+      Array.isArray(source.inspectChecklist) ? source.inspectChecklist[i] === true : false),
     inspectSource: enumValue(source.inspectSource, ['image', 'url'], DEFAULT_EDITOR_SETTINGS.inspectSource),
     urlInput: textValue(source.urlInput, DEFAULT_EDITOR_SETTINGS.urlInput, 2048),
     previewUrl: textValue(source.previewUrl, DEFAULT_EDITOR_SETTINGS.previewUrl, 2048),
