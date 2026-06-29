@@ -141,9 +141,13 @@ function MockupProps({
   const [mockupQuery, setMockupQuery] = useState('');
   // User-toggled category open states (overrides the default-open heuristic).
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+  // The full mockup catalog stays collapsed once a mockup is chosen, so the
+  // panel leads with the active mockup + per-layer controls instead.
+  const [showCatalog, setShowCatalog] = useState(false);
   const selected = mockupItems.find((it) => it.id === selectedMockupItemId) ?? null;
   const selectedMockupAsset = mockupAssets.find((asset) => asset.id === s.selectedMockupId) ?? null;
   const visibleLayerCount = mockupItems.filter((item) => item.visible).length;
+  const catalogOpen = showCatalog || !selectedMockupAsset;
   const hasLongLayer = mockupItems.some((item) => item.height / item.width >= 1.75);
   const query = mockupQuery.trim().toLowerCase();
   const visibleMockupAssets = query
@@ -162,60 +166,7 @@ function MockupProps({
 
   return (
     <>
-      <RSection title="실사 목업 선택">
-        {hasLongLayer && (
-          <p className={styles.infoHint}>긴 상세페이지 이미지로 보입니다. 상세페이지 목업과 아래 자동 맞춤 버튼을 먼저 사용해보세요.</p>
-        )}
-        <label className={styles.searchLabel}>
-          <span>목업 검색</span>
-          <input
-            value={mockupQuery}
-            onChange={(event) => setMockupQuery(event.target.value)}
-            placeholder="상세페이지, 앱, 광고..."
-          />
-        </label>
-        {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets.length ? (
-          <div className={styles.mockupCategoryList}>
-            {Object.entries(groupedMockups).map(([category, assets]) => {
-              const defaultOpen = assets.some((asset) => asset.id === s.selectedMockupId)
-                || (hasLongLayer && category.includes('상세페이지'));
-              // While searching, force-open every group; otherwise respect the
-              // user's manual toggle, falling back to the default-open heuristic.
-              const isOpen = query ? true : (openCategories[category] ?? defaultOpen);
-              return (
-              <details
-                key={category}
-                className={styles.mockupCategory}
-                open={isOpen}
-                onToggle={(event) => {
-                  const next = event.currentTarget.open;
-                  setOpenCategories((prev) => (prev[category] === next ? prev : { ...prev, [category]: next }));
-                }}
-              >
-                <summary className={styles.mockupCategoryTitle}>
-                  <span>{category}</span>
-                  <span>{assets.length}</span>
-                </summary>
-                <div className={styles.mockupAssetGrid}>
-                  {assets.map((asset) => (
-                    <MockupAssetCard
-                      key={asset.id}
-                      asset={asset}
-                      active={s.selectedMockupId === asset.id}
-                      onSelect={() => patch('selectedMockupId', asset.id)}
-                    />
-                  ))}
-                </div>
-              </details>
-              );
-            })}
-            {visibleMockupAssets.length === 0 && <p className={styles.hint}>검색 결과가 없습니다. 다른 키워드를 입력해보세요.</p>}
-          </div>
-        ) : <p className={styles.hint}>목업을 불러오지 못했습니다. 잠시 후 새로고침하면 목업 목록이 다시 표시됩니다.</p>}
-        <p className={styles.hint}>실제 목업 이미지만 사용합니다. 투명하게 뚫린 영역 뒤로 사용자 이미지가 들어갑니다.</p>
-      </RSection>
-
-      <RSection title="현재 목업">
+      <RSection title="목업">
         {selectedMockupAsset ? (
           <div className={styles.selectedMockupCard}>
             <div className={styles.mockupThumbWrap}>
@@ -227,9 +178,69 @@ function MockupProps({
             </div>
           </div>
         ) : (
-          <p className={styles.hint}>목업을 하나 선택하면 캔버스 중앙에 크게 표시됩니다.</p>
+          <p className={styles.hint}>아래에서 목업을 하나 선택하면 캔버스 중앙에 크게 표시됩니다.</p>
+        )}
+        {selectedMockupAsset && (
+          <Button variant="secondary" size="sm" fullWidth onClick={() => setShowCatalog((v) => !v)}>
+            {catalogOpen ? '목록 닫기' : '다른 목업 선택'}
+          </Button>
         )}
       </RSection>
+
+      {catalogOpen && (
+        <RSection title="실사 목업 선택">
+          {hasLongLayer && (
+            <p className={styles.infoHint}>긴 상세페이지 이미지로 보입니다. 상세페이지 목업과 자동 맞춤 버튼을 먼저 사용해보세요.</p>
+          )}
+          <label className={styles.searchLabel}>
+            <span>목업 검색</span>
+            <input
+              value={mockupQuery}
+              onChange={(event) => setMockupQuery(event.target.value)}
+              placeholder="상세페이지, 앱, 광고..."
+            />
+          </label>
+          {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets.length ? (
+            <div className={styles.mockupCategoryList}>
+              {Object.entries(groupedMockups).map(([category, assets]) => {
+                const defaultOpen = assets.some((asset) => asset.id === s.selectedMockupId)
+                  || (hasLongLayer && category.includes('상세페이지'));
+                // While searching, force-open every group; otherwise respect the
+                // user's manual toggle, falling back to the default-open heuristic.
+                const isOpen = query ? true : (openCategories[category] ?? defaultOpen);
+                return (
+                <details
+                  key={category}
+                  className={styles.mockupCategory}
+                  open={isOpen}
+                  onToggle={(event) => {
+                    const next = event.currentTarget.open;
+                    setOpenCategories((prev) => (prev[category] === next ? prev : { ...prev, [category]: next }));
+                  }}
+                >
+                  <summary className={styles.mockupCategoryTitle}>
+                    <span>{category}</span>
+                    <span>{assets.length}</span>
+                  </summary>
+                  <div className={styles.mockupAssetGrid}>
+                    {assets.map((asset) => (
+                      <MockupAssetCard
+                        key={asset.id}
+                        asset={asset}
+                        active={s.selectedMockupId === asset.id}
+                        onSelect={() => { patch('selectedMockupId', asset.id); setShowCatalog(false); }}
+                      />
+                    ))}
+                  </div>
+                </details>
+                );
+              })}
+              {visibleMockupAssets.length === 0 && <p className={styles.hint}>검색 결과가 없습니다. 다른 키워드를 입력해보세요.</p>}
+            </div>
+          ) : <p className={styles.hint}>목업을 불러오지 못했습니다. 잠시 후 새로고침하면 목업 목록이 다시 표시됩니다.</p>}
+          <p className={styles.hint}>실제 목업 이미지만 사용합니다. 투명하게 뚫린 영역 뒤로 사용자 이미지가 들어갑니다.</p>
+        </RSection>
+      )}
 
       <RSection title={`이미지 레이어 (${mockupItems.length}장)`}>
         <LayerList
@@ -252,38 +263,34 @@ function MockupProps({
       </RSection>
 
       {selected ? (
-        <>
-          <RSection title="선택 레이어 빠른 작업">
-            <div className={styles.layerActionGrid}>
-              <button className={styles.layerActionBtn} onClick={() => onUpdateMockupItem(selected.id, { x: 0, y: 0 })}>가운데</button>
-              <button className={styles.layerActionBtn} onClick={() => onDuplicateMockupItem(selected.id)}>복제</button>
-              <button className={styles.layerActionBtn} onClick={() => onReorderMockupItem(selected.id, 'forward')}>앞으로</button>
-              <button className={styles.layerActionBtn} onClick={() => onReorderMockupItem(selected.id, 'backward')}>뒤로</button>
-              <button className={styles.layerActionBtn} onClick={() => onFitMockupItem(selected.id, 'contain')}>전체 맞춤</button>
-              <button className={styles.layerActionBtn} onClick={() => onFitMockupItem(selected.id, 'width')}>폭 맞춤</button>
-              <button className={styles.layerActionBtn} onClick={() => onFitMockupItem(selected.id, 'height')}>높이 맞춤</button>
-            </div>
-            <p className={styles.hint}>긴 상세페이지는 폭 맞춤이나 전체 맞춤으로 시작하면 잘림을 줄일 수 있습니다.</p>
-          </RSection>
+        <RSection title="선택 레이어">
+          <div className={styles.layerActionGrid}>
+            <button className={styles.layerActionBtn} onClick={() => onFitMockupItem(selected.id, 'contain')}>전체 맞춤</button>
+            <button className={styles.layerActionBtn} onClick={() => onFitMockupItem(selected.id, 'width')}>폭 맞춤</button>
+            <button className={styles.layerActionBtn} onClick={() => onFitMockupItem(selected.id, 'height')}>높이 맞춤</button>
+            <button className={styles.layerActionBtn} onClick={() => onUpdateMockupItem(selected.id, { x: 0, y: 0 })}>가운데</button>
+            <button className={styles.layerActionBtn} onClick={() => onDuplicateMockupItem(selected.id)}>복제</button>
+            <button className={styles.layerActionBtn} onClick={() => onReorderMockupItem(selected.id, 'forward')}>앞으로</button>
+            <button className={styles.layerActionBtn} onClick={() => onReorderMockupItem(selected.id, 'backward')}>뒤로</button>
+          </div>
+          <p className={styles.hint}>캔버스에서 코너를 끌면 한쪽 꼭짓점만 늘릴 수 있어요. (Shift = 비율 유지)</p>
 
-          <RSection title="선택 레이어 조정">
-            <Slider label="X 위치" value={selected.x} min={-120} max={120} unit="%" onChange={value => onUpdateMockupItem(selected.id, { x: value })} />
-            <Slider label="Y 위치" value={selected.y} min={-120} max={120} unit="%" onChange={value => onUpdateMockupItem(selected.id, { y: value })} />
-            <Slider label="크기" value={Math.round(selected.scale * 100)} min={10} max={300} unit="%" onChange={value => onUpdateMockupItem(selected.id, { scale: value / 100 })} />
-            <Slider label="회전" value={selected.rotation} min={-180} max={180} unit="°" onChange={value => onUpdateMockupItem(selected.id, { rotation: value })} />
-            <Slider label="투명도" value={Math.round(selected.opacity * 100)} min={0} max={100} unit="%" onChange={value => onUpdateMockupItem(selected.id, { opacity: value / 100 })} />
-            <CollapsibleSection title="고급 변형">
-              <Slider label="가로 늘림" value={Math.round(selected.stretchX * 100)} min={25} max={400} unit="%" onChange={value => onUpdateMockupItem(selected.id, { stretchX: value / 100 })} />
-              <Slider label="세로 늘림" value={Math.round(selected.stretchY * 100)} min={25} max={400} unit="%" onChange={value => onUpdateMockupItem(selected.id, { stretchY: value / 100 })} />
-              <Slider label="X 비틀기" value={selected.skewX} min={-60} max={60} unit="°" onChange={value => onUpdateMockupItem(selected.id, { skewX: value })} />
-              <Slider label="Y 비틀기" value={selected.skewY} min={-60} max={60} unit="°" onChange={value => onUpdateMockupItem(selected.id, { skewY: value })} />
-            </CollapsibleSection>
-            <Button variant="secondary" size="sm" fullWidth onClick={onCompositeReset}>선택 레이어 초기화</Button>
-          </RSection>
-        </>
+          <Slider label="X 위치" value={selected.x} min={-120} max={120} unit="%" onChange={value => onUpdateMockupItem(selected.id, { x: value })} />
+          <Slider label="Y 위치" value={selected.y} min={-120} max={120} unit="%" onChange={value => onUpdateMockupItem(selected.id, { y: value })} />
+          <Slider label="크기" value={Math.round(selected.scale * 100)} min={10} max={300} unit="%" onChange={value => onUpdateMockupItem(selected.id, { scale: value / 100 })} />
+          <Slider label="회전" value={selected.rotation} min={-180} max={180} unit="°" onChange={value => onUpdateMockupItem(selected.id, { rotation: value })} />
+          <Slider label="투명도" value={Math.round(selected.opacity * 100)} min={0} max={100} unit="%" onChange={value => onUpdateMockupItem(selected.id, { opacity: value / 100 })} />
+          <CollapsibleSection title="고급 변형">
+            <Slider label="가로 늘림" value={Math.round(selected.stretchX * 100)} min={25} max={400} unit="%" onChange={value => onUpdateMockupItem(selected.id, { stretchX: value / 100 })} />
+            <Slider label="세로 늘림" value={Math.round(selected.stretchY * 100)} min={25} max={400} unit="%" onChange={value => onUpdateMockupItem(selected.id, { stretchY: value / 100 })} />
+            <Slider label="X 비틀기" value={selected.skewX} min={-60} max={60} unit="°" onChange={value => onUpdateMockupItem(selected.id, { skewX: value })} />
+            <Slider label="Y 비틀기" value={selected.skewY} min={-60} max={60} unit="°" onChange={value => onUpdateMockupItem(selected.id, { skewY: value })} />
+          </CollapsibleSection>
+          <Button variant="secondary" size="sm" fullWidth onClick={onCompositeReset}>선택 레이어 초기화</Button>
+        </RSection>
       ) : (
         <RSection title="선택 레이어">
-          <p className={styles.hint}>레이어를 선택하면 위치, 크기, 회전, 비틀기 값을 조정할 수 있습니다.</p>
+          <p className={styles.hint}>레이어를 선택하면 위치·크기·회전·변형을 조정할 수 있어요. 캔버스에서 코너를 끌면 한쪽 꼭짓점만 늘릴 수 있습니다.</p>
         </RSection>
       )}
 

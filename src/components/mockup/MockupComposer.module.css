@@ -140,11 +140,26 @@
   touch-action: none;
 }
 
+/* Corners are the primary "stretch one vertex" grips: larger, square. */
+.handleCorner {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+}
+
+/* Edge grips are smaller bars so corners read as the main affordance. */
+.handleEdge {
+  width: 14px;
+  height: 14px;
+  background: var(--bg-base);
+  border-color: var(--accent);
+}
+
 .resizeHandle::after,
 .rotateHandle::after {
   content: '';
   position: absolute;
-  inset: -8px;
+  inset: -12px;
   border-radius: 50%;
 }
 

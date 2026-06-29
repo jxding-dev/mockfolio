@@ -220,11 +220,11 @@ export function MockupComposer({
   return (
     <div className={styles.wrap}>
       <div className={styles.shortcutDock} aria-label="Mockup layer controls">
-        <span><kbd>Drag</kbd> 이동</span>
-        <span><kbd>Corner</kbd> 크기</span>
-        <span><kbd>Edge</kbd> 늘림</span>
-        <span><kbd>Shift</kbd> 비율</span>
-        <span><kbd>Alt</kbd> 중심</span>
+        <span><kbd>드래그</kbd> 이동</span>
+        <span><kbd>코너</kbd> 꼭짓점 늘리기</span>
+        <span><kbd>변</kbd> 한 방향 늘리기</span>
+        <span><kbd>Shift</kbd> 비율 유지</span>
+        <span><kbd>Alt</kbd> 중심 기준</span>
       </div>
       <div
         className={styles.stage}
@@ -272,19 +272,23 @@ export function MockupComposer({
             onPointerCancel={onPointerUp}
             aria-label={`${selectedItem.name} transform box`}
           >
-            {(Object.keys(HANDLE_DIRECTIONS) as ResizeHandle[]).map((handle) => (
-              <button
-                key={handle}
-                type="button"
-                className={`${styles.resizeHandle} ${styles[`handle_${handle}`]}`}
-                onPointerDown={(event) => onResizePointerDown(event, selectedItem, handle)}
-                onPointerMove={onPointerMove}
-                onPointerUp={onPointerUp}
-                onPointerCancel={onPointerUp}
-                aria-label={`${handle} resize handle`}
-                title="드래그해서 자유 변형"
-              />
-            ))}
+            {(Object.keys(HANDLE_DIRECTIONS) as ResizeHandle[]).map((handle) => {
+              const dir = HANDLE_DIRECTIONS[handle];
+              const isCorner = dir.x !== 0 && dir.y !== 0;
+              return (
+                <button
+                  key={handle}
+                  type="button"
+                  className={`${styles.resizeHandle} ${isCorner ? styles.handleCorner : styles.handleEdge} ${styles[`handle_${handle}`]}`}
+                  onPointerDown={(event) => onResizePointerDown(event, selectedItem, handle)}
+                  onPointerMove={onPointerMove}
+                  onPointerUp={onPointerUp}
+                  onPointerCancel={onPointerUp}
+                  aria-label={`${handle} ${isCorner ? '코너 늘리기' : '변 늘리기'} 핸들`}
+                  title={isCorner ? '코너를 끌어 한쪽 꼭짓점만 늘리기 (Shift=비율 유지)' : '변을 끌어 한 방향으로 늘리기'}
+                />
+              );
+            })}
             <button
               type="button"
               className={styles.rotateHandle}
@@ -298,7 +302,7 @@ export function MockupComposer({
           </div>
         )}
       </div>
-      <p className={styles.hint}>레이어를 선택한 뒤 박스 안을 드래그하면 이동, 모서리와 변을 잡으면 자유 변형됩니다.</p>
+      <p className={styles.hint}>레이어를 선택한 뒤 박스 안을 드래그하면 이동, 코너를 잡으면 한쪽 꼭짓점만, 변을 잡으면 한 방향으로 늘릴 수 있어요.</p>
     </div>
   );
 }
