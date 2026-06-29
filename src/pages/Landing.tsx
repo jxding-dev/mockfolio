@@ -154,6 +154,7 @@ export function Landing() {
       <section className={styles.hero}>
         <div className={styles.heroBg}>
           <div className={styles.heroBgGradient} />
+          <div className={styles.heroBgAurora} />
           <div className={styles.heroBgGlow1} />
           <div className={styles.heroBgGlow2} />
           <div className={styles.heroBgGlow3} />
