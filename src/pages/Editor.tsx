@@ -15,8 +15,6 @@ import { EditorRightPanel } from '../components/layout/EditorRightPanel';
 import { EditorCanvas } from '../components/layout/EditorCanvas';
 import styles from './Editor.module.css';
 
-/* Loads a bundled public asset into the same UploadedImage shape as a real upload. */
-const SAMPLE_IMAGE_SRC = `${import.meta.env.BASE_URL}mockups/overlays/samples/sample-desktop-studio.webp`;
 const LONG_DETAIL_RATIO = 2.3;
 
 function isLongDetailImage(image: UploadedImage | null): boolean {
@@ -58,29 +56,76 @@ function containScale(itemW: number, itemH: number, mockupRatio: number): number
   return clampScale(Math.min(1, (mockupRatio * itemW) / itemH));
 }
 
+/**
+ * Builds a sample "portfolio landing page" screenshot on a canvas so the
+ * try-it-out flow has zero external asset dependency (and can't break when
+ * mockup assets are reorganized).
+ */
 async function loadSampleImage(): Promise<UploadedImage> {
-  const response = await fetch(SAMPLE_IMAGE_SRC, { cache: 'force-cache' });
-  if (!response.ok) throw new Error('sample-fetch-failed');
-  const blob = await response.blob();
-  const dataUrl = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-  const { width, height } = await new Promise<{ width: number; height: number }>((resolve, reject) => {
-    const probe = new Image();
-    probe.onload = () => resolve({ width: probe.naturalWidth, height: probe.naturalHeight });
-    probe.onerror = reject;
-    probe.src = dataUrl;
-  });
+  const width = 1440;
+  const height = 900;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('sample-canvas-unavailable');
+
+  // page background
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(0, 0, width, height);
+  const glow = ctx.createLinearGradient(0, 0, width, height);
+  glow.addColorStop(0, '#1e293b');
+  glow.addColorStop(1, '#0f172a');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, width, height);
+
+  // top nav bar
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fillRect(0, 0, width, 72);
+  ctx.fillStyle = '#6366F1';
+  ctx.fillRect(64, 26, 20, 20);
+  ctx.fillStyle = '#e2e8f0';
+  ctx.font = '600 20px system-ui, sans-serif';
+  ctx.fillText('Studio Portfolio', 96, 47);
+
+  // hero copy
+  ctx.fillStyle = '#f8fafc';
+  ctx.font = '800 64px system-ui, sans-serif';
+  ctx.fillText('Design that ships.', 64, 320);
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '400 24px system-ui, sans-serif';
+  ctx.fillText('A sample project so you can try the editor right away.', 64, 372);
+
+  // CTA button
+  ctx.fillStyle = '#6366F1';
+  ctx.fillRect(64, 420, 200, 56);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '600 20px system-ui, sans-serif';
+  ctx.fillText('Get started', 104, 455);
+
+  // three feature cards
+  const accents = ['#0ea5e9', '#8b5cf6', '#34d399'];
+  for (let i = 0; i < 3; i++) {
+    const x = 64 + i * 300;
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.fillRect(x, 560, 264, 240);
+    ctx.fillStyle = accents[i];
+    ctx.fillRect(x + 24, 588, 48, 48);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillRect(x + 24, 664, 180, 16);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillRect(x + 24, 696, 216, 12);
+    ctx.fillRect(x + 24, 720, 160, 12);
+  }
+
+  const dataUrl = canvas.toDataURL('image/png');
   return {
     id: `sample_${Date.now()}`,
-    name: '샘플 프로젝트.webp',
+    name: '샘플 프로젝트.png',
     dataUrl,
     width,
     height,
-    size: blob.size,
+    size: Math.round((dataUrl.length - 22) * 0.75),
     uploadedAt: Date.now(),
   };
 }
