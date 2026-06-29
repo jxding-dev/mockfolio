@@ -149,9 +149,9 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
 ];
 
 const WORKFLOW_EXAMPLES = [
-  { src: 'mockups/overlays/realistic/devices/real-laptop-cafe-table.webp', cat: 'WEB', title: '카페 노트북 목업' },
-  { src: 'mockups/overlays/realistic/devices/real-smartphone-in-hand.webp', cat: 'APP', title: '손에 든 스마트폰 목업' },
-  { src: 'mockups/overlays/realistic/ads/real-city-building-billboard.webp', cat: 'AD', title: '도심 빌딩 광고판' },
+  { src: 'mockups/previews/completed-laptop-cafe.png', cat: 'WEB', title: '카페 노트북 목업' },
+  { src: 'mockups/previews/completed-phone-app.png', cat: 'APP', title: '손에 든 스마트폰 목업' },
+  { src: 'mockups/previews/completed-city-billboard.png', cat: 'AD', title: '도심 빌딩 광고판' },
 ] as const;
 
 /* ─────────────────────────────────────────────────────────
