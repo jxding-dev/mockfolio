@@ -153,8 +153,10 @@ export function Landing() {
       {/* ── HERO ─────────────────────────────── */}
       <section className={styles.hero}>
         <div className={styles.heroBg}>
+          <div className={styles.heroBgGradient} />
           <div className={styles.heroBgGlow1} />
           <div className={styles.heroBgGlow2} />
+          <div className={styles.heroBgGlow3} />
           <div className={styles.heroBgGrid} />
         </div>
 
