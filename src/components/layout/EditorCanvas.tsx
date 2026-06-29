@@ -109,6 +109,13 @@ export function EditorCanvas({
     : isComposite ? true
     : !!image;
 
+  // Keep first paint and mode changes framed inside the available canvas.
+  useEffect(() => {
+    if (showingUrlPreview || !hasContent) return;
+    const frame = window.requestAnimationFrame(fitZoom);
+    return () => window.cancelAnimationFrame(frame);
+  }, [activeMode, selectedDeviceId, fitMode, inspectOrientation, image?.id, selectedMockup?.id, mockupItems.length, hasContent, showingUrlPreview, fitZoom]);
+
   return (
     <div className={styles.wrap}>
       {/* canvas area */}

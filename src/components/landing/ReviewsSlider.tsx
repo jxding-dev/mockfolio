@@ -16,9 +16,14 @@ export function ReviewsSlider({ reviews }: Props) {
   return (
     <div className={styles.wrap} role="region" aria-label="사용자 후기 목록">
       <div className={styles.viewport}>
-        <div className={styles.track}>
+        <div className={styles.track} aria-live="off">
           {[0, 1].map((groupIndex) => (
-            <div className={styles.group} key={groupIndex} aria-hidden={groupIndex === 1}>
+            <div
+              className={styles.group}
+              key={groupIndex}
+              aria-hidden={groupIndex === 1 ? true : undefined}
+              role={groupIndex === 1 ? 'presentation' : undefined}
+            >
               {reviews.map((review) => (
                 <figure className={styles.card} key={`${groupIndex}-${review.name}`}>
                   <div className={styles.stars} aria-label="별점 5점 만점에 5점">★★★★★</div>

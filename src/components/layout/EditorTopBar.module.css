@@ -165,13 +165,19 @@
 /* ── Responsive ───────────────────────────── */
 @media (max-width: 900px) {
   .bar { grid-template-columns: auto 1fr auto; }
-  .tabLabel { display: none; }
-  .tab { padding: 5px 10px; }
+  .tabs { justify-content: center; }
+  .tab { padding: 5px 8px; gap: 3px; font-size: 11px; }
+  .tabIcon { font-size: 12px; }
   .saveState { display: none; }
 }
 
 @media (max-width: 600px) {
   .bar { grid-template-columns: auto 1fr; padding: 0 var(--space-3); }
   .right { display: none; }
-  .nameBtn { max-width: 120px; font-size: var(--text-xs); }
+  .divider,
+  .nameBtn,
+  .nameInput {
+    display: none;
+  }
+  .tabs { justify-self: end; }
 }

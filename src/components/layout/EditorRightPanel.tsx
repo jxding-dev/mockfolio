@@ -138,10 +138,21 @@ function MockupProps({
   onDuplicateMockupItem, onReorderMockupItem, onFitMockupItem,
 }: Props) {
   const addRef = useRef<HTMLInputElement>(null);
+  const [mockupQuery, setMockupQuery] = useState('');
   const selected = mockupItems.find((it) => it.id === selectedMockupItemId) ?? null;
   const selectedMockupAsset = mockupAssets.find((asset) => asset.id === s.selectedMockupId) ?? null;
   const visibleLayerCount = mockupItems.filter((item) => item.visible).length;
-  const groupedMockups = mockupAssets.reduce<Record<string, MockupAsset[]>>((grouped, asset) => {
+  const hasLongLayer = mockupItems.some((item) => item.height / item.width >= 1.75);
+  const query = mockupQuery.trim().toLowerCase();
+  const visibleMockupAssets = query
+    ? mockupAssets.filter((asset) => [
+      asset.label,
+      asset.category ?? '',
+      asset.description ?? '',
+      ...(asset.tags ?? []),
+    ].some((value) => value.toLowerCase().includes(query)))
+    : mockupAssets;
+  const groupedMockups = visibleMockupAssets.reduce<Record<string, MockupAsset[]>>((grouped, asset) => {
     const category = asset.category || '실사 목업';
     grouped[category] = [...(grouped[category] ?? []), asset];
     return grouped;
@@ -150,14 +161,29 @@ function MockupProps({
   return (
     <>
       <RSection title="실사 목업 선택">
-        {mockupItems.some((item) => item.height / item.width >= 1.75) && (
+        {hasLongLayer && (
           <p className={styles.infoHint}>긴 상세페이지 이미지로 보입니다. 상세페이지 목업과 아래 자동 맞춤 버튼을 먼저 사용해보세요.</p>
         )}
+        <label className={styles.searchLabel}>
+          <span>목업 검색</span>
+          <input
+            value={mockupQuery}
+            onChange={(event) => setMockupQuery(event.target.value)}
+            placeholder="상세페이지, 앱, 광고..."
+          />
+        </label>
         {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets.length ? (
           <div className={styles.mockupCategoryList}>
             {Object.entries(groupedMockups).map(([category, assets]) => (
-              <div key={category} className={styles.mockupCategory}>
-                <div className={styles.mockupCategoryTitle}>{category}</div>
+              <details
+                key={category}
+                className={styles.mockupCategory}
+                open={Boolean(query) || assets.some((asset) => asset.id === s.selectedMockupId) || (hasLongLayer && category.includes('상세페이지'))}
+              >
+                <summary className={styles.mockupCategoryTitle}>
+                  <span>{category}</span>
+                  <span>{assets.length}</span>
+                </summary>
                 <div className={styles.mockupAssetGrid}>
                   {assets.map((asset) => (
                     <MockupAssetCard
@@ -168,8 +194,9 @@ function MockupProps({
                     />
                   ))}
                 </div>
-              </div>
+              </details>
             ))}
+            {visibleMockupAssets.length === 0 && <p className={styles.hint}>검색 결과가 없습니다. 다른 키워드를 입력해보세요.</p>}
           </div>
         ) : <p className={styles.hint}>public/mockups에 PNG와 manifest를 추가하면 여기에서 선택할 수 있습니다.</p>}
         <p className={styles.hint}>실제 목업 이미지만 사용합니다. 투명하게 뚫린 영역 뒤로 사용자 이미지가 들어갑니다.</p>

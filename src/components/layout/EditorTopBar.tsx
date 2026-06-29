@@ -20,10 +20,10 @@ function formatSavedTime(ts: number): string {
 }
 
 const TABS: { id: AppMode; label: string; icon: string }[] = [
-  { id: 'inspect', label: 'Inspect',  icon: '📐' },
-  { id: 'mockup',  label: 'Mockup',   icon: '🖼'  },
-  { id: 'compare', label: 'Compare',  icon: '🔄'  },
-  { id: 'export',  label: 'Export',   icon: '💾'  },
+  { id: 'inspect', label: '검수', icon: '📐' },
+  { id: 'mockup', label: '목업', icon: '🖼' },
+  { id: 'compare', label: '비교', icon: '🔄' },
+  { id: 'export', label: '저장', icon: '💾' },
 ];
 
 export function EditorTopBar({
@@ -83,6 +83,7 @@ export function EditorTopBar({
               key={id}
               className={`${styles.tab} ${activeMode === id ? styles.tabActive : ''}`}
               onClick={() => onModeChange(id)}
+              title={`${label} 모드`}
             >
               <span className={styles.tabIcon}>{icon}</span>
               <span className={styles.tabLabel}>{label}</span>
