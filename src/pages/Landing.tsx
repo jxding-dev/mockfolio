@@ -62,38 +62,6 @@ function publicMockupSrc(src: string): string {
   return `${import.meta.env.BASE_URL}${src}`;
 }
 
-function RealMockupShowcase() {
-  const [main, side1, side2] = showcaseMockups;
-
-  return (
-    <div className={styles.realShowcase} aria-label="실제 목업 이미지 쇼케이스">
-      <figure className={styles.realShowcaseMain}>
-        <img src={publicMockupSrc(main.src)} alt={main.title} loading="eager" decoding="async" />
-        <figcaption>
-          <span>{main.category}</span>
-          <strong>{main.title}</strong>
-        </figcaption>
-      </figure>
-      <div className={styles.realShowcaseStrip}>
-        <figure className={styles.realShowcaseThumb} key={side1.src}>
-          <img src={publicMockupSrc(side1.src)} alt={side1.title} loading="lazy" decoding="async" />
-          <figcaption>
-            <span>{side1.category}</span>
-            <strong>{side1.title}</strong>
-          </figcaption>
-        </figure>
-        <figure className={styles.realShowcaseThumb} key={side2.src}>
-          <img src={publicMockupSrc(side2.src)} alt={side2.title} loading="lazy" decoding="async" />
-          <figcaption>
-            <span>{side2.category}</span>
-            <strong>{side2.title}</strong>
-          </figcaption>
-        </figure>
-      </div>
-    </div>
-  );
-}
-
 /* ─────────────────────────────────────────────────────────
    Feature Card
    ───────────────────────────────────────────────────────── */
@@ -209,9 +177,6 @@ export function Landing() {
             </div>
           </div>
 
-          <div className={`${styles.heroVisual} ${styles.heroEnterVisual}`}>
-            <RealMockupShowcase />
-          </div>
         </div>
       </section>
 
