@@ -23,8 +23,15 @@ function isLongDetailImage(image: UploadedImage | null): boolean {
   return Boolean(image && image.height / image.width >= LONG_DETAIL_RATIO);
 }
 
-function initialMockupScale(image: UploadedImage): number {
-  return isLongDetailImage(image) ? 0.56 : 1;
+const clampScale = (value: number) => Math.max(0.1, Math.min(3, value));
+
+/**
+ * Scale that keeps the layer fully inside the mockup stage (contain).
+ * mockupRatio = mockup height / width; layer height(px) ∝ scale * (h/w).
+ * Pass mockupRatio = 1 before the mockup's real ratio is known.
+ */
+function containScale(itemW: number, itemH: number, mockupRatio: number): number {
+  return clampScale(Math.min(1, (mockupRatio * itemW) / itemH));
 }
 
 async function loadSampleImage(): Promise<UploadedImage> {
@@ -243,6 +250,10 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   const [mockupItems, setMockupItems] = useState<MockupItem[]>([]);
   const [selectedMockupItemId, setSelectedMockupItemId] = useState<string | null>(null);
 
+  // Natural aspect ratio (height / width) of the selected mockup, used by the
+  // "fit" actions. Defaults to 1 until the mockup image has loaded.
+  const mockupRatioRef = useRef(1);
+
   const makeMockupItem = useCallback((img: UploadedImage, offset: number): MockupItem => ({
     id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     dataUrl: img.dataUrl,
@@ -253,7 +264,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     frameColor: settings.frameColor,
     x: offset * 7,
     y: offset * 5,
-    scale: offset === 0 ? initialMockupScale(img) : 0.82,
+    scale: offset === 0 ? containScale(img.width, img.height, 1) : 0.82,
     stretchX: 1,
     stretchY: 1,
     rotation: 0,
@@ -290,12 +301,15 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   const fitMockupItem = useCallback((id: string, mode: 'contain' | 'width' | 'height') => {
     setMockupItems((prev) => prev.map((it) => {
       if (it.id !== id) return it;
-      const isLong = it.height / it.width >= LONG_DETAIL_RATIO;
+      // width fit → layer spans the mockup width (scale 1).
+      // height fit → layer height matches the mockup height (scale = ratio·w/h).
+      // contain → the smaller of the two so nothing is clipped.
+      const heightScale = clampScale((mockupRatioRef.current * it.width) / it.height);
       const scale = mode === 'width'
-        ? (isLong ? 0.58 : 1)
+        ? 1
         : mode === 'height'
-          ? (isLong ? 0.38 : 0.72)
-          : (isLong ? 0.5 : 0.86);
+          ? heightScale
+          : containScale(it.width, it.height, mockupRatioRef.current);
       return {
         ...it,
         x: 0,
@@ -347,6 +361,19 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
 
   const exportRef = useRef<HTMLDivElement | null>(null);
   const selectedMockup = mockupAssets.find((asset) => asset.id === selectedMockupId) ?? null;
+
+  // Measure the selected mockup's real aspect ratio so "fit" actions are exact.
+  const selectedMockupSrc = selectedMockup?.src ?? null;
+  useEffect(() => {
+    if (!selectedMockupSrc) return;
+    let active = true;
+    const probe = new Image();
+    probe.onload = () => {
+      if (active && probe.naturalWidth) mockupRatioRef.current = probe.naturalHeight / probe.naturalWidth;
+    };
+    probe.src = selectedMockupSrc;
+    return () => { active = false; };
+  }, [selectedMockupSrc]);
 
   useEffect(() => {
     if ((activeMode === 'mockup' || activeMode === 'export') && !selectedMockup && mockupAssets.length > 0) {

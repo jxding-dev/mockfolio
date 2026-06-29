@@ -229,7 +229,7 @@ export function MockupComposer({
       <div
         className={styles.stage}
         ref={stageRef}
-        onClick={() => onSelect(null)}
+        onPointerDown={() => onSelect(null)}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}

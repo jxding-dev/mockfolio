@@ -139,6 +139,8 @@ function MockupProps({
 }: Props) {
   const addRef = useRef<HTMLInputElement>(null);
   const [mockupQuery, setMockupQuery] = useState('');
+  // User-toggled category open states (overrides the default-open heuristic).
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
   const selected = mockupItems.find((it) => it.id === selectedMockupItemId) ?? null;
   const selectedMockupAsset = mockupAssets.find((asset) => asset.id === s.selectedMockupId) ?? null;
   const visibleLayerCount = mockupItems.filter((item) => item.visible).length;
@@ -174,11 +176,21 @@ function MockupProps({
         </label>
         {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets.length ? (
           <div className={styles.mockupCategoryList}>
-            {Object.entries(groupedMockups).map(([category, assets]) => (
+            {Object.entries(groupedMockups).map(([category, assets]) => {
+              const defaultOpen = assets.some((asset) => asset.id === s.selectedMockupId)
+                || (hasLongLayer && category.includes('상세페이지'));
+              // While searching, force-open every group; otherwise respect the
+              // user's manual toggle, falling back to the default-open heuristic.
+              const isOpen = query ? true : (openCategories[category] ?? defaultOpen);
+              return (
               <details
                 key={category}
                 className={styles.mockupCategory}
-                open={Boolean(query) || assets.some((asset) => asset.id === s.selectedMockupId) || (hasLongLayer && category.includes('상세페이지'))}
+                open={isOpen}
+                onToggle={(event) => {
+                  const next = event.currentTarget.open;
+                  setOpenCategories((prev) => (prev[category] === next ? prev : { ...prev, [category]: next }));
+                }}
               >
                 <summary className={styles.mockupCategoryTitle}>
                   <span>{category}</span>
@@ -195,7 +207,8 @@ function MockupProps({
                   ))}
                 </div>
               </details>
-            ))}
+              );
+            })}
             {visibleMockupAssets.length === 0 && <p className={styles.hint}>검색 결과가 없습니다. 다른 키워드를 입력해보세요.</p>}
           </div>
         ) : <p className={styles.hint}>public/mockups에 PNG와 manifest를 추가하면 여기에서 선택할 수 있습니다.</p>}
