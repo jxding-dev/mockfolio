@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import styles from './Footer.module.css';
 
 export function Footer() {
@@ -14,9 +15,9 @@ export function Footer() {
           </span>
         </div>
         <div className={styles.right}>
-          <a href="#/pricing">Pricing</a>
-          <a href="#/billing">Billing</a>
-          <a href="#/dashboard">Dashboard</a>
+          <Link to="/pricing">Pricing</Link>
+          <Link to="/billing">Billing</Link>
+          <Link to="/dashboard">Dashboard</Link>
         </div>
       </div>
     </footer>

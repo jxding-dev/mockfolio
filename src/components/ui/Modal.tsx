@@ -21,6 +21,9 @@ export function Modal({ open, onClose, title, children, width = 480 }: Props) {
     if (!open) return;
     returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus(), 0);
+    // Lock background scroll while the dialog is open.
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
@@ -46,6 +49,7 @@ export function Modal({ open, onClose, title, children, width = 480 }: Props) {
     return () => {
       window.clearTimeout(focusTimer);
       document.removeEventListener('keydown', handler);
+      document.body.style.overflow = previousOverflow;
       returnFocusRef.current?.focus();
     };
   }, [open, onClose]);

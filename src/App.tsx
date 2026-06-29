@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { HashRouter as BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
@@ -11,12 +12,37 @@ import { NotFound } from './pages/NotFound';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { ThemeProvider } from './hooks/useTheme';
 
+const DEFAULT_TITLE = 'Mockfolio — Portfolio Mockup Builder';
+const ROUTE_TITLES: Record<string, string> = {
+  '/': 'Mockfolio — 포트폴리오 목업 & 반응형 검수',
+  '/editor': '에디터 · Mockfolio',
+  '/pricing': '요금제 · Mockfolio',
+  '/login': '로그인 · Mockfolio',
+  '/signup': '계정 만들기 · Mockfolio',
+  '/forgot-password': '비밀번호 재설정 · Mockfolio',
+  '/dashboard': 'Dashboard · Mockfolio',
+  '/billing': 'Billing · Mockfolio',
+  '/subscription': '구독 · Mockfolio',
+  '/invoice': 'Invoice · Mockfolio',
+};
+
+/* Resets scroll and updates the document title on every route change. */
+function RouteEffects() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.title = ROUTE_TITLES[pathname] ?? DEFAULT_TITLE;
+  }, [pathname]);
+  return null;
+}
+
 function AppShell() {
   const { pathname } = useLocation();
   const isEditor = pathname === '/editor';
 
   return (
     <ErrorBoundary>
+      <RouteEffects />
       {!isEditor && <Header />}
       <Routes>
         <Route path="/"        element={<Landing />} />
