@@ -19,18 +19,6 @@
       "src": "mockups/overlays/poster/gallery-poster-wall.png"
     },
     {
-      "id": "wide-transit-banner",
-      "label": "와이드 배너",
-      "category": "배너/광고 목업",
-      "src": "mockups/overlays/banner/wide-transit-banner.png"
-    },
-    {
-      "id": "square-ad-cards",
-      "label": "정사각 광고 카드",
-      "category": "소셜 광고 목업",
-      "src": "mockups/overlays/social/square-ad-cards.png"
-    },
-    {
       "id": "outdoor-shelter-ad",
       "label": "야외 쉘터 광고",
       "category": "실사 광고 목업",
@@ -89,12 +77,6 @@
       "label": "긴 상세페이지 패널",
       "category": "상세페이지 목업",
       "src": "mockups/overlays/ecommerce/commerce-long-detail-panels.png"
-    },
-    {
-      "id": "product-page-card-gallery",
-      "label": "상품 페이지 갤러리",
-      "category": "상세페이지 목업",
-      "src": "mockups/overlays/ecommerce/product-page-card-gallery.png"
     },
     {
       "id": "real-storefront-hanging-sign",
