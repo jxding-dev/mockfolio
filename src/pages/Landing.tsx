@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
@@ -61,6 +61,79 @@ const showcaseMockups = [
 function publicMockupSrc(src: string): string {
   return `${import.meta.env.BASE_URL}${src}`;
 }
+
+/* ─────────────────────────────────────────────────────────
+   Workflow steps — the 5-step flow a first-time user follows
+   ───────────────────────────────────────────────────────── */
+interface WorkflowStep {
+  title: string;
+  desc: string;
+  icon: ReactNode;
+  pro?: string;
+}
+
+const WORKFLOW_STEPS: WorkflowStep[] = [
+  {
+    title: 'URL 입력',
+    desc: '확인할 사이트 주소를 붙여넣거나 작업 이미지를 바로 업로드합니다.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    title: '반응형 확인',
+    desc: '모바일·태블릿·데스크탑·와이드에서 레이아웃이 깨지지 않는지 한눈에 검수합니다.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="2" y="4" width="14" height="10" rx="1.5" stroke="currentColor" strokeWidth="2"/>
+        <rect x="17" y="9" width="5" height="11" rx="1.5" stroke="currentColor" strokeWidth="2"/>
+        <path d="M6 18h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    title: '목업 적용',
+    desc: '실사형·디바이스 목업에 작업물을 올리고 위치·크기·각도를 맞춥니다.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 3 3 7.5l9 4.5 9-4.5L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+        <path d="m3 12 9 4.5L21 12M3 16.5 12 21l9-4.5" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+      </svg>
+    ),
+    pro: '프리미엄 목업',
+  },
+  {
+    title: '비포애프터 비교',
+    desc: '원본과 목업 결과를 슬라이더로 나란히 두고 완성도를 확인합니다.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
+        <path d="M12 4v16" stroke="currentColor" strokeWidth="2"/>
+        <path d="m8 9-2 3 2 3M16 9l2 3-2 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    title: '저장',
+    desc: '완성된 결과를 PNG·GIF로 내려받아 포트폴리오·제안서에 바로 사용합니다.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 3v12m0 0 4-4m-4 4-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    ),
+    pro: '고화질 Export',
+  },
+];
+
+const WORKFLOW_EXAMPLES = [
+  { src: 'mockups/overlays/realistic/devices/real-laptop-cafe-table.webp', cat: 'WEB', title: '카페 노트북 목업' },
+  { src: 'mockups/overlays/realistic/devices/real-smartphone-in-hand.webp', cat: 'APP', title: '손에 든 스마트폰 목업' },
+  { src: 'mockups/overlays/realistic/ads/real-city-building-billboard.webp', cat: 'AD', title: '도심 빌딩 광고판' },
+] as const;
 
 /* ─────────────────────────────────────────────────────────
    Feature Card
@@ -279,36 +352,76 @@ export function Landing() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ─────────────────────── */}
-      <section className={styles.stepsSection}>
-        <div className={styles.stepsLeft}>
-          <div className={styles.sectionLabel}>사용 방법</div>
-          <h2 className={styles.sectionTitle}>4단계로 완성하는<br />상업용 목업 이미지</h2>
-          <p className={styles.stepsDesc}>
-            복잡한 설정 없이 이미지를 올리는 순간부터<br />
-            바로 시작할 수 있습니다.
+      {/* ── WORKFLOW (HOW IT WORKS) ──────────── */}
+      <section className={styles.workflowSection}>
+        <Reveal>
+          <div className={styles.sectionLabelCenter}>사용 흐름</div>
+          <h2 className={styles.sectionTitleCenter}>URL만 넣으면, 저장까지 한 흐름으로</h2>
+          <p className={styles.workflowSubtitle}>
+            처음 써도 막히지 않도록 5단계로 단순하게. 화면 흐름 그대로 따라가면 끝납니다.
           </p>
-          <Button variant="primary" size="lg" onClick={() => navigate('/editor')} style={{marginTop: 8}}>
-            지금 바로 시작 →
-          </Button>
-        </div>
+        </Reveal>
 
-        <div className={styles.stepsRight}>
-          {[
-            { n: '01', title: '작업물 업로드', desc: '웹·앱 화면, 상세페이지, 포스터, 배너 이미지를 드래그하거나 클릭해서 올립니다. 서버로 전송되지 않습니다.' },
-            { n: '02', title: 'URL 또는 이미지 검수', desc: '프리셋 크기와 직접 입력 크기로 레이아웃을 확인하고, iframe 차단 사이트는 새 창에서 검수합니다.' },
-            { n: '03', title: '목업 합성', desc: '카테고리별 목업을 고르고 여러 이미지 레이어를 위치, 크기, 회전, 왜곡까지 조절합니다.' },
-            { n: '04', title: 'PNG/GIF 저장', desc: '합성된 결과만 다운로드합니다. 목업 원본 단독 저장 흐름은 제공하지 않습니다.' },
-          ].map((s) => (
-            <div key={s.n} className={styles.stepItem}>
-              <div className={styles.stepNum}>{s.n}</div>
-              <div>
-                <h4 className={styles.stepTitle}>{s.title}</h4>
-                <p className={styles.stepDesc}>{s.desc}</p>
-              </div>
+        <Reveal delay={80}>
+          <ol className={styles.workflowFlow}>
+            {WORKFLOW_STEPS.map((s, i) => (
+              <Fragment key={s.title}>
+                <li className={styles.workflowStep}>
+                  <span className={styles.workflowStepNum}>STEP {i + 1}</span>
+                  <div className={styles.workflowIcon}>{s.icon}</div>
+                  <h3 className={styles.workflowStepTitle}>{s.title}</h3>
+                  <p className={styles.workflowStepDesc}>{s.desc}</p>
+                  <div className={styles.workflowTags}>
+                    <span className={styles.tagFree}>무료</span>
+                    {s.pro && <span className={styles.tagPro}>+ Pro {s.pro}</span>}
+                  </div>
+                </li>
+                {i < WORKFLOW_STEPS.length - 1 && (
+                  <li className={styles.workflowArrow} aria-hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </li>
+                )}
+              </Fragment>
+            ))}
+          </ol>
+        </Reveal>
+
+        {/* 사용 예시 이미지 — 결과 미리보기 */}
+        <Reveal delay={120}>
+          <div className={styles.workflowExample}>
+            <div className={styles.workflowExampleHead}>
+              <span className={styles.sectionLabelCenter}>결과 예시</span>
+              <h3>이 흐름을 거치면 이렇게 완성됩니다</h3>
             </div>
-          ))}
-        </div>
+            <div className={styles.workflowExampleGrid}>
+              {WORKFLOW_EXAMPLES.map((ex) => (
+                <figure className={styles.workflowExampleItem} key={ex.src}>
+                  <img src={publicMockupSrc(ex.src)} alt={ex.title} loading="lazy" decoding="async" />
+                  <figcaption>
+                    <span>{ex.cat}</span>
+                    <strong>{ex.title}</strong>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        {/* 무료 → Pro 자연스러운 연결 */}
+        <Reveal delay={160}>
+          <div className={styles.workflowUpsell}>
+            <div className={styles.workflowUpsellText}>
+              <strong>전체 흐름은 무료로 사용할 수 있어요.</strong>
+              <span>Pro는 프리미엄 목업과 고화질 Export, Before/After GIF를 더합니다.</span>
+            </div>
+            <div className={styles.workflowUpsellBtns}>
+              <Button variant="primary" onClick={() => navigate('/editor')}>무료로 시작하기</Button>
+              <Button variant="ghost" onClick={() => navigate('/pricing')}>Pro 기능 보기 →</Button>
+            </div>
+          </div>
+        </Reveal>
       </section>
 
       {/* ── REVIEWS ──────────────────────────── */}
