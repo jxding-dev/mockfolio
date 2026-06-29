@@ -132,31 +132,40 @@ export function Landing() {
         <div className={styles.heroInner}>
           <div className={`${styles.heroText} ${styles.heroEnter}`}>
             <span className={styles.heroBadgeWrap}>
-              <Badge variant="accent">Free available · Pro ₩9,900/mo 준비 중</Badge>
+              <Badge variant="accent">지금 무료 · 가입 없이 바로 시작</Badge>
             </span>
 
             <h1 className={styles.heroTitle}>
-              내 작업물을<br />
-              <span className={styles.heroAccent}>실제 서비스처럼</span><br />
-              보여주는 목업 툴.
+              내 포트폴리오를<br />
+              <span className={styles.heroAccent}>실제 출시된 서비스처럼</span><br />
+              보여주세요.
             </h1>
 
-            <p className={styles.heroDesc}>
-              웹사이트, 앱, 상세페이지, 포스터, 배너 이미지를 업로드하고
-              반응형 검수와 실사형 목업 합성을 한 화면에서 처리하세요.<br />
-              <strong>서버 업로드 없이 브라우저에서만 처리합니다.</strong>
+            <p className={styles.heroLead}>
+              포트폴리오를 전문가처럼 목업으로 만들고,<br className={styles.brDesktop} />
+              반응형까지 한 번에 확인하세요.
             </p>
 
-            <div className={styles.heroCtas}>
-              <Button variant="primary" size="lg" onClick={() => navigate('/editor')}>
-                무료로 시작하기
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </Button>
-              <Button variant="secondary" size="lg" onClick={() => navigate('/pricing')}>
-                요금제 보기
-              </Button>
+            <p className={styles.heroDesc}>
+              웹·앱·상세페이지·포스터·배너 이미지를 올리면 실사형 목업 합성과 반응형 검수를 한 화면에서.
+              <strong> 서버 업로드 없이 브라우저에서만 처리합니다.</strong>
+            </p>
+
+            <div className={styles.heroCtaGroup}>
+              <div className={styles.heroCtas}>
+                <Button variant="primary" size="lg" className={styles.heroPrimaryCta} onClick={() => navigate('/editor')}>
+                  무료로 시작하기
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </Button>
+                <Button variant="secondary" size="lg" onClick={() => navigate('/pricing')}>
+                  요금제 보기
+                </Button>
+              </div>
+              <p className={styles.heroCtaNote}>
+                신용카드 불필요 · 회원가입 없이 · 결과물은 내 브라우저에만 저장
+              </p>
             </div>
 
             <div className={styles.heroStats}>
