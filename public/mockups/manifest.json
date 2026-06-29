@@ -1,12 +1,6 @@
 {
   "mockups": [
     {
-      "id": "detail-page-panels",
-      "label": "상세페이지 3단 패널",
-      "category": "상세페이지 목업",
-      "src": "mockups/overlays/ecommerce/detail-page-panels.png"
-    },
-    {
       "id": "multi-device-app-showcase",
       "label": "앱 디바이스 쇼케이스",
       "category": "앱 목업",
@@ -67,30 +61,6 @@
       "src": "mockups/overlays/samples/sample-desktop-studio.png"
     },
     {
-      "id": "ios-phone-desk-premium",
-      "label": "iOS 폰 데스크",
-      "category": "앱 목업",
-      "src": "mockups/overlays/app/ios-phone-desk-premium.png"
-    },
-    {
-      "id": "android-phone-gradient-card",
-      "label": "안드로이드 그라디언트 카드",
-      "category": "앱 목업",
-      "src": "mockups/overlays/app/android-phone-gradient-card.png"
-    },
-    {
-      "id": "tablet-dashboard-studio",
-      "label": "태블릿 대시보드",
-      "category": "앱 목업",
-      "src": "mockups/overlays/app/tablet-dashboard-studio.png"
-    },
-    {
-      "id": "dual-mobile-app-showcase",
-      "label": "듀얼 모바일 앱",
-      "category": "앱 목업",
-      "src": "mockups/overlays/app/dual-mobile-app-showcase.png"
-    },
-    {
       "id": "desktop-monitor-clean-office",
       "label": "데스크탑 모니터",
       "category": "웹사이트 목업",
@@ -127,59 +97,15 @@
       "src": "mockups/overlays/ecommerce/product-page-card-gallery.png"
     },
     {
-      "id": "street-billboard-wide",
-      "label": "거리 와이드 광고판",
-      "category": "배너/광고 목업",
-      "src": "mockups/overlays/banner/street-billboard-wide.png"
-    },
-    {
-      "id": "metro-platform-banner",
-      "label": "메트로 플랫폼 배너",
-      "category": "배너/광고 목업",
-      "src": "mockups/overlays/banner/metro-platform-banner.png"
-    },
-    {
-      "id": "social-square-card-stack",
-      "label": "소셜 정사각 카드 스택",
-      "category": "소셜 광고 목업",
-      "src": "mockups/overlays/social/social-square-card-stack.png"
-    },
-    {
-      "id": "vertical-story-phone-ad",
-      "label": "스토리형 모바일 광고",
-      "category": "소셜 광고 목업",
-      "src": "mockups/overlays/social/vertical-story-phone-ad.png"
-    },
-    {
-      "id": "bus-stop-premium-panel",
-      "label": "버스정류장 프리미엄 패널",
-      "category": "실사 광고 목업",
-      "src": "mockups/overlays/ads/bus-stop-premium-panel.png"
-    },
-    {
-      "id": "city-rooftop-billboard",
-      "label": "옥상 광고판",
-      "category": "실사 광고 목업",
-      "src": "mockups/overlays/ads/city-rooftop-billboard.png"
-    },
-    {
-      "id": "round-hanging-store-sign",
-      "label": "원형 행잉 간판",
-      "category": "간판 목업",
-      "src": "mockups/overlays/signage/round-hanging-store-sign.png"
-    },
-    {
-      "id": "magazine-spread-ad",
-      "label": "매거진 펼침면 광고",
-      "category": "프린트 목업",
-      "src": "mockups/overlays/print/magazine-spread-ad.png"
-    },
-    {
       "id": "real-storefront-hanging-sign",
       "label": "실사 매장 행잉 간판",
       "category": "실사 간판 목업",
       "description": "카페, 편집샵, 오프라인 매장 로고/간판 시안에 적합",
-      "tags": ["간판", "매장", "로고"],
+      "tags": [
+        "간판",
+        "매장",
+        "로고"
+      ],
       "src": "mockups/overlays/realistic/signage/real-storefront-hanging-sign.webp"
     },
     {
@@ -187,7 +113,11 @@
       "label": "실사 원형 카페 간판",
       "category": "실사 간판 목업",
       "description": "브랜드 로고, 카페 사인, 작은 매장 간판 시안용",
-      "tags": ["원형", "카페", "로고"],
+      "tags": [
+        "원형",
+        "카페",
+        "로고"
+      ],
       "src": "mockups/overlays/realistic/signage/real-round-cafe-sign.webp"
     },
     {
@@ -195,7 +125,11 @@
       "label": "실사 매장 메뉴보드",
       "category": "실사 간판 목업",
       "description": "식당, 카페, 매장 메뉴판 또는 프로모션 보드용",
-      "tags": ["메뉴판", "매장", "가로형"],
+      "tags": [
+        "메뉴판",
+        "매장",
+        "가로형"
+      ],
       "src": "mockups/overlays/realistic/signage/real-restaurant-menu-board.webp"
     },
     {
@@ -203,7 +137,11 @@
       "label": "실사 도심 빌딩 광고판",
       "category": "실사 광고판 목업",
       "description": "대형 옥외 광고, 캠페인, 포스터 디자인 프레젠테이션용",
-      "tags": ["도심", "광고판", "세로형"],
+      "tags": [
+        "도심",
+        "광고판",
+        "세로형"
+      ],
       "src": "mockups/overlays/realistic/ads/real-city-building-billboard.webp"
     },
     {
@@ -211,7 +149,11 @@
       "label": "실사 옥상 LED 광고판",
       "category": "실사 광고판 목업",
       "description": "야외 대형 LED 배너, 브랜드 캠페인, 이벤트 광고용",
-      "tags": ["LED", "옥상", "가로형"],
+      "tags": [
+        "LED",
+        "옥상",
+        "가로형"
+      ],
       "src": "mockups/overlays/realistic/ads/real-rooftop-led-billboard.webp"
     },
     {
@@ -219,7 +161,11 @@
       "label": "실사 버스정류장 라이트박스",
       "category": "실사 광고판 목업",
       "description": "교통 광고, 포스터, 브랜드 캠페인 시안용",
-      "tags": ["버스정류장", "포스터", "세로형"],
+      "tags": [
+        "버스정류장",
+        "포스터",
+        "세로형"
+      ],
       "src": "mockups/overlays/realistic/ads/real-bus-stop-lightbox.webp"
     },
     {
@@ -227,7 +173,11 @@
       "label": "실사 쇼핑몰 디지털 키오스크",
       "category": "실사 광고판 목업",
       "description": "쇼핑몰 안내 화면, 디지털 사이니지, 세로 광고용",
-      "tags": ["키오스크", "쇼핑몰", "디지털"],
+      "tags": [
+        "키오스크",
+        "쇼핑몰",
+        "디지털"
+      ],
       "src": "mockups/overlays/realistic/ads/real-mall-digital-kiosk.webp"
     },
     {
@@ -235,7 +185,11 @@
       "label": "실사 지하철 플랫폼 포스터",
       "category": "실사 포스터 목업",
       "description": "지하철 포스터, 공공 캠페인, 세로형 광고 검수용",
-      "tags": ["지하철", "포스터", "세로형"],
+      "tags": [
+        "지하철",
+        "포스터",
+        "세로형"
+      ],
       "src": "mockups/overlays/realistic/poster/real-subway-platform-poster.webp"
     },
     {
@@ -243,7 +197,11 @@
       "label": "실사 매장 윈도우 포스터",
       "category": "실사 포스터 목업",
       "description": "매장 유리창 포스터, 세일 배너, 브랜드 이벤트용",
-      "tags": ["윈도우", "매장", "포스터"],
+      "tags": [
+        "윈도우",
+        "매장",
+        "포스터"
+      ],
       "src": "mockups/overlays/realistic/poster/real-store-window-poster.webp"
     },
     {
@@ -251,7 +209,11 @@
       "label": "실사 도로변 대형 광고판",
       "category": "실사 배너 목업",
       "description": "도로변 대형 광고, 브랜드 캠페인, 가로 배너용",
-      "tags": ["도로", "광고판", "가로형"],
+      "tags": [
+        "도로",
+        "광고판",
+        "가로형"
+      ],
       "src": "mockups/overlays/realistic/banner/real-highway-billboard-sunset.webp"
     },
     {
@@ -259,7 +221,11 @@
       "label": "실사 전시 부스 와이드 배너",
       "category": "실사 배너 목업",
       "description": "박람회, 팝업스토어, 전시 부스 백월 배너용",
-      "tags": ["전시", "부스", "와이드"],
+      "tags": [
+        "전시",
+        "부스",
+        "와이드"
+      ],
       "src": "mockups/overlays/realistic/banner/real-event-booth-wide-banner.webp"
     },
     {
@@ -267,7 +233,11 @@
       "label": "실사 건물 외벽 세로 배너",
       "category": "실사 배너 목업",
       "description": "건물 외벽 현수막, 세로 배너, 오프라인 캠페인용",
-      "tags": ["건물", "현수막", "세로형"],
+      "tags": [
+        "건물",
+        "현수막",
+        "세로형"
+      ],
       "src": "mockups/overlays/realistic/banner/real-building-wall-banner.webp"
     },
     {
@@ -275,7 +245,11 @@
       "label": "실사 무대 LED 전광판",
       "category": "실사 배너 목업",
       "description": "컨퍼런스, 공연, 이벤트 무대용 LED 화면 시안",
-      "tags": ["전광판", "무대", "이벤트"],
+      "tags": [
+        "전광판",
+        "무대",
+        "이벤트"
+      ],
       "src": "mockups/overlays/realistic/banner/real-led-stage-screen.webp"
     },
     {
@@ -283,7 +257,11 @@
       "label": "실사 데스크탑 모니터",
       "category": "실사 디바이스 목업",
       "description": "웹사이트, SaaS 대시보드, 데스크탑 UI 목업용",
-      "tags": ["웹", "모니터", "데스크탑"],
+      "tags": [
+        "웹",
+        "모니터",
+        "데스크탑"
+      ],
       "src": "mockups/overlays/realistic/devices/real-desktop-monitor-desk.webp"
     },
     {
@@ -291,7 +269,11 @@
       "label": "실사 카페 노트북",
       "category": "실사 디바이스 목업",
       "description": "웹사이트, 랜딩페이지, 서비스 화면 포트폴리오용",
-      "tags": ["웹", "노트북", "카페"],
+      "tags": [
+        "웹",
+        "노트북",
+        "카페"
+      ],
       "src": "mockups/overlays/realistic/devices/real-laptop-cafe-table.webp"
     },
     {
@@ -299,7 +281,11 @@
       "label": "실사 스튜디오 모니터",
       "category": "실사 디바이스 목업",
       "description": "웹앱, 관리자 페이지, 디자인 시스템 화면 목업용",
-      "tags": ["웹앱", "모니터", "스튜디오"],
+      "tags": [
+        "웹앱",
+        "모니터",
+        "스튜디오"
+      ],
       "src": "mockups/overlays/realistic/devices/real-studio-monitor-imac.webp"
     },
     {
@@ -307,7 +293,11 @@
       "label": "실사 손에 든 스마트폰",
       "category": "실사 디바이스 목업",
       "description": "모바일 앱, SNS 화면, 앱 홍보 이미지용",
-      "tags": ["앱", "스마트폰", "모바일"],
+      "tags": [
+        "앱",
+        "스마트폰",
+        "모바일"
+      ],
       "src": "mockups/overlays/realistic/devices/real-smartphone-in-hand.webp"
     },
     {
@@ -315,7 +305,11 @@
       "label": "실사 책상 위 스마트폰",
       "category": "실사 디바이스 목업",
       "description": "모바일 UI, 앱 소개, 소셜 콘텐츠 목업용",
-      "tags": ["앱", "스마트폰", "책상"],
+      "tags": [
+        "앱",
+        "스마트폰",
+        "책상"
+      ],
       "src": "mockups/overlays/realistic/devices/real-phone-on-desk.webp"
     },
     {
@@ -323,7 +317,11 @@
       "label": "실사 오피스 태블릿",
       "category": "실사 디바이스 목업",
       "description": "태블릿 앱, 대시보드, 상세페이지 화면 목업용",
-      "tags": ["태블릿", "앱", "오피스"],
+      "tags": [
+        "태블릿",
+        "앱",
+        "오피스"
+      ],
       "src": "mockups/overlays/realistic/devices/real-tablet-office-table.webp"
     },
     {
@@ -331,7 +329,11 @@
       "label": "실사 노트북+모바일 쇼케이스",
       "category": "실사 디바이스 목업",
       "description": "반응형 웹, 앱+웹 동시 소개, 서비스 쇼케이스용",
-      "tags": ["반응형", "웹", "모바일"],
+      "tags": [
+        "반응형",
+        "웹",
+        "모바일"
+      ],
       "src": "mockups/overlays/realistic/devices/real-dual-device-showcase.webp"
     }
   ]
