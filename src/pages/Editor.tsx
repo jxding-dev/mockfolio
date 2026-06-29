@@ -149,7 +149,7 @@ function UploadZone({ onUpload, onUseSample, error, onError, onClearError, onSta
 
           <div className={styles.dropzoneText}>
             <strong>{dragging ? '여기에 놓으세요!' : '화면 캡처 이미지를 여기에 끌어다 놓으세요'}</strong>
-            <span>클릭해서 파일 선택 · 스크린샷은 <strong>Ctrl/⌘ + V</strong>로 바로 붙여넣기</span>
+            <span>클릭해서 파일 선택 · 스크린샷은 <kbd className={styles.shortcutKey}>Ctrl/⌘ + V</kbd>로 바로 붙여넣기</span>
           </div>
 
           <div className={styles.dropzoneMeta}>PNG · JPG · WebP · 최대 20MB</div>
@@ -577,6 +577,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
           selectedMockupItemId={selectedMockupItemId}
           onMockupItemSelect={(id) => setSelectedMockupItemId(id || null)}
           onMockupItemMove={moveMockupItem}
+          onMockupItemTransform={updateMockupItem}
         />
 
         <EditorRightPanel

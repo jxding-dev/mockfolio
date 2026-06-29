@@ -29,6 +29,7 @@ interface Props {
   selectedMockupItemId?: string | null;
   onMockupItemSelect?: (id: string | null) => void;
   onMockupItemMove?: (id: string, x: number, y: number) => void;
+  onMockupItemTransform?: (id: string, patch: Partial<MockupItem>) => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -48,6 +49,7 @@ export function EditorCanvas({
   selectedMockupItemId = null,
   onMockupItemSelect,
   onMockupItemMove,
+  onMockupItemTransform,
 }: Props) {
   const {
     activeMode, selectedDeviceId, fitMode, inspectOrientation,
@@ -146,6 +148,7 @@ export function EditorCanvas({
               mockup={selectedMockup}
               onSelect={(id) => onMockupItemSelect?.(id)}
               onPositionChange={onMockupItemMove ?? (() => {})}
+              onTransformChange={onMockupItemTransform ?? (() => {})}
             />
           </div>
         ) : (activeMode === 'mockup' || activeMode === 'export') && !selectedMockup ? (

@@ -1,10 +1,52 @@
 .wrap {
   width: min(100%, 760px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: 36px;
+}
+
+.shortcutDock {
+  align-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg-base) 92%, transparent);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.shortcutDock span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.shortcutDock kbd {
+  min-width: 22px;
+  padding: 2px 5px;
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  text-align: center;
 }
 
 .stage {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   border-radius: var(--radius-xl);
   background: var(--bg-muted);
   box-shadow: var(--shadow-lg);
@@ -20,16 +62,6 @@
   touch-action: none;
   transform-origin: center;
   line-height: 0;
-}
-
-.imageLayerSelected::after {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  border: 2px solid var(--accent);
-  border-radius: var(--radius-sm);
-  pointer-events: none;
-  box-shadow: 0 0 0 4px var(--accent-subtle);
 }
 
 .imageLayerLocked {
@@ -53,9 +85,118 @@
   pointer-events: none;
 }
 
+.transformBox {
+  position: absolute;
+  z-index: 1100;
+  max-width: none;
+  cursor: move;
+  touch-action: none;
+  transform-origin: center;
+  line-height: 0;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+  box-shadow:
+    0 0 0 4px var(--accent-subtle),
+    0 0 0 1px rgba(255, 255, 255, 0.75) inset;
+}
+
+.transformBox::before,
+.transformBox::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.transformBox::before {
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--bg-base);
+  transform: translate(-50%, -50%);
+}
+
+.transformBox::after {
+  left: 50%;
+  top: -36px;
+  height: 34px;
+  border-left: 1px dashed var(--accent);
+  transform: translateX(-50%);
+}
+
+.resizeHandle,
+.rotateHandle {
+  position: absolute;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.24);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.resizeHandle::after,
+.rotateHandle::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+}
+
+.resizeHandle:hover,
+.resizeHandle:focus-visible,
+.rotateHandle:hover,
+.rotateHandle:focus-visible {
+  outline: none;
+  transform: translate(-50%, -50%) scale(1.14);
+}
+
+.handle_nw { left: 0; top: 0; cursor: nwse-resize; transform: translate(-50%, -50%); }
+.handle_n { left: 50%; top: 0; cursor: ns-resize; transform: translate(-50%, -50%); }
+.handle_ne { left: 100%; top: 0; cursor: nesw-resize; transform: translate(-50%, -50%); }
+.handle_e { left: 100%; top: 50%; cursor: ew-resize; transform: translate(-50%, -50%); }
+.handle_se { left: 100%; top: 100%; cursor: nwse-resize; transform: translate(-50%, -50%); }
+.handle_s { left: 50%; top: 100%; cursor: ns-resize; transform: translate(-50%, -50%); }
+.handle_sw { left: 0; top: 100%; cursor: nesw-resize; transform: translate(-50%, -50%); }
+.handle_w { left: 0; top: 50%; cursor: ew-resize; transform: translate(-50%, -50%); }
+
+.rotateHandle {
+  left: 50%;
+  top: -46px;
+  background: var(--bg-base);
+  color: var(--accent);
+  transform: translate(-50%, -50%);
+}
+
+.rotateHandle::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 2px solid currentColor;
+  border-left-color: transparent;
+  border-radius: 50%;
+}
+
 .hint {
-  margin-top: var(--space-3);
   color: var(--text-tertiary);
   font-size: var(--text-xs);
   text-align: center;
+}
+
+@media (max-width: 560px) {
+  .shortcutDock {
+    border-radius: var(--radius-lg);
+    font-size: 10px;
+  }
+
+  .resizeHandle,
+  .rotateHandle {
+    width: 22px;
+    height: 22px;
+  }
 }
