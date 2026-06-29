@@ -65,8 +65,7 @@ export function BillingPage({ view }: Props) {
         <Badge variant="accent">Payment preview</Badge>
         <h1>Pro 월 9,900원 구독 화면 미리보기</h1>
         <p>
-          현재는 실제 결제를 만들지 않습니다. Pro 혜택과 결제 후 화면을 미리 확인할 수 있으며,
-          과금이나 구독 변경은 발생하지 않습니다.
+          Pro로 열리는 혜택과 결제 흐름을 미리 둘러보세요. 정식 출시 전까지는 카드 정보를 받지 않습니다.
         </p>
       </section>
 
@@ -80,12 +79,12 @@ export function BillingPage({ view }: Props) {
           <h2>Upgrade 미리보기</h2>
           <p>Pro 월 {PRO_MONTHLY_PRICE_KRW.toLocaleString('ko-KR')}원 구독 화면의 흐름을 확인합니다.</p>
           <div className={styles.codeBox}>
-            실제 결제 요청은 아직 생성하지 않습니다.
+            Pro 월 9,900원 · 무제한 목업 · 고화질/GIF Export · 상업적 사용
           </div>
           <Button variant="primary" fullWidth onClick={() => navigate('/payment/success')}>
             결제 완료 화면 미리보기
           </Button>
-          <p className={styles.smallNote}>현재 버튼은 미리보기 이동만 수행하며 결제 요청은 만들지 않습니다.</p>
+          <p className={styles.smallNote}>미리보기 화면으로만 이동하며, 실제 결제는 발생하지 않습니다.</p>
         </aside>
       </section>
 

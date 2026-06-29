@@ -5,6 +5,7 @@ import { DEVICE_PRESETS } from '../data/devices';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useMockupAssets } from '../hooks/useMockupAssets';
+import type { MockupAsset } from '../data/mockups';
 import { exportPng } from '../utils/exportPng';
 import { exportComparisonGif, exportMockupComposite } from '../utils/mediaExport';
 import { normalizePreviewUrl, openPreviewWindow } from '../utils/urlPreview';
@@ -17,10 +18,32 @@ import styles from './Editor.module.css';
 /* Loads a bundled public asset into the same UploadedImage shape as a real upload. */
 const SAMPLE_IMAGE_SRC = `${import.meta.env.BASE_URL}mockups/overlays/samples/sample-desktop-studio.webp`;
 const LONG_DETAIL_RATIO = 1.75;
-const LONG_DETAIL_MOCKUP_ID = 'commerce-long-detail-panels';
 
 function isLongDetailImage(image: UploadedImage | null): boolean {
   return Boolean(image && image.height / image.width >= LONG_DETAIL_RATIO);
+}
+
+/**
+ * Picks a mockup that suits the uploaded image's aspect ratio so the first
+ * composite never lands on a mismatched mockup (e.g. a desktop screenshot on a
+ * long detail-page panel). Category keywords are matched against the manifest.
+ */
+function recommendMockupId(image: UploadedImage, assets: MockupAsset[]): string | null {
+  if (assets.length === 0) return null;
+  const ratio = image.width / image.height;
+  let keywords: string[];
+  if (image.height / image.width >= LONG_DETAIL_RATIO) keywords = ['상세'];
+  else if (ratio > 1.3) keywords = ['웹', '데스크', '노트북', 'laptop', 'desktop'];
+  else if (ratio < 0.85) keywords = ['앱', 'app', '모바일', '스마트폰'];
+  else keywords = ['소셜', '포스터', '광고'];
+  for (const key of keywords) {
+    const hit = assets.find((a) =>
+      (a.category ?? '').toLowerCase().includes(key.toLowerCase())
+      || a.label.toLowerCase().includes(key.toLowerCase())
+      || a.id.toLowerCase().includes(key.toLowerCase()));
+    if (hit) return hit.id;
+  }
+  return assets[0].id;
 }
 
 const clampScale = (value: number) => Math.max(0.1, Math.min(3, value));
@@ -394,11 +417,16 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
       : '이미지를 업로드했어요. Inspect에서 먼저 확인하세요.');
   }, [image, patch]);
 
+  // Recommend a mockup that fits each newly uploaded image's aspect ratio, once
+  // per image — so a previous (e.g. long detail-page) mockup never carries over
+  // to a mismatched new image. The user's later manual choice is preserved.
+  const lastRecommendedImageId = useRef<string | null>(null);
   useEffect(() => {
-    if (!image || !isLongDetailImage(image) || mockupAssets.length === 0) return;
-    const recommended = mockupAssets.find((asset) => asset.id === LONG_DETAIL_MOCKUP_ID)
-      ?? mockupAssets.find((asset) => asset.id.includes('detail') || asset.category?.includes('상세페이지'));
-    if (recommended) patch('selectedMockupId', recommended.id);
+    if (!image || mockupAssets.length === 0) return;
+    if (image.id === lastRecommendedImageId.current) return;
+    lastRecommendedImageId.current = image.id;
+    const recommended = recommendMockupId(image, mockupAssets);
+    if (recommended) patch('selectedMockupId', recommended);
   }, [image, mockupAssets, patch]);
 
   // Keyboard: 1–4 switch modes (ignored while typing in inputs)

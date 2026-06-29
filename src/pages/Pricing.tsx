@@ -17,8 +17,8 @@ export function Pricing() {
         <Badge variant="accent">Pricing</Badge>
         <h1>Free로 시작하고, Pro 월 9,900원으로 확장</h1>
         <p>
-          기본 검수와 목업 제작은 무료로 시작하세요. Pro는 더 많은 목업과 고화질 저장을 위한
-          정식 구독 플랜으로 준비 중이며, 현재 페이지에서는 실제 결제가 발생하지 않습니다.
+          반응형 검수와 목업 제작은 지금 무료로 시작하세요. Pro는 무제한 목업과 고화질·GIF 저장,
+          상업적 사용까지 한 번에 여는 구독 플랜으로 곧 출시됩니다.
         </p>
       </section>
 
@@ -61,10 +61,8 @@ export function Pricing() {
       </section>
 
       <section className={styles.notice}>
-        <h3>현재 결제 상태</h3>
         <p>
-          지금은 가격과 플랜을 미리 보여주는 단계입니다. 버튼을 눌러도 실제 과금, 구독 변경,
-          계정 저장은 발생하지 않습니다.
+          지금은 무료 베타입니다 — 카드 정보 없이 핵심 기능을 모두 사용할 수 있고, Pro는 정식 출시 때 열립니다.
         </p>
       </section>
     </main>

@@ -211,7 +211,7 @@ function MockupProps({
             })}
             {visibleMockupAssets.length === 0 && <p className={styles.hint}>검색 결과가 없습니다. 다른 키워드를 입력해보세요.</p>}
           </div>
-        ) : <p className={styles.hint}>public/mockups에 PNG와 manifest를 추가하면 여기에서 선택할 수 있습니다.</p>}
+        ) : <p className={styles.hint}>목업을 불러오지 못했습니다. 잠시 후 새로고침하면 목업 목록이 다시 표시됩니다.</p>}
         <p className={styles.hint}>실제 목업 이미지만 사용합니다. 투명하게 뚫린 영역 뒤로 사용자 이미지가 들어갑니다.</p>
       </RSection>
 

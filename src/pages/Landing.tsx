@@ -321,9 +321,9 @@ export function Landing() {
         <div className={styles.advantageGrid}>
           {[
             { title: '다양한 작업자 대응', desc: '웹 제작자, 앱 개발자, 상세페이지 디자이너, 광고·배너·포스터 작업자가 같은 에디터에서 결과물을 만들 수 있습니다.' },
-            { title: '목업 자산 확장 구조', desc: 'public/mockups manifest 기반으로 카테고리와 파일을 분리해, 직접 제작한 목업을 계속 추가하기 쉽습니다.' },
-            { title: '상업 서비스 준비', desc: '무료 사용과 30일 이용권만 남겨 가격 구조를 단순화했습니다. 결제 연동 전에는 실제 과금 코드가 없습니다.' },
-            { title: '로컬 우선 보안', desc: '업로드 이미지를 외부 서버로 보내지 않는 구조라 초기 서비스 단계에서도 개인정보 리스크를 줄일 수 있습니다.' },
+            { title: '계속 늘어나는 목업', desc: '카테고리별 실사·디바이스 목업을 꾸준히 추가하고 있어, 작업물 종류가 달라도 어울리는 목업을 고를 수 있습니다.' },
+            { title: '간단한 가격 구조', desc: '지금은 무료 베타로 핵심 기능을 모두 열어두었고, Pro는 월 9,900원 한 가지로 단순하게 준비하고 있습니다.' },
+            { title: '로컬 우선 보안', desc: '업로드한 이미지는 브라우저 안에서만 처리하고 외부 서버로 보내지 않아, 작업물이 유출될 걱정 없이 사용할 수 있습니다.' },
           ].map((item, i) => (
             <Reveal key={item.title} delay={i * 70}>
               <article className={styles.advantageCard}>
@@ -515,7 +515,7 @@ export function Landing() {
                 ))}
               </ul>
               <Button variant="primary" fullWidth className={styles.planProCta} onClick={() => setComingSoon(true)}>
-                Pro 시작하기 →
+                Pro 결과 예시 보기
               </Button>
               <p className={styles.planProNote}>카드 정보 없이 출시 알림부터 받아보세요</p>
             </div>
@@ -556,8 +556,7 @@ export function Landing() {
         </Reveal>
 
         <p className={styles.planGuardCenter}>
-          현재는 결제 연동 준비 단계로, 카드 정보나 개인정보를 받지 않습니다.
-          Pro 버튼은 출시 알림 안내만 제공합니다.
+          지금은 무료 베타라 모든 기능을 그냥 쓰실 수 있어요. Pro는 정식 출시 때 열리며, 그때까지 카드 정보는 받지 않습니다.
         </p>
       </section>
 
@@ -611,12 +610,24 @@ export function Landing() {
         </div>
       </section>
 
-      <Modal open={comingSoon} onClose={() => setComingSoon(false)} title="준비 중입니다">
+      <Modal open={comingSoon} onClose={() => setComingSoon(false)} title="Pro로 만드는 결과">
         <div className={styles.comingSoonModal}>
-          <div className={styles.csEmoji}>📬</div>
-          <p>Pro 결제는 아직 연결하지 않았습니다.<br />지금은 로그인 없이 Free 기능만 사용할 수 있습니다.</p>
-          <Button variant="primary" fullWidth onClick={() => setComingSoon(false)}>
-            확인
+          <div className={styles.csPreviewGrid}>
+            {WORKFLOW_EXAMPLES.map((ex) => (
+              <figure className={styles.csPreviewItem} key={ex.src}>
+                <img src={publicMockupSrc(ex.src)} alt={ex.title} loading="lazy" decoding="async" />
+                <figcaption>{ex.cat}</figcaption>
+              </figure>
+            ))}
+          </div>
+          <ul className={styles.csBenefits}>
+            <li><span className={styles.checkOn}>✓</span>무제한 목업 · 프리미엄 50종+</li>
+            <li><span className={styles.checkOn}>✓</span>워터마크 없는 고화질(2x·4x) PNG · GIF</li>
+            <li><span className={styles.checkOn}>✓</span>상업적 사용 + 신규 목업 우선 제공</li>
+          </ul>
+          <p className={styles.csNote}>정식 출시 때 열립니다. 지금은 무료 베타로 핵심 기능을 바로 써볼 수 있어요.</p>
+          <Button variant="primary" fullWidth onClick={() => { setComingSoon(false); navigate('/editor'); }}>
+            무료로 지금 만들어보기
           </Button>
         </div>
       </Modal>
