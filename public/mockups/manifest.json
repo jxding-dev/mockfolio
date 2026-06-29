@@ -4,67 +4,67 @@
       "id": "detail-page-panels",
       "label": "상세페이지 3단 패널",
       "category": "상세페이지 목업",
-      "src": "mockups/overlays/ecommerce/detail-page-panels.webp"
+      "src": "mockups/overlays/ecommerce/detail-page-panels.png"
     },
     {
       "id": "multi-device-app-showcase",
       "label": "앱 디바이스 쇼케이스",
       "category": "앱 목업",
-      "src": "mockups/overlays/app/multi-device-app-showcase.webp"
+      "src": "mockups/overlays/app/multi-device-app-showcase.png"
     },
     {
       "id": "desktop-laptop-website",
       "label": "웹사이트 데스크탑",
       "category": "웹사이트 목업",
-      "src": "mockups/overlays/web/desktop-laptop-website.webp"
+      "src": "mockups/overlays/web/desktop-laptop-website.png"
     },
     {
       "id": "gallery-poster-wall",
       "label": "갤러리 포스터 벽면",
       "category": "포스터 목업",
-      "src": "mockups/overlays/poster/gallery-poster-wall.webp"
+      "src": "mockups/overlays/poster/gallery-poster-wall.png"
     },
     {
       "id": "wide-transit-banner",
       "label": "와이드 배너",
       "category": "배너/광고 목업",
-      "src": "mockups/overlays/banner/wide-transit-banner.webp"
+      "src": "mockups/overlays/banner/wide-transit-banner.png"
     },
     {
       "id": "square-ad-cards",
       "label": "정사각 광고 카드",
       "category": "소셜 광고 목업",
-      "src": "mockups/overlays/social/square-ad-cards.webp"
+      "src": "mockups/overlays/social/square-ad-cards.png"
     },
     {
       "id": "outdoor-shelter-ad",
       "label": "야외 쉘터 광고",
       "category": "실사 광고 목업",
-      "src": "mockups/overlays/ads/outdoor-shelter-ad.webp"
+      "src": "mockups/overlays/ads/outdoor-shelter-ad.png"
     },
     {
       "id": "city-building-billboard",
       "label": "도심 빌딩 광고판",
       "category": "실사 광고 목업",
-      "src": "mockups/overlays/ads/city-building-billboard.webp"
+      "src": "mockups/overlays/ads/city-building-billboard.png"
     },
     {
       "id": "round-storefront-sign",
       "label": "원형 매장 간판",
       "category": "간판 목업",
-      "src": "mockups/overlays/signage/round-storefront-sign.webp"
+      "src": "mockups/overlays/signage/round-storefront-sign.png"
     },
     {
       "id": "sample-mobile-portrait",
       "label": "모바일 세로 샘플",
       "category": "샘플 목업",
-      "src": "mockups/overlays/samples/sample-mobile-portrait.webp"
+      "src": "mockups/overlays/samples/sample-mobile-portrait.png"
     },
     {
       "id": "sample-desktop-studio",
       "label": "데스크탑 스튜디오 샘플",
       "category": "샘플 목업",
-      "src": "mockups/overlays/samples/sample-desktop-studio.webp"
+      "src": "mockups/overlays/samples/sample-desktop-studio.png"
     },
     {
       "id": "ios-phone-desk-premium",
@@ -118,7 +118,7 @@
       "id": "commerce-long-detail-panels",
       "label": "긴 상세페이지 패널",
       "category": "상세페이지 목업",
-      "src": "mockups/overlays/ecommerce/commerce-long-detail-panels.webp"
+      "src": "mockups/overlays/ecommerce/commerce-long-detail-panels.png"
     },
     {
       "id": "product-page-card-gallery",
