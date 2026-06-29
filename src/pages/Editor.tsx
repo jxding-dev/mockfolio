@@ -14,9 +14,40 @@ import { EditorRightPanel } from '../components/layout/EditorRightPanel';
 import { EditorCanvas } from '../components/layout/EditorCanvas';
 import styles from './Editor.module.css';
 
+/* Loads a bundled public asset into the same UploadedImage shape as a real upload. */
+const SAMPLE_IMAGE_SRC = `${import.meta.env.BASE_URL}mockups/overlays/samples/sample-desktop-studio.webp`;
+
+async function loadSampleImage(): Promise<UploadedImage> {
+  const response = await fetch(SAMPLE_IMAGE_SRC, { cache: 'force-cache' });
+  if (!response.ok) throw new Error('sample-fetch-failed');
+  const blob = await response.blob();
+  const dataUrl = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+  const { width, height } = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+    const probe = new Image();
+    probe.onload = () => resolve({ width: probe.naturalWidth, height: probe.naturalHeight });
+    probe.onerror = reject;
+    probe.src = dataUrl;
+  });
+  return {
+    id: `sample_${Date.now()}`,
+    name: '샘플 프로젝트.webp',
+    dataUrl,
+    width,
+    height,
+    size: blob.size,
+    uploadedAt: Date.now(),
+  };
+}
+
 /* ─── Upload Zone ────────────────────────────────────── */
-function UploadZone({ onUpload, error, onError, onClearError, onStartWithUrl }: {
+function UploadZone({ onUpload, onUseSample, error, onError, onClearError, onStartWithUrl }: {
   onUpload: (img: UploadedImage) => void;
+  onUseSample: () => Promise<void>;
   error: string | null;
   onError: (msg: string) => void;
   onClearError: () => void;
@@ -24,14 +55,51 @@ function UploadZone({ onUpload, error, onError, onClearError, onStartWithUrl }: 
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const [sampleLoading, setSampleLoading] = useState(false);
+  const dragDepth = useRef(0);
   const { handleFiles, handleInputChange } = useImageUpload({ onSuccess: onUpload, onError });
 
-  const onDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); setDragging(true); }, []);
-  const onDragLeave = useCallback(() => setDragging(false), []);
+  // Use a depth counter so dragging child elements doesn't flicker the highlight.
+  const onDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    dragDepth.current += 1;
+    setDragging(true);
+  }, []);
+  const onDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); }, []);
+  const onDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    dragDepth.current = Math.max(0, dragDepth.current - 1);
+    if (dragDepth.current === 0) setDragging(false);
+  }, []);
   const onDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault(); setDragging(false);
+    e.preventDefault();
+    dragDepth.current = 0;
+    setDragging(false);
     handleFiles(e.dataTransfer.files);
   }, [handleFiles]);
+
+  // Paste an image straight from the clipboard (screenshot → Ctrl/Cmd+V).
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const file = Array.from(e.clipboardData?.files ?? []).find((f) => f.type.startsWith('image/'));
+      if (file) {
+        e.preventDefault();
+        handleFiles([file]);
+      }
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }, [handleFiles]);
+
+  const handleSample = useCallback(async () => {
+    if (sampleLoading) return;
+    setSampleLoading(true);
+    try {
+      await onUseSample();
+    } finally {
+      setSampleLoading(false);
+    }
+  }, [onUseSample, sampleLoading]);
 
   return (
     <div className={styles.uploadPage}>
@@ -46,7 +114,7 @@ function UploadZone({ onUpload, error, onError, onClearError, onStartWithUrl }: 
 
         <div
           className={`${styles.dropzone} ${dragging ? styles.dropzoneDragging : ''}`}
-          onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
+          onDragEnter={onDragEnter} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
           onClick={() => inputRef.current?.click()}
           role="button" tabIndex={0}
           onKeyDown={(e) => {
@@ -71,15 +139,29 @@ function UploadZone({ onUpload, error, onError, onClearError, onStartWithUrl }: 
 
           <div className={styles.dropzoneText}>
             <strong>{dragging ? '여기에 놓으세요!' : '화면 캡처 이미지를 여기에 끌어다 놓으세요'}</strong>
-            <span>또는 클릭해서 파일 선택 · URL은 아래 버튼으로 시작</span>
+            <span>클릭해서 파일 선택 · 스크린샷은 <strong>Ctrl/⌘ + V</strong>로 바로 붙여넣기</span>
           </div>
 
           <div className={styles.dropzoneMeta}>PNG · JPG · WebP · 최대 20MB</div>
         </div>
 
-        <button className={styles.urlStartButton} type="button" onClick={onStartWithUrl}>
-          URL 링크로 반응형 검수 시작
-        </button>
+        <div className={styles.startActions}>
+          <button
+            className={styles.sampleButton}
+            type="button"
+            onClick={handleSample}
+            disabled={sampleLoading}
+          >
+            {sampleLoading ? (
+              <><span className={styles.sampleSpinner} aria-hidden />샘플 불러오는 중…</>
+            ) : (
+              <>✨ 샘플 프로젝트로 둘러보기</>
+            )}
+          </button>
+          <button className={styles.urlStartButton} type="button" onClick={onStartWithUrl}>
+            URL 링크로 반응형 검수 시작
+          </button>
+        </div>
 
         {error && (
           <div className={styles.errorBanner} role="alert">
@@ -143,6 +225,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   const [autoSlide, setAutoSlide] = useState(false);
   const [gifLoading, setGifLoading] = useState(false);
   const [gifMessage, setGifMessage] = useState<string | null>(null);
+  const [saveToast, setSaveToast] = useState<string | null>(null);
   const [initialSourceApplied, setInitialSourceApplied] = useState(false);
   const { assets: mockupAssets, loading: mockupsLoading } = useMockupAssets();
 
@@ -286,6 +369,30 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     setError(null);
   }, [patch, urlInput]);
 
+  // Auto-preview: once a complete URL (dotted host) is typed, load it after a
+  // short debounce so the user doesn't have to press the button every time.
+  useEffect(() => {
+    if (activeMode !== 'inspect' || inspectSource !== 'url') return;
+    const normalized = normalizePreviewUrl(urlInput);
+    if (!normalized || normalized === previewUrl) return;
+    let host = '';
+    try { host = new URL(normalized).hostname; } catch { return; }
+    if (!host.includes('.')) return;
+    const timer = window.setTimeout(() => {
+      patch('previewUrl', normalized);
+      setUrlRefreshKey((key) => key + 1);
+      setError(null);
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [urlInput, activeMode, inspectSource, previewUrl, patch]);
+
+  // Auto-dismiss the save toast.
+  useEffect(() => {
+    if (!saveToast) return;
+    const timer = window.setTimeout(() => setSaveToast(null), 2400);
+    return () => window.clearTimeout(timer);
+  }, [saveToast]);
+
   const handleCompositeExport = useCallback(async () => {
     if (!selectedMockup) return;
     if (!mockupItems.some((item) => item.visible)) {
@@ -297,6 +404,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     try {
       await exportMockupComposite(mockupItems, selectedMockup.src, projectName);
       setExportMessage('합성된 PNG 파일을 저장했습니다.');
+      setSaveToast('합성 PNG를 저장했어요');
     } catch {
       setExportMessage('목업 PNG를 저장하지 못했습니다. 목업 파일을 확인해주세요.');
     } finally {
@@ -326,6 +434,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     try {
       await exportComparisonGif(beforeImage.dataUrl, afterImage.dataUrl, projectName, compareOrientation);
       setGifMessage('GIF 파일을 저장했습니다.');
+      setSaveToast('GIF를 저장했어요');
     } catch {
       setGifMessage('GIF를 생성하지 못했습니다. 이미지를 다시 확인해주세요.');
     } finally {
@@ -344,6 +453,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     try {
       const fileName = await exportPng(exportRef.current, projectName, exportScale);
       setExportMessage(`${fileName} 파일을 저장했습니다.`);
+      setSaveToast('PNG를 저장했어요');
     } catch {
       setExportMessage('PNG를 저장하지 못했습니다. 이미지를 다시 확인한 뒤 재시도하세요.');
     } finally {
@@ -445,6 +555,18 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
           onReorderMockupItem={reorderMockupItem}
         />
       </div>
+
+      {/* save / success toast */}
+      {saveToast && (
+        <div className={styles.saveToast} role="status">
+          <span className={styles.saveToastCheck} aria-hidden>
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>
+          {saveToast}
+        </div>
+      )}
     </div>
   );
 }
@@ -460,6 +582,17 @@ export function Editor() {
     return (
       <UploadZone
         onUpload={(img) => { setImage(img); setInitialInspectSource('image'); setStarted(true); setError(null); }}
+        onUseSample={async () => {
+          setError(null);
+          try {
+            const sample = await loadSampleImage();
+            setImage(sample);
+            setInitialInspectSource('image');
+            setStarted(true);
+          } catch {
+            setError('샘플을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+          }
+        }}
         error={error}
         onError={setError}
         onClearError={() => setError(null)}

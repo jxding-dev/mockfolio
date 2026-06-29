@@ -22,6 +22,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  animation: uploadCardRise var(--ease-spring) both;
+}
+
+@keyframes uploadCardRise {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* ── Header ───────────────────────────────── */
@@ -101,7 +107,11 @@
 .dropzoneIcon {
   color: var(--accent);
   opacity: 0.8;
+  transition: transform var(--ease-base), opacity var(--ease-base);
 }
+
+.dropzone:hover .dropzoneIcon { transform: translateY(-3px); opacity: 1; }
+.dropzoneDragging .dropzoneIcon { transform: scale(1.12) translateY(-2px); opacity: 1; }
 
 .dropzoneText {
   display: flex;
@@ -150,6 +160,53 @@
   outline: none;
 }
 
+/* ── Start actions (sample + URL) ─────────── */
+.startActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sampleButton {
+  width: 100%;
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  box-shadow: var(--shadow-accent);
+  transition:
+    background var(--ease-fast),
+    box-shadow var(--ease-fast),
+    transform var(--ease-fast);
+}
+
+.sampleButton:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(99,102,241,0.35);
+}
+.sampleButton:active:not(:disabled) { transform: translateY(0); }
+.sampleButton:disabled { opacity: 0.7; cursor: progress; }
+
+.sampleSpinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: editorSpin 0.6s linear infinite;
+}
+
+@keyframes editorSpin { to { transform: rotate(360deg); } }
+
 /* ── Error ────────────────────────────────── */
 .errorBanner {
   display: flex;
@@ -162,6 +219,13 @@
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-sm);
   color: var(--error);
+  animation: errorPop var(--ease-base) both;
+}
+
+@keyframes errorPop {
+  0%   { opacity: 0; transform: translateY(-6px); }
+  60%  { transform: translateY(1px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .errorBanner button {
@@ -189,7 +253,9 @@
   gap: var(--space-3);
   font-size: var(--text-sm);
   color: var(--text-secondary);
+  transition: transform var(--ease-fast), color var(--ease-fast);
 }
+.tip:hover { transform: translateX(3px); color: var(--text-primary); }
 
 .tipIcon { flex-shrink: 0; font-size: 16px; }
 
@@ -238,6 +304,67 @@
   font-size: var(--text-sm);
   color: var(--error);
   flex-shrink: 0;
+  animation: errorSlideDown var(--ease-base) both;
+}
+
+@keyframes errorSlideDown {
+  from { opacity: 0; transform: translateY(-100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Save / success toast ─────────────────── */
+.saveToast {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-8);
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-full);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-xl);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  animation: toastRise var(--ease-spring) both;
+}
+
+@keyframes toastRise {
+  from { opacity: 0; transform: translate(-50%, 16px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.saveToastCheck {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--success-subtle);
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.saveToastCheck svg { width: 16px; height: 16px; }
+
+.saveToastCheck svg path {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  animation: checkDraw 0.45s var(--ease-base) 0.08s forwards;
+}
+
+@keyframes checkDraw { to { stroke-dashoffset: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .errorBanner, .errorBannerInline, .saveToast, .uploadCard { animation: none; }
+  .sampleSpinner { animation: none; }
+  .saveToastCheck svg path { animation: none; stroke-dashoffset: 0; }
+  .dropzoneIcon, .tip { transition: none; }
 }
 
 .errorBannerInline button {
