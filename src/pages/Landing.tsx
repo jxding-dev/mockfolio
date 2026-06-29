@@ -29,10 +29,29 @@ const REVIEWS: Review[] = [
 ];
 
 const FAQS: { q: string; a: string }[] = [
-  { q: '정말 무료인가요?', a: '네. Free 플랜은 URL Preview, 기본 목업, PNG 저장, 일부 프레임을 계속 무료로 제공합니다.' },
+  { q: 'Free와 Pro는 무엇이 다른가요?', a: 'Free는 샘플 목업 2개와 반응형 검수를 체험용으로 제공하고, 저장은 워터마크·저해상도로 제한됩니다. Pro는 무제한 목업, 고화질 PNG·GIF Export, Premium Mockup, 상업적 사용까지 모두 열립니다.' },
+  { q: '왜 월 9,900원인가요?', a: '하루로 치면 약 330원입니다. 목업 외주나 스톡 목업 한 건 값보다 싸게, 무제한으로 결과물을 뽑을 수 있도록 책정했습니다.' },
+  { q: '무료로도 충분하지 않나요?', a: '가볍게 둘러보기엔 충분합니다. 다만 워터마크 없이 고화질로 저장하거나 포트폴리오·납품 등 상업적으로 쓰려면 Pro가 필요합니다.' },
   { q: '업로드한 이미지는 안전한가요?', a: '모든 이미지는 브라우저 안에서만 처리됩니다. 외부 서버로 전송하지 않고, AI 학습에도 사용하지 않습니다.' },
-  { q: '결제는 어떻게 하나요?', a: '아직 실제 결제는 연결하지 않았습니다. 향후 Supabase Auth와 Toss Payments를 붙여 Pro 월 9,900원 구조로 제공할 예정입니다.' },
-  { q: '상업적으로 사용할 수 있나요?', a: '네. 직접 만든 목업 결과물은 포트폴리오·제안서 등 상업적 용도로 자유롭게 사용할 수 있습니다.' },
+  { q: '결제는 어떻게 하나요?', a: '현재는 결제 연동 준비 단계입니다. 정식 출시 시 Toss Payments로 월 9,900원 구독을 제공하며, 구독 약정 없이 언제든 해지할 수 있습니다.' },
+  { q: '상업적으로 사용할 수 있나요?', a: 'Pro 플랜에서 만든 결과물은 포트폴리오·제안서·광고 등 상업적 용도로 자유롭게 사용할 수 있습니다.' },
+];
+
+/* Free vs Pro comparison — true=included, false=not, string=detail */
+const PLAN_COMPARISON: { label: string; free: boolean | string; pro: boolean | string }[] = [
+  { label: '사용 가능한 목업', free: '샘플 2개', pro: '무제한' },
+  { label: 'Premium Mockup', free: false, pro: true },
+  { label: 'PNG Export', free: '제한 · 워터마크', pro: '고화질 무제한' },
+  { label: 'GIF Export (Before/After)', free: false, pro: true },
+  { label: '상업적 사용', free: false, pro: true },
+  { label: '우선 업데이트 · 신규 목업', free: false, pro: true },
+];
+
+const TRUST_ITEMS: { icon: string; label: string }[] = [
+  { icon: '🔒', label: '서버 업로드 없음' },
+  { icon: '💳', label: '카드 정보 저장 안 함' },
+  { icon: '↩️', label: '구독 약정 없이 언제든 해지' },
+  { icon: '⚡', label: '결제 즉시 전체 기능 적용' },
 ];
 
 const showcaseMockups = [
@@ -179,6 +198,15 @@ function FaqItem({ q, a }: { q: string; a: string }) {
       </div>
     </div>
   );
+}
+
+/* ─────────────────────────────────────────────────────────
+   Pricing comparison cell — renders ✓ / — / detail text
+   ───────────────────────────────────────────────────────── */
+function CompareCell({ value }: { value: boolean | string }) {
+  if (value === true) return <span className={styles.cellYes} aria-label="포함">✓</span>;
+  if (value === false) return <span className={styles.cellNo} aria-label="미포함">—</span>;
+  return <span className={styles.cellText}>{value}</span>;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -435,60 +463,102 @@ export function Landing() {
         </Reveal>
       </section>
 
-      {/* ── PLAN TEASER ──────────────────────── */}
+      {/* ── PRICING ──────────────────────────── */}
       <section className={styles.section}>
         <Reveal>
-          <div className={styles.sectionLabel}>요금제</div>
-          <h2 className={styles.sectionTitle}>Free와 Pro, 운영하기 쉬운 두 가지 플랜</h2>
+          <div className={styles.sectionLabelCenter}>요금제</div>
+          <h2 className={styles.sectionTitleCenter}>하루 330원으로, 모든 한계를 풉니다</h2>
+          <p className={styles.pricingLede}>
+            커피 한 잔보다 싼 월 9,900원. 무제한 목업과 고화질·상업적 사용까지 한 번에 풀립니다.
+          </p>
         </Reveal>
 
-        <div className={styles.planRow}>
-          {/* Free */}
-          <div className={`${styles.planCard} ${styles.planCardFree}`}>
-            <div className={styles.planHead}>
-              <div>
-                <div className={styles.planName}>Free</div>
-                <div className={styles.planPrice}>₩0</div>
+        <Reveal delay={80}>
+          <div className={styles.planRow}>
+            {/* Free */}
+            <div className={`${styles.planCard} ${styles.planCardFree}`}>
+              <div className={styles.planHead}>
+                <div>
+                  <div className={styles.planName}>Free</div>
+                  <div className={styles.planPrice}>₩0 <span>/ 월</span></div>
+                </div>
+                <Badge variant="outline">맛보기</Badge>
               </div>
-              <Badge variant="success">지금 사용 가능</Badge>
+              <p className={styles.planDesc}>먼저 가볍게 체험해보는 샘플 플랜</p>
+              <ul className={styles.planList}>
+                <li><span className={styles.checkOn}>✓</span>샘플 목업 2개</li>
+                <li><span className={styles.checkOn}>✓</span>반응형 검수 · URL 미리보기</li>
+                <li className={styles.planLimitItem}><span className={styles.checkLimit}>!</span>저장 제한 (워터마크 · 저해상도)</li>
+                <li className={styles.planOffItem}><span className={styles.checkOff}>✕</span>Premium Mockup</li>
+                <li className={styles.planOffItem}><span className={styles.checkOff}>✕</span>상업적 사용</li>
+              </ul>
+              <Button variant="secondary" fullWidth onClick={() => navigate('/editor')}>
+                무료로 시작하기
+              </Button>
             </div>
-            <p className={styles.planDesc}>로그인 없이 바로 쓰는 핵심 제작 기능</p>
-            <ul className={styles.planList}>
-              {['반응형 검수와 URL 미리보기', '목업 이미지 레이어 합성', 'Before/After 비교와 GIF 저장', 'PNG 결과 저장', '로컬 처리 (서버 전송 없음)'].map(f => (
-                <li key={f}><span className={styles.checkOn}>✓</span>{f}</li>
-              ))}
-            </ul>
-            <Button variant="primary" fullWidth onClick={() => navigate('/editor')}>
-              지금 무료로 시작하기
-            </Button>
-          </div>
 
-          {/* Pro */}
-          <div className={styles.planComboCol}>
-            <div className={`${styles.planCard} ${styles.planCardSoon}`}>
+            {/* Pro — highlighted */}
+            <div className={`${styles.planCard} ${styles.planCardPro}`}>
+              <span className={styles.planRibbon}>가장 인기</span>
               <div className={styles.planHead}>
                 <div>
                   <div className={styles.planName}>Pro</div>
                   <div className={styles.planPrice}>₩9,900 <span>/ 월</span></div>
+                  <div className={styles.planPerDay}>하루 약 330원</div>
                 </div>
-                <Badge variant="outline">결제 준비 중</Badge>
+                <Badge variant="accent">추천</Badge>
               </div>
-              <p className={styles.planDesc}>Supabase Auth와 Toss Payments 연결 후 제공할 상업용 플랜입니다.</p>
+              <p className={styles.planDesc}>실제 작업·납품까지 쓰는 무제한 상업용 플랜</p>
               <ul className={styles.planList}>
-                {['모든 목업', 'Before / After GIF', '고화질 Export', 'Premium Mockups', '커스텀 PNG 목업', '향후 추가 기능 포함'].map(f => (
-                  <li key={f}><span className={styles.checkOff}>–</span>{f}</li>
+                {['무제한 목업', 'PNG Export (고화질)', 'GIF Export (Before/After)', 'Premium Mockup', '상업적 사용', '우선 업데이트 · 신규 목업 먼저'].map(f => (
+                  <li key={f}><span className={styles.checkOn}>✓</span>{f}</li>
                 ))}
               </ul>
-              <Button variant="secondary" fullWidth onClick={() => setComingSoon(true)}>
-                Upgrade 준비 보기
+              <Button variant="primary" fullWidth className={styles.planProCta} onClick={() => setComingSoon(true)}>
+                Pro 시작하기 →
               </Button>
-            </div>
-            <div className={styles.planGuard}>
-              결제 버튼처럼 보이더라도 현재 단계에서는 카드 정보나 개인정보를 받지 않습니다.
-              정식 출시 전까지 결제와 구독 변경은 실제 동작하지 않습니다.
+              <p className={styles.planProNote}>카드 정보 없이 출시 알림부터 받아보세요</p>
             </div>
           </div>
-        </div>
+        </Reveal>
+
+        {/* 가격 비교표 */}
+        <Reveal delay={120}>
+          <div className={styles.compareWrap}>
+            <table className={styles.compareTable}>
+              <thead>
+                <tr>
+                  <th>기능</th>
+                  <th>Free</th>
+                  <th className={styles.compareProCol}>Pro</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PLAN_COMPARISON.map((row) => (
+                  <tr key={row.label}>
+                    <td>{row.label}</td>
+                    <td><CompareCell value={row.free} /></td>
+                    <td className={styles.compareProCol}><CompareCell value={row.pro} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Reveal>
+
+        {/* 신뢰 요소 */}
+        <Reveal delay={160}>
+          <ul className={styles.trustRow}>
+            {TRUST_ITEMS.map((t) => (
+              <li key={t.label}><span aria-hidden>{t.icon}</span>{t.label}</li>
+            ))}
+          </ul>
+        </Reveal>
+
+        <p className={styles.planGuardCenter}>
+          현재는 결제 연동 준비 단계로, 카드 정보나 개인정보를 받지 않습니다.
+          Pro 버튼은 출시 알림 안내만 제공합니다.
+        </p>
       </section>
 
       {/* ── FAQ ──────────────────────────────── */}
