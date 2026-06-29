@@ -255,10 +255,12 @@ export function Landing() {
             <div className={styles.heroCtaGroup}>
               <div className={styles.heroCtas}>
                 <Button variant="primary" size="lg" className={styles.heroPrimaryCta} onClick={() => navigate('/editor')}>
-                  무료로 시작하기
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <span className={styles.heroCtaInline}>
+                    무료로 시작하기
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
                 </Button>
                 <Button variant="secondary" size="lg" onClick={() => navigate('/pricing')}>
                   요금제 보기

@@ -183,9 +183,24 @@
 
 /* emphasize the primary "무료로 시작하기" with an accent glow + lift */
 .heroPrimaryCta {
+  min-width: 208px;
   box-shadow: var(--shadow-accent);
   transition: transform var(--ease-base), box-shadow var(--ease-base);
 }
+
+.heroCtaInline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.heroCtaInline svg {
+  flex: 0 0 auto;
+}
+
 .heroPrimaryCta:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(99, 102, 241, 0.42);
