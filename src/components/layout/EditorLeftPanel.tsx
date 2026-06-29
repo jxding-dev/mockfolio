@@ -117,7 +117,16 @@ export function EditorLeftPanel({
             ? '이미지를 올려 검수하거나, 아래 "웹페이지 URL"로 사이트를 바로 확인하세요.'
             : '이 이미지가 목업 장면의 첫 번째로 들어갑니다. 여러 장은 오른쪽 패널 "이미지 추가"로 넣으세요.'}
         </p>
-        <ImageUrlInput onLoad={loadImageUrl} placeholder="이미지 파일 URL (https://…/img.png)" />
+        <div className={styles.inputCard}>
+          <div className={styles.inputCardHead}>
+            <span className={styles.inputCardIcon} aria-hidden>🖼</span>
+            <div>
+              <strong>이미지 링크 불러오기</strong>
+              <span>PNG, JPG, WebP처럼 이미지 파일로 끝나는 주소를 넣으세요.</span>
+            </div>
+          </div>
+          <ImageUrlInput onLoad={loadImageUrl} placeholder="이미지 파일 주소 (예: https://site.com/image.png)" />
+        </div>
         <input
           ref={inputRef}
           type="file"
@@ -138,21 +147,29 @@ export function EditorLeftPanel({
             </div>
             {inspectSource === 'url' && (
               <>
-                <p className={styles.hint}>웹페이지 주소를 넣고 사이트 미리보기를 누르세요. https://가 없으면 자동으로 붙습니다.</p>
-                <input
-                  className={styles.urlInput}
-                  value={urlInput}
-                  onChange={(event) => onUrlInputChange?.(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') onPreviewUrl?.();
-                  }}
-                  placeholder="검수할 사이트 주소 (예: https://example.com)"
-                  inputMode="url"
-                  aria-label="사이트 미리보기 URL"
-                />
-                <div className={styles.previewActions}>
-                  <Button size="sm" variant="primary" onClick={onPreviewUrl}>사이트 미리보기</Button>
-                  <Button size="sm" variant="secondary" onClick={onPreviewRefresh} disabled={!previewReady}>새로고침</Button>
+                <div className={styles.inputCard}>
+                  <div className={styles.inputCardHead}>
+                    <span className={styles.inputCardIcon} aria-hidden>🌐</span>
+                    <div>
+                      <strong>웹페이지 주소 검수</strong>
+                      <span>사이트 주소를 넣으면 모바일, 태블릿, 데스크톱 크기로 확인합니다.</span>
+                    </div>
+                  </div>
+                  <input
+                    className={styles.urlInput}
+                    value={urlInput}
+                    onChange={(event) => onUrlInputChange?.(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') onPreviewUrl?.();
+                    }}
+                    placeholder="검수할 사이트 주소 (예: https://example.com)"
+                    inputMode="url"
+                    aria-label="사이트 미리보기 URL"
+                  />
+                  <div className={styles.previewActions}>
+                    <Button size="sm" variant="primary" onClick={onPreviewUrl}>사이트 미리보기</Button>
+                    <Button size="sm" variant="secondary" onClick={onPreviewRefresh} disabled={!previewReady}>새로고침</Button>
+                  </div>
                 </div>
                 <div className={styles.sizeInputs}>
                   <label>W<input type="number" min="240" max="1920" value={previewWidth} onChange={(event) => onPreviewSizeChange?.(Number(event.target.value), previewHeight)} /></label>

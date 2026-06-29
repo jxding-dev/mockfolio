@@ -39,6 +39,21 @@ const detailCopy: Partial<Record<BillingRouteState, { badge: string; title: stri
   },
 };
 
+const PRO_OUTCOME_ITEMS = [
+  {
+    title: '프리미엄 목업 전체 이용',
+    desc: '앱, 웹, 상세페이지, 옥외광고, 포스터 목업을 클라이언트 제안서 수준으로 확장합니다.',
+  },
+  {
+    title: '고화질 결과물 저장',
+    desc: '포트폴리오 커버와 발표 자료에 쓰기 좋은 PNG, Before/After GIF 흐름을 준비합니다.',
+  },
+  {
+    title: '상업용 작업 흐름',
+    desc: '반복 작업자는 자주 쓰는 목업과 Export 옵션을 Pro 기준으로 빠르게 묶어 사용할 수 있습니다.',
+  },
+];
+
 export function BillingPage({ view }: Props) {
   const navigate = useNavigate();
   const copy = view === 'upgrade' ? null : detailCopy[view];
@@ -86,6 +101,16 @@ export function BillingPage({ view }: Props) {
           </Button>
           <p className={styles.smallNote}>미리보기 화면으로만 이동하며, 실제 결제는 발생하지 않습니다.</p>
         </aside>
+      </section>
+
+      <section className={styles.outcomeGrid} aria-label="Pro 업그레이드 결과">
+        {PRO_OUTCOME_ITEMS.map((item) => (
+          <article key={item.title} className={styles.outcomeCard}>
+            <span className={styles.eyebrow}>Pro outcome</span>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
+          </article>
+        ))}
       </section>
 
       <section className={styles.dashboardGrid}>

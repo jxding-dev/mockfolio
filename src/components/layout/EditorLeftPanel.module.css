@@ -117,6 +117,51 @@
 
 .hidden { display: none; }
 
+.inputCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-subtle);
+}
+
+.inputCardHead {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.inputCardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-base);
+  border: 1px solid var(--border-muted);
+  font-size: 14px;
+}
+
+.inputCardHead strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.inputCardHead span:not(.inputCardIcon) {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-tertiary);
+  font-size: 10px;
+  line-height: var(--leading-normal);
+}
+
 .linkLoader {
   display: flex;
   flex-direction: column;
