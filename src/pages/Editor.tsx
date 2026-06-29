@@ -17,7 +17,7 @@ import styles from './Editor.module.css';
 
 /* Loads a bundled public asset into the same UploadedImage shape as a real upload. */
 const SAMPLE_IMAGE_SRC = `${import.meta.env.BASE_URL}mockups/overlays/samples/sample-desktop-studio.webp`;
-const LONG_DETAIL_RATIO = 1.75;
+const LONG_DETAIL_RATIO = 2.3;
 
 function isLongDetailImage(image: UploadedImage | null): boolean {
   return Boolean(image && image.height / image.width >= LONG_DETAIL_RATIO);
@@ -30,11 +30,12 @@ function isLongDetailImage(image: UploadedImage | null): boolean {
  */
 function recommendMockupId(image: UploadedImage, assets: MockupAsset[]): string | null {
   if (assets.length === 0) return null;
-  const ratio = image.width / image.height;
+  const portrait = image.height / image.width; // taller-than-wide ratio
+  const landscape = image.width / image.height;
   let keywords: string[];
-  if (image.height / image.width >= LONG_DETAIL_RATIO) keywords = ['상세'];
-  else if (ratio > 1.3) keywords = ['웹', '데스크', '노트북', 'laptop', 'desktop'];
-  else if (ratio < 0.85) keywords = ['앱', 'app', '모바일', '스마트폰'];
+  if (portrait >= LONG_DETAIL_RATIO) keywords = ['상세'];                 // very long page
+  else if (portrait >= 1.3) keywords = ['앱', 'app', '모바일', '스마트폰']; // phone/portrait screen
+  else if (landscape > 1.3) keywords = ['웹', '데스크', '노트북', 'laptop', 'desktop'];
   else keywords = ['소셜', '포스터', '광고'];
   for (const key of keywords) {
     const hit = assets.find((a) =>
@@ -467,7 +468,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   const handlePreviewUrl = useCallback(() => {
     const normalized = normalizePreviewUrl(urlInput);
     if (!normalized) {
-      setError('http 또는 https URL을 입력해주세요.');
+      setError('올바른 사이트 주소를 입력해주세요. (예: https://example.com)');
       return;
     }
     patch('previewUrl', normalized);

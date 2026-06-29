@@ -146,7 +146,7 @@ export function EditorLeftPanel({
                   onKeyDown={(event) => {
                     if (event.key === 'Enter') onPreviewUrl?.();
                   }}
-                  placeholder="example.com"
+                  placeholder="검수할 사이트 주소 (예: https://example.com)"
                   inputMode="url"
                   aria-label="사이트 미리보기 URL"
                 />
