@@ -90,52 +90,6 @@
   text-decoration: line-through;
 }
 
-/* ── Scale Buttons ────────────────────────── */
-.scaleRow {
-  display: flex;
-  gap: 6px;
-}
-
-.scaleBtn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 8px 4px;
-  border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--ease-fast);
-  background: var(--bg-subtle);
-}
-
-.scaleBtn:hover {
-  border-color: var(--accent-muted);
-  background: var(--accent-subtle);
-}
-
-.scaleBtnActive {
-  border-color: var(--accent) !important;
-  background: var(--accent-subtle) !important;
-}
-
-.scaleName {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  color: var(--text-primary);
-  font-family: var(--font-mono);
-}
-
-.scaleSub {
-  font-size: 9px;
-  color: var(--text-tertiary);
-  white-space: nowrap;
-}
-
-.scaleBtnActive .scaleName { color: var(--accent); }
-.scaleBtnActive .scaleSub  { color: var(--accent); opacity: 0.7; }
-
 /* ── Output Info ──────────────────────────── */
 .outputInfo {
   display: flex;
@@ -178,13 +132,7 @@
   text-align: center;
 }
 
-/* ── Frame Grid ───────────────────────────── */
-.frameGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
+/* ── Mockup asset selector ─────────────────── */
 .mockupAssetGrid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -209,174 +157,6 @@
   color: var(--text-tertiary);
   letter-spacing: 0.04em;
   overflow-wrap: anywhere;
-}
-
-.frameBtn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 8px 2px;
-  min-width: 0;
-  border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-md);
-  background: var(--bg-subtle);
-  color: var(--text-secondary);
-  font-size: 10px;
-  line-height: 1.25;
-  text-align: center;
-  overflow-wrap: anywhere;
-  cursor: pointer;
-  transition: all var(--ease-fast);
-}
-
-.frameBtn:hover {
-  border-color: var(--accent-muted);
-  background: var(--accent-subtle);
-}
-
-.frameBtnActive {
-  border-color: var(--accent) !important;
-  background: var(--accent-subtle) !important;
-  color: var(--accent) !important;
-  font-weight: var(--weight-semibold);
-}
-
-.frameIcon { font-size: 16px; line-height: 1; }
-
-.frameLabel {
-  font-size: 9px;
-  color: var(--text-secondary);
-  text-align: center;
-  white-space: nowrap;
-}
-
-.frameBtnActive .frameLabel { color: var(--accent); font-weight: var(--weight-semibold); }
-
-/* ── Swatch (frame color) ─────────────────── */
-.swatchRow {
-  display: flex;
-  gap: 6px;
-}
-
-.swatch {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 2px;
-  border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--ease-fast);
-  background: var(--bg-subtle);
-}
-
-.swatch:hover { border-color: var(--accent-muted); }
-
-.swatchActive {
-  border-color: var(--accent) !important;
-  background: var(--accent-subtle) !important;
-}
-
-.swatchDot {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.12);
-}
-
-.swatchLabel {
-  font-size: 9px;
-  color: var(--text-secondary);
-}
-
-.swatchActive .swatchLabel { color: var(--accent); font-weight: var(--weight-semibold); }
-
-/* ── Background Grid ──────────────────────── */
-.bgGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
-.bgBtn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 5px;
-  border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--ease-fast);
-  background: var(--bg-subtle);
-}
-
-.bgBtn:hover { border-color: var(--accent-muted); }
-
-.bgBtnActive {
-  border-color: var(--accent) !important;
-}
-
-.bgPreview {
-  width: 100%;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(0,0,0,0.08);
-}
-
-.bgLabel {
-  font-size: 9px;
-  color: var(--text-secondary);
-}
-
-.bgBtnActive .bgLabel { color: var(--accent); font-weight: var(--weight-semibold); }
-
-/* ── Text Fields ──────────────────────────── */
-.textFields {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: var(--space-2);
-}
-
-.colorField {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  color: var(--text-secondary);
-  font-size: var(--text-xs);
-}
-
-.colorField input {
-  width: 32px;
-  height: 28px;
-  padding: 2px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-
-.textInput {
-  width: 100%;
-  padding: 7px 10px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  background: var(--bg-base);
-  font-size: var(--text-xs);
-  color: var(--text-primary);
-  transition: border-color var(--ease-fast);
-}
-
-.textInput::placeholder { color: var(--text-tertiary); }
-
-.textInput:focus {
-  outline: none;
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 /* ── Mockup item list ─────────────────────── */
@@ -716,26 +496,12 @@
     padding-inline: var(--space-4);
   }
 
-  .frameBtn { min-height: 40px; }
 }
 
 @media (max-width: 480px) {
-  .fitRow,
-  .scaleRow,
-  .swatchRow {
-    flex-wrap: wrap;
-  }
+  .fitRow { flex-wrap: wrap; }
 
-  .fitBtn,
-  .scaleBtn,
-  .swatch {
-    min-width: 0;
-  }
-
-  .frameGrid,
-  .bgGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  .fitBtn { min-width: 0; }
 
   .exportFooter {
     padding-inline: var(--space-4);

@@ -4,7 +4,6 @@ import type { EditorSettings } from '../../data/editorSettings';
 import { DEVICE_PRESETS } from '../../data/devices';
 import { CompareSlider } from '../mockup/CompareSlider';
 import { MockupComposer } from '../mockup/MockupComposer';
-import { MockupScene } from '../mockup/MockupScene';
 import { UrlPreview } from '../inspector/UrlPreview';
 import type { MockupAsset } from '../../data/mockups';
 import styles from './EditorCanvas.module.css';
@@ -28,7 +27,7 @@ interface Props {
   // Multi-image mockup
   mockupItems?: MockupItem[];
   selectedMockupItemId?: string | null;
-  onMockupItemSelect?: (id: string) => void;
+  onMockupItemSelect?: (id: string | null) => void;
   onMockupItemMove?: (id: string, x: number, y: number) => void;
 }
 
@@ -53,15 +52,8 @@ export function EditorCanvas({
   const {
     activeMode, selectedDeviceId, fitMode, inspectOrientation,
     showGuides, showGrid, showCenter, showMargins,
-    shadowIntensity, frameCornerRadius,
-    transparentBg, bgStyle,
-    mockupTitle, mockupSubtitle, mockupTags, mockupTextPosition, showMockupDate, mockupTextColor,
     compareOrientation, inspectSource, previewUrl, previewWidth, previewHeight,
   } = settings;
-  const sceneText = {
-    title: mockupTitle, subtitle: mockupSubtitle, tags: mockupTags,
-    showDate: showMockupDate, textPosition: mockupTextPosition, textColor: mockupTextColor,
-  };
   const guides: GuideOptions = { showGuides, showGrid, showCenter, showMargins };
   const [zoom, setZoom] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -111,12 +103,10 @@ export function EditorCanvas({
   }, [fitZoom]);
 
   const isCompare = activeMode === 'compare';
-  const isSceneMode = (activeMode === 'mockup' || activeMode === 'export') && !selectedMockup;
   const isComposite = (activeMode === 'mockup' || activeMode === 'export') && !!selectedMockup;
   const hasContent = isCompare ? (!!beforeImage || !!afterImage)
     : showingUrlPreview ? Boolean(previewUrl)
-    : isSceneMode ? mockupItems.length > 0
-    : isComposite ? mockupItems.length > 0
+    : isComposite ? true
     : !!image;
 
   return (
@@ -141,34 +131,18 @@ export function EditorCanvas({
               <UrlEmptyState />
             )}
           </div>
-        ) : isSceneMode ? (
-          mockupItems.length > 0 ? (
-            <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
-              <MockupScene
-                items={mockupItems}
-                selectedId={selectedMockupItemId}
-                bgStyle={bgStyle}
-                shadowIntensity={shadowIntensity}
-                frameCornerRadius={frameCornerRadius}
-                transparentBg={transparentBg}
-                text={sceneText}
-                exportRef={exportRef}
-                interactive={activeMode === 'mockup'}
-                onSelect={onMockupItemSelect}
-                onMove={onMockupItemMove}
-              />
-            </div>
-          ) : <EmptyState />
-        ) : isComposite && mockupItems.length > 0 ? (
+        ) : isComposite ? (
           <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
             <MockupComposer
               items={mockupItems}
               selectedId={selectedMockupItemId}
               mockup={selectedMockup}
-              onSelect={(id) => onMockupItemSelect?.(id ?? '')}
+              onSelect={(id) => onMockupItemSelect?.(id)}
               onPositionChange={onMockupItemMove ?? (() => {})}
             />
           </div>
+        ) : (activeMode === 'mockup' || activeMode === 'export') && !selectedMockup ? (
+          <MockupEmptyState />
         ) : activeMode === 'inspect' && image ? (
           <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
             <InspectView image={image} device={device} fitMode={fitMode} orientation={inspectOrientation} guides={guides} />
@@ -193,7 +167,7 @@ export function EditorCanvas({
           <button className={styles.zoomFit} onClick={fitZoom} title="화면에 맞춤 (F)">맞춤</button>
           <div className={styles.zoomDivider} />
           <span className={styles.deviceInfo}>
-            {isCompare ? 'Before / After' : `${device.label} · ${device.width}×${device.height}`}
+            {isCompare ? 'Before / After' : isComposite ? selectedMockup.label : `${device.label} · ${device.width}×${device.height}`}
           </span>
         </div>
       )}
@@ -292,6 +266,22 @@ function UrlEmptyState() {
       </div>
       <p className={styles.emptyTitle}>URL을 입력하고 미리보기를 눌러주세요</p>
       <p className={styles.emptyDesc}>왼쪽 패널에서 Mobile · Tablet · Desktop · Wide 크기를 바로 바꿀 수 있습니다.</p>
+    </div>
+  );
+}
+
+function MockupEmptyState() {
+  return (
+    <div className={styles.emptyState}>
+      <div className={styles.emptyIcon}>
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <rect x="7" y="9" width="34" height="30" rx="6" stroke="currentColor" strokeWidth="2" />
+          <path d="M14 29l6-7 5 5 4-4 5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 15h24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.35"/>
+        </svg>
+      </div>
+      <p className={styles.emptyTitle}>실사 목업을 선택하세요</p>
+      <p className={styles.emptyDesc}>오른쪽 패널의 목업 이미지가 선택되면 여기에 크게 표시됩니다.</p>
     </div>
   );
 }

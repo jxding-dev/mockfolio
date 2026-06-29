@@ -35,201 +35,55 @@ const FAQS: { q: string; a: string }[] = [
   { q: '상업적으로 사용할 수 있나요?', a: '네. 직접 만든 목업 결과물은 포트폴리오·제안서 등 상업적 용도로 자유롭게 사용할 수 있습니다.' },
 ];
 
-/* ─────────────────────────────────────────────────────────
-   App Preview — CSS/SVG 기반 인터랙티브 미리보기
-   ───────────────────────────────────────────────────────── */
-type PreviewTab = 'inspect' | 'mockup' | 'export';
+const showcaseMockups = [
+  {
+    title: '실사 도심 빌딩 광고판',
+    category: 'Hero Mockup',
+    src: 'mockups/overlays/realistic/ads/real-city-building-billboard.webp',
+  },
+  {
+    title: '실사 카페 노트북',
+    category: 'Web',
+    src: 'mockups/overlays/realistic/devices/real-laptop-cafe-table.webp',
+  },
+  {
+    title: '실사 손에 든 스마트폰',
+    category: 'App',
+    src: 'mockups/overlays/realistic/devices/real-smartphone-in-hand.webp',
+  },
+  {
+    title: '실사 매장 행잉 간판',
+    category: 'Signage',
+    src: 'mockups/overlays/realistic/signage/real-storefront-hanging-sign.webp',
+  },
+] as const;
 
-function AppPreview() {
-  const [tab, setTab] = useState<PreviewTab>('inspect');
-
-  return (
-    <div className={styles.appPreview}>
-      {/* Outer shell */}
-      <div className={styles.apShell}>
-        {/* Top bar */}
-        <div className={styles.apTopBar}>
-          <div className={styles.apLogo}>
-            <div className={styles.apLogoMark} />
-            <span>Mockfolio</span>
-          </div>
-          <div className={styles.apTabs}>
-            {(['inspect','mockup','export'] as PreviewTab[]).map((t) => (
-              <button
-                key={t}
-                className={`${styles.apTab} ${tab === t ? styles.apTabActive : ''}`}
-                onClick={() => setTab(t)}
-              >
-                {t === 'inspect' ? 'Inspect' : t === 'mockup' ? 'Mockup' : 'Export'}
-              </button>
-            ))}
-          </div>
-          <div className={styles.apActions}>
-            <div className={styles.apSaveState}>저장됨</div>
-            <div className={styles.apAvatar} />
-          </div>
-        </div>
-
-        {/* Body */}
-        <div className={styles.apBody}>
-          {/* Left sidebar */}
-          <div className={styles.apSidebar}>
-            <div className={styles.apSideSection}>
-              <div className={styles.apSideLabel}>업로드</div>
-              <div className={styles.apUploadBox}>
-                <div className={styles.apUploadIcon}>↑</div>
-                <div className={styles.apUploadText}>이미지 드롭</div>
-              </div>
-            </div>
-            <div className={styles.apSideSection}>
-              <div className={styles.apSideLabel}>디바이스</div>
-              {['Mobile 390', 'Tablet 768', 'Desktop 1440'].map((d, i) => (
-                <div key={d} className={`${styles.apDeviceItem} ${i === 0 ? styles.apDeviceActive : ''}`}>
-                  <div className={styles.apDeviceDot} />
-                  {d}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Canvas */}
-          <div className={styles.apCanvas}>
-            {tab === 'inspect' && <InspectCanvas />}
-            {tab === 'mockup' && <MockupCanvas />}
-            {tab === 'export' && <ExportCanvas />}
-          </div>
-
-          {/* Right panel */}
-          <div className={styles.apRight}>
-            <div className={styles.apSideLabel}>속성</div>
-            {tab === 'inspect' && (
-              <>
-                <div className={styles.apPropRow}><span>가이드</span><div className={styles.apToggleOn} /></div>
-                <div className={styles.apPropRow}><span>그리드</span><div className={styles.apToggleOff} /></div>
-                <div className={styles.apPropRow}><span>중앙선</span><div className={styles.apToggleOff} /></div>
-                <div className={styles.apPropRow}><span>여백</span><div className={styles.apToggleOn} /></div>
-              </>
-            )}
-            {tab === 'mockup' && (
-              <>
-                <div className={styles.apPropRow}><span>프레임</span><div className={styles.apPropTag}>Browser</div></div>
-                <div className={styles.apSliderRow}>
-                  <span>그림자</span>
-                  <div className={styles.apSlider}><div className={styles.apSliderFill} style={{width:'65%'}} /></div>
-                </div>
-                <div className={styles.apSliderRow}>
-                  <span>배경</span>
-                  <div className={styles.apColorDots}>
-                    <div style={{background:'#6366F1'}} className={`${styles.apColorDot} ${styles.apColorActive}`}/>
-                    <div style={{background:'#F472B6'}} className={styles.apColorDot}/>
-                    <div style={{background:'#34D399'}} className={styles.apColorDot}/>
-                    <div style={{background:'#1E293B'}} className={styles.apColorDot}/>
-                  </div>
-                </div>
-                <div className={styles.apSliderRow}>
-                  <span>스케일</span>
-                  <div className={styles.apSlider}><div className={styles.apSliderFill} style={{width:'80%'}} /></div>
-                </div>
-              </>
-            )}
-            {tab === 'export' && (
-              <>
-                <div className={styles.apPropRow}><span>해상도</span><div className={styles.apPropTag}>2×</div></div>
-                <div className={styles.apPropRow}><span>형식</span><div className={styles.apPropTag}>PNG</div></div>
-                <div className={styles.apExportBtn}>PNG 저장</div>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+function publicMockupSrc(src: string): string {
+  return `${import.meta.env.BASE_URL}${src}`;
 }
 
-function InspectCanvas() {
-  return (
-    <div className={styles.inspectCanvas}>
-      {/* Browser chrome */}
-      <div className={styles.icBrowser}>
-        <div className={styles.icBar}>
-          <span className={styles.icDot} style={{background:'#ff5f57'}}/>
-          <span className={styles.icDot} style={{background:'#ffbd2e'}}/>
-          <span className={styles.icDot} style={{background:'#28c840'}}/>
-          <div className={styles.icUrl}>yourportfolio.com</div>
-          <span className={styles.icWidth}>390px</span>
-        </div>
-        <div className={styles.icScreen}>
-          {/* Guide lines */}
-          <div className={styles.icMarginLeft} />
-          <div className={styles.icMarginRight} />
-          <div className={styles.icCenterLine} />
-          {/* Skeleton UI */}
-          <div className={styles.icNav}/>
-          <div className={styles.icHero}/>
-          <div className={styles.icRow}>
-            <div className={styles.icCard}/>
-            <div className={styles.icCard}/>
-          </div>
-          <div className={styles.icBtn}/>
-        </div>
-      </div>
-    </div>
-  );
-}
+function RealMockupShowcase() {
+  const [main, ...supporting] = showcaseMockups;
 
-function MockupCanvas() {
   return (
-    <div className={styles.mockupCanvas}>
-      {/* Gradient background */}
-      <div className={styles.mcGradientBg}>
-        {/* Browser frame */}
-        <div className={styles.mcFrame}>
-          <div className={styles.mcFrameBar}>
-            <span className={styles.icDot} style={{background:'#ff5f57'}}/>
-            <span className={styles.icDot} style={{background:'#ffbd2e'}}/>
-            <span className={styles.icDot} style={{background:'#28c840'}}/>
-            <div className={styles.icUrl}>yourportfolio.com</div>
-          </div>
-          <div className={styles.mcFrameScreen}>
-            <div className={styles.mcSkNav}/>
-            <div className={styles.mcSkHero}/>
-            <div className={styles.mcSkCards}>
-              <div className={styles.mcSkCard}/>
-              <div className={styles.mcSkCard}/>
-              <div className={styles.mcSkCard}/>
-            </div>
-          </div>
-        </div>
-        {/* Phone */}
-        <div className={styles.mcPhone}>
-          <div className={styles.mcPhoneIsland}/>
-          <div className={styles.mcPhoneScreen}>
-            <div className={styles.mcSkPhoneHero}/>
-            <div className={styles.mcSkPhoneCard}/>
-            <div className={styles.mcSkPhoneCard}/>
-          </div>
-          <div className={styles.mcPhoneHome}/>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ExportCanvas() {
-  return (
-    <div className={styles.exportCanvas}>
-      <div className={styles.ecPreviewBox}>
-        <div className={styles.ecMiniGrad}>
-          <div className={styles.ecMiniFrame}>
-            <div className={styles.ecMiniBar}/>
-            <div className={styles.ecMiniScreen}/>
-          </div>
-        </div>
-      </div>
-      <div className={styles.ecInfo}>
-        <div className={styles.ecFileName}>mockfolio-portfolio-2026.png</div>
-        <div className={styles.ecSize}>3200 × 2000px · 2× · PNG</div>
-        <div className={styles.ecCheck}>✓ 저장 준비 완료</div>
+    <div className={styles.realShowcase} aria-label="실제 목업 이미지 쇼케이스">
+      <figure className={styles.realShowcaseMain}>
+        <img src={publicMockupSrc(main.src)} alt={main.title} loading="eager" decoding="async" />
+        <figcaption>
+          <span>{main.category}</span>
+          <strong>{main.title}</strong>
+        </figcaption>
+      </figure>
+      <div className={styles.realShowcaseStrip}>
+        {supporting.map((mockup) => (
+          <figure className={styles.realShowcaseThumb} key={mockup.src}>
+            <img src={publicMockupSrc(mockup.src)} alt={mockup.title} loading="lazy" decoding="async" />
+            <figcaption>
+              <span>{mockup.category}</span>
+              <strong>{mockup.title}</strong>
+            </figcaption>
+          </figure>
+        ))}
       </div>
     </div>
   );
@@ -348,7 +202,7 @@ export function Landing() {
           </div>
 
           <div className={`${styles.heroVisual} ${styles.heroEnterVisual}`}>
-            <AppPreview />
+            <RealMockupShowcase />
           </div>
         </div>
       </section>
@@ -429,17 +283,13 @@ export function Landing() {
           <h2 className={styles.sectionTitle}>실사형 목업부터 디바이스 목업까지</h2>
         </Reveal>
         <div className={styles.mockupExampleGrid}>
-          {[
-            { label: 'Signage', title: '매장 간판·전광판', tone: 'dark' },
-            { label: 'Device', title: '모바일·태블릿·데스크탑', tone: 'light' },
-            { label: 'Commerce', title: '상세페이지·제품 소개', tone: 'green' },
-          ].map((item) => (
-            <Reveal key={item.label}>
-              <article className={`${styles.mockupExampleCard} ${styles[`mockupTone${item.tone}`]}`}>
-                <span>{item.label}</span>
-                <h3>{item.title}</h3>
-                <div className={styles.mockupSlot}>
-                  <div />
+          {showcaseMockups.slice(1).map((item) => (
+            <Reveal key={item.src}>
+              <article className={styles.mockupExampleCard}>
+                <img src={publicMockupSrc(item.src)} alt={item.title} loading="lazy" decoding="async" />
+                <div className={styles.mockupExampleMeta}>
+                  <span>{item.category}</span>
+                  <h3>{item.title}</h3>
                 </div>
               </article>
             </Reveal>

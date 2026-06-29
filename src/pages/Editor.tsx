@@ -90,7 +90,7 @@ function UploadZone({ onUpload, error, onError, onClearError, onStartWithUrl }: 
 
         <div className={styles.uploadTips}>
           <div className={styles.tip}><span className={styles.tipIcon}>📐</span><span>이미지 또는 <strong>URL 링크</strong>로 반응형 레이아웃을 확인하세요</span></div>
-          <div className={styles.tip}><span className={styles.tipIcon}>🖼</span><span>목업 모드에서 <strong>프레임과 배경</strong>을 꾸미세요</span></div>
+          <div className={styles.tip}><span className={styles.tipIcon}>🖼</span><span>목업 모드에서 <strong>실사 목업과 레이어</strong>를 합성하세요</span></div>
           <div className={styles.tip}><span className={styles.tipIcon}>💾</span><span><strong>PNG 2×</strong> 고해상도로 바로 다운로드</span></div>
         </div>
 
@@ -232,6 +232,12 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
 
   const exportRef = useRef<HTMLDivElement | null>(null);
   const selectedMockup = mockupAssets.find((asset) => asset.id === selectedMockupId) ?? null;
+
+  useEffect(() => {
+    if ((activeMode === 'mockup' || activeMode === 'export') && !selectedMockup && mockupAssets.length > 0) {
+      patch('selectedMockupId', mockupAssets[0].id);
+    }
+  }, [activeMode, mockupAssets, patch, selectedMockup]);
 
   // Keyboard: 1–4 switch modes (ignored while typing in inputs)
   useEffect(() => {

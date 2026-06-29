@@ -193,7 +193,7 @@ export function EditorLeftPanel({
       {activeMode === 'mockup' && (
         <Section title="목업 설정">
           <p className={styles.hint}>
-            우측 패널에서 프레임, 배경, 그림자를 조절하세요.
+            우측 패널에서 실사 목업을 고르고 이미지 레이어를 합성하세요.
           </p>
         </Section>
       )}
