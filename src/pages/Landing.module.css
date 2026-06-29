@@ -1224,8 +1224,22 @@
    REVIEWS
 ══════════════════════════════════════════════════════ */
 .reviewsSection {
+  max-width: none;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  overflow: hidden;
   background:
     radial-gradient(ellipse 60% 50% at 50% 0%, var(--accent-subtle) 0%, transparent 70%);
+}
+
+.reviewsSection .sectionLabelCenter,
+.reviewsSection .sectionTitleCenter {
+  max-width: var(--max-content-w);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
 }
 
 /* ══════════════════════════════════════════════════════

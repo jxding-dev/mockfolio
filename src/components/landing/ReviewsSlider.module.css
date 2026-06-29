@@ -1,34 +1,50 @@
 .wrap {
   position: relative;
-  max-width: 720px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-5);
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  overflow: hidden;
 }
 
 .viewport {
   width: 100%;
   overflow: hidden;
-  border-radius: var(--radius-xl);
+  padding:
+    var(--space-2)
+    max(var(--space-4), calc((100vw - var(--max-content-w)) / 2 + var(--space-6)))
+    var(--space-4);
+  mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
 }
 
 .track {
   display: flex;
-  transition: transform var(--ease-slow);
+  width: max-content;
+  animation: reviewMarquee 36s linear infinite;
   will-change: transform;
 }
 
+.wrap:hover .track,
+.wrap:focus-within .track {
+  animation-play-state: paused;
+}
+
+.group {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(280px, 28vw, 420px);
+  gap: var(--space-4);
+  padding-right: var(--space-4);
+}
+
 .card {
-  flex: 0 0 100%;
   min-width: 0;
+  min-height: 240px;
   margin: 0;
-  padding: var(--space-8);
+  padding: var(--space-6);
   background: var(--bg-base);
-  border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -37,14 +53,15 @@
 
 .stars {
   color: #f5b301;
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: 2px;
 }
 
 .quote {
   margin: 0;
-  font-size: var(--text-lg);
-  line-height: 1.6;
+  flex: 1;
+  font-size: var(--text-md);
+  line-height: var(--leading-loose);
   color: var(--text-primary);
   font-weight: var(--weight-medium);
   letter-spacing: -0.01em;
@@ -70,59 +87,57 @@
   flex-shrink: 0;
 }
 
-.personText { display: flex; flex-direction: column; }
-.name { font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--text-primary); }
-.role { font-size: var(--text-xs); color: var(--text-tertiary); }
-
-/* Arrows */
-.arrow {
-  position: absolute;
-  top: 38%;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--bg-base);
-  border: 1px solid var(--border-default);
-  box-shadow: var(--shadow-md);
-  color: var(--text-secondary);
-  font-size: 22px;
-  line-height: 1;
+.personText {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-  transition: all var(--ease-fast);
+  flex-direction: column;
+  min-width: 0;
 }
 
-.arrow:hover { color: var(--accent); border-color: var(--accent-muted); transform: translateY(-50%) scale(1.08); }
-.arrowLeft  { left: -8px; }
-.arrowRight { right: -8px; }
-
-/* Dots */
-.dots { display: flex; gap: var(--space-2); }
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--border-strong);
-  cursor: pointer;
-  transition: all var(--ease-fast);
-  padding: 0;
+.name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
 }
 
-.dot:hover { background: var(--text-tertiary); }
+.role {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
 
-.dotActive {
-  background: var(--accent);
-  width: 22px;
-  border-radius: 4px;
+@keyframes reviewMarquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewport {
+    overflow-x: auto;
+    mask-image: none;
+  }
+
+  .track {
+    animation: none;
+  }
+
+  .group[aria-hidden='true'] {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {
-  .card { padding: var(--space-6); }
-  .quote { font-size: var(--text-md); }
-  .arrow { display: none; }
+  .viewport {
+    padding: 0 var(--space-4) var(--space-2);
+    mask-image: linear-gradient(90deg, transparent 0, #000 5%, #000 95%, transparent 100%);
+  }
+
+  .group {
+    grid-auto-columns: minmax(280px, 82vw);
+    gap: var(--space-3);
+    padding-right: var(--space-3);
+  }
+
+  .card {
+    min-height: 220px;
+    padding: var(--space-5);
+  }
 }
