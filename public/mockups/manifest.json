@@ -70,49 +70,49 @@
       "id": "ios-phone-desk-premium",
       "label": "iOS 폰 데스크",
       "category": "앱 목업",
-      "src": "mockups/overlays/app/ios-phone-desk-premium.webp"
+      "src": "mockups/overlays/app/ios-phone-desk-premium.png"
     },
     {
       "id": "android-phone-gradient-card",
       "label": "안드로이드 그라디언트 카드",
       "category": "앱 목업",
-      "src": "mockups/overlays/app/android-phone-gradient-card.webp"
+      "src": "mockups/overlays/app/android-phone-gradient-card.png"
     },
     {
       "id": "tablet-dashboard-studio",
       "label": "태블릿 대시보드",
       "category": "앱 목업",
-      "src": "mockups/overlays/app/tablet-dashboard-studio.webp"
+      "src": "mockups/overlays/app/tablet-dashboard-studio.png"
     },
     {
       "id": "dual-mobile-app-showcase",
       "label": "듀얼 모바일 앱",
       "category": "앱 목업",
-      "src": "mockups/overlays/app/dual-mobile-app-showcase.webp"
+      "src": "mockups/overlays/app/dual-mobile-app-showcase.png"
     },
     {
       "id": "desktop-monitor-clean-office",
       "label": "데스크탑 모니터",
       "category": "웹사이트 목업",
-      "src": "mockups/overlays/web/desktop-monitor-clean-office.webp"
+      "src": "mockups/overlays/web/desktop-monitor-clean-office.png"
     },
     {
       "id": "laptop-website-hero-angle",
       "label": "노트북 웹사이트 히어로",
       "category": "웹사이트 목업",
-      "src": "mockups/overlays/web/laptop-website-hero-angle.webp"
+      "src": "mockups/overlays/web/laptop-website-hero-angle.png"
     },
     {
       "id": "browser-window-saas-dashboard",
       "label": "SaaS 브라우저 화면",
       "category": "웹사이트 목업",
-      "src": "mockups/overlays/web/browser-window-saas-dashboard.webp"
+      "src": "mockups/overlays/web/browser-window-saas-dashboard.png"
     },
     {
       "id": "ultrawide-dashboard-wall",
       "label": "울트라와이드 대시보드",
       "category": "웹사이트 목업",
-      "src": "mockups/overlays/web/ultrawide-dashboard-wall.webp"
+      "src": "mockups/overlays/web/ultrawide-dashboard-wall.png"
     },
     {
       "id": "commerce-long-detail-panels",
@@ -124,67 +124,67 @@
       "id": "product-page-card-gallery",
       "label": "상품 페이지 갤러리",
       "category": "상세페이지 목업",
-      "src": "mockups/overlays/ecommerce/product-page-card-gallery.webp"
+      "src": "mockups/overlays/ecommerce/product-page-card-gallery.png"
     },
     {
       "id": "subway-lightbox-poster",
       "label": "지하철 라이트박스",
       "category": "포스터 목업",
-      "src": "mockups/overlays/poster/subway-lightbox-poster.webp"
+      "src": "mockups/overlays/poster/subway-lightbox-poster.png"
     },
     {
       "id": "gallery-wall-poster-duo",
       "label": "갤러리 포스터 2종",
       "category": "포스터 목업",
-      "src": "mockups/overlays/poster/gallery-wall-poster-duo.webp"
+      "src": "mockups/overlays/poster/gallery-wall-poster-duo.png"
     },
     {
       "id": "street-billboard-wide",
       "label": "거리 와이드 광고판",
       "category": "배너/광고 목업",
-      "src": "mockups/overlays/banner/street-billboard-wide.webp"
+      "src": "mockups/overlays/banner/street-billboard-wide.png"
     },
     {
       "id": "metro-platform-banner",
       "label": "메트로 플랫폼 배너",
       "category": "배너/광고 목업",
-      "src": "mockups/overlays/banner/metro-platform-banner.webp"
+      "src": "mockups/overlays/banner/metro-platform-banner.png"
     },
     {
       "id": "social-square-card-stack",
       "label": "소셜 정사각 카드 스택",
       "category": "소셜 광고 목업",
-      "src": "mockups/overlays/social/social-square-card-stack.webp"
+      "src": "mockups/overlays/social/social-square-card-stack.png"
     },
     {
       "id": "vertical-story-phone-ad",
       "label": "스토리형 모바일 광고",
       "category": "소셜 광고 목업",
-      "src": "mockups/overlays/social/vertical-story-phone-ad.webp"
+      "src": "mockups/overlays/social/vertical-story-phone-ad.png"
     },
     {
       "id": "bus-stop-premium-panel",
       "label": "버스정류장 프리미엄 패널",
       "category": "실사 광고 목업",
-      "src": "mockups/overlays/ads/bus-stop-premium-panel.webp"
+      "src": "mockups/overlays/ads/bus-stop-premium-panel.png"
     },
     {
       "id": "city-rooftop-billboard",
       "label": "옥상 광고판",
       "category": "실사 광고 목업",
-      "src": "mockups/overlays/ads/city-rooftop-billboard.webp"
+      "src": "mockups/overlays/ads/city-rooftop-billboard.png"
     },
     {
       "id": "round-hanging-store-sign",
       "label": "원형 행잉 간판",
       "category": "간판 목업",
-      "src": "mockups/overlays/signage/round-hanging-store-sign.webp"
+      "src": "mockups/overlays/signage/round-hanging-store-sign.png"
     },
     {
       "id": "magazine-spread-ad",
       "label": "매거진 펼침면 광고",
       "category": "프린트 목업",
-      "src": "mockups/overlays/print/magazine-spread-ad.webp"
+      "src": "mockups/overlays/print/magazine-spread-ad.png"
     },
     {
       "id": "real-storefront-hanging-sign",
