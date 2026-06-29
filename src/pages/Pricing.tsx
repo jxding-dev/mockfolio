@@ -47,7 +47,6 @@ export function Pricing() {
         </p>
         <div className={styles.heroActions}>
           <Button variant="primary" onClick={() => navigate('/editor')}>무료로 에디터 열기</Button>
-          <Button variant="secondary" onClick={() => navigate('/billing')}>Pro 결과 예시 보기</Button>
         </div>
       </section>
 
@@ -81,7 +80,6 @@ export function Pricing() {
             <span className={styles.eyebrow}>Feature matrix</span>
             <h2>Free와 Pro의 차이를 한눈에 확인하세요</h2>
           </div>
-          <Button variant="secondary" onClick={() => navigate('/billing')}>결제 화면 미리보기</Button>
         </div>
 
         <div className={styles.table}>

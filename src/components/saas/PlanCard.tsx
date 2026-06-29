@@ -47,7 +47,7 @@ export function PlanCard({ plan, compact = false }: Props) {
       <Button
         variant={plan.highlighted ? 'primary' : 'secondary'}
         fullWidth
-        onClick={() => navigate(isFree ? '/editor' : '/billing')}
+        onClick={() => navigate('/editor')}
       >
         {plan.cta}
       </Button>

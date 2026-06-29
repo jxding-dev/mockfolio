@@ -5,9 +5,6 @@ import { Footer } from './components/layout/Footer';
 import { Landing } from './pages/Landing';
 import { Editor } from './pages/Editor';
 import { Pricing } from './pages/Pricing';
-import { AuthPage } from './pages/AuthPage';
-import { BillingPage } from './pages/BillingPage';
-import { Dashboard } from './pages/Dashboard';
 import { NotFound } from './pages/NotFound';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { ThemeProvider } from './hooks/useTheme';
@@ -17,13 +14,6 @@ const ROUTE_TITLES: Record<string, string> = {
   '/': 'Mockfolio — 포트폴리오 목업 & 반응형 검수',
   '/editor': '에디터 · Mockfolio',
   '/pricing': '요금제 · Mockfolio',
-  '/login': '로그인 · Mockfolio',
-  '/signup': '계정 만들기 · Mockfolio',
-  '/forgot-password': '비밀번호 재설정 · Mockfolio',
-  '/dashboard': 'Dashboard · Mockfolio',
-  '/billing': 'Billing · Mockfolio',
-  '/subscription': '구독 · Mockfolio',
-  '/invoice': 'Invoice · Mockfolio',
 };
 
 /* Resets scroll and updates the document title on every route change. */
@@ -51,16 +41,6 @@ function AppShell() {
         <Route path="/"        element={<Landing />} />
         <Route path="/editor"  element={<Editor />} />
         <Route path="/pricing" element={<Pricing />} />
-        <Route path="/login" element={<AuthPage mode="login" />} />
-        <Route path="/signup" element={<AuthPage mode="signup" />} />
-        <Route path="/forgot-password" element={<AuthPage mode="forgot-password" />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/billing" element={<BillingPage view="upgrade" />} />
-        <Route path="/subscription" element={<BillingPage view="subscription" />} />
-        <Route path="/invoice" element={<BillingPage view="invoice" />} />
-        <Route path="/payment/success" element={<BillingPage view="success" />} />
-        <Route path="/payment/failure" element={<BillingPage view="failure" />} />
-        <Route path="/payment/cancel" element={<BillingPage view="cancel" />} />
         <Route path="*"        element={<NotFound />} />
       </Routes>
       {!isEditor && <Footer />}

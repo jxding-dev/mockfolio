@@ -86,11 +86,3 @@ export interface Plan {
   note?: string;
   cta: string;
 }
-
-export interface SavedProject {
-  id: string;
-  name: string;
-  thumbnail?: string;
-  updatedAt: string;
-  ownerId?: string;
-}

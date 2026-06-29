@@ -28,7 +28,7 @@ export const PLANS: Plan[] = [
     available: false,
     highlighted: true,
     badge: '곧 출시',
-    cta: 'Pro 결과 예시 보기',
+    cta: '무료로 먼저 써보기',
     note: '정식 출시 전까지는 카드 정보를 받지 않아요.',
     features: [
       '무제한 실사·디바이스 목업',

@@ -30,18 +30,12 @@ export function Header() {
           <Link to="/" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/' ? styles.active : ''}`}>홈</Link>
           <Link to="/editor" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/editor' ? styles.active : ''}`}>에디터</Link>
           <Link to="/pricing" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/pricing' ? styles.active : ''}`}>요금제</Link>
-          <Link to="/dashboard" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/dashboard' ? styles.active : ''}`}>Dashboard Preview</Link>
-          <Link to="/login" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${styles.navAuthLink} ${pathname === '/login' ? styles.active : ''}`}>Login</Link>
-          <Link to="/signup" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${styles.navAuthLink} ${pathname === '/signup' ? styles.active : ''}`}>Sign up</Link>
         </nav>
 
         <div className={styles.actions}>
           <ThemeToggle />
-          <Button className={styles.loginButton} variant="ghost" size="sm" onClick={() => navigate('/login')}>
-            Login
-          </Button>
-          <Button variant="primary" size="sm" onClick={() => navigate('/signup')}>
-            Sign up
+          <Button variant="primary" size="sm" onClick={() => navigate('/editor')}>
+            무료로 시작
           </Button>
           <button
             type="button"

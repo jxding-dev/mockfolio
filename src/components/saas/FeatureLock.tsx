@@ -31,8 +31,8 @@ export function FeatureLock({
         <h3>{title}</h3>
         <p>{description}</p>
       </div>
-      <Button variant="secondary" size="sm" onClick={() => navigate('/billing')}>
-        Pro 보기
+      <Button variant="secondary" size="sm" onClick={() => navigate('/editor')}>
+        무료로 시작
       </Button>
     </div>
   );

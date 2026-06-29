@@ -15,9 +15,8 @@ export function Footer() {
           </span>
         </div>
         <div className={styles.right}>
-          <Link to="/pricing">Pricing</Link>
-          <Link to="/billing">Billing</Link>
-          <Link to="/dashboard">Dashboard Preview</Link>
+          <Link to="/editor">에디터</Link>
+          <Link to="/pricing">요금제</Link>
         </div>
       </div>
     </footer>
