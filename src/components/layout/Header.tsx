@@ -30,7 +30,9 @@ export function Header() {
           <Link to="/" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/' ? styles.active : ''}`}>홈</Link>
           <Link to="/editor" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/editor' ? styles.active : ''}`}>에디터</Link>
           <Link to="/pricing" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/pricing' ? styles.active : ''}`}>요금제</Link>
-          <Link to="/dashboard" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/dashboard' ? styles.active : ''}`}>Dashboard</Link>
+          <Link to="/dashboard" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${pathname === '/dashboard' ? styles.active : ''}`}>Dashboard Preview</Link>
+          <Link to="/login" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${styles.navAuthLink} ${pathname === '/login' ? styles.active : ''}`}>Login</Link>
+          <Link to="/signup" onClick={() => setMenuOpen(false)} className={`${styles.navLink} ${styles.navAuthLink} ${pathname === '/signup' ? styles.active : ''}`}>Sign up</Link>
         </nav>
 
         <div className={styles.actions}>

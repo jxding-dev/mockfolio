@@ -16,6 +16,16 @@ import styles from './Editor.module.css';
 
 /* Loads a bundled public asset into the same UploadedImage shape as a real upload. */
 const SAMPLE_IMAGE_SRC = `${import.meta.env.BASE_URL}mockups/overlays/samples/sample-desktop-studio.webp`;
+const LONG_DETAIL_RATIO = 1.75;
+const LONG_DETAIL_MOCKUP_ID = 'commerce-long-detail-panels';
+
+function isLongDetailImage(image: UploadedImage | null): boolean {
+  return Boolean(image && image.height / image.width >= LONG_DETAIL_RATIO);
+}
+
+function initialMockupScale(image: UploadedImage): number {
+  return isLongDetailImage(image) ? 0.56 : 1;
+}
 
 async function loadSampleImage(): Promise<UploadedImage> {
   const response = await fetch(SAMPLE_IMAGE_SRC, { cache: 'force-cache' });
@@ -243,7 +253,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     frameColor: settings.frameColor,
     x: offset * 7,
     y: offset * 5,
-    scale: offset === 0 ? 1 : 0.82,
+    scale: offset === 0 ? initialMockupScale(img) : 0.82,
     stretchX: 1,
     stretchY: 1,
     rotation: 0,
@@ -276,6 +286,28 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
 
   const updateMockupItem = useCallback((id: string, patchItem: Partial<MockupItem>) => {
     setMockupItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...patchItem } : it)));
+  }, []);
+  const fitMockupItem = useCallback((id: string, mode: 'contain' | 'width' | 'height') => {
+    setMockupItems((prev) => prev.map((it) => {
+      if (it.id !== id) return it;
+      const isLong = it.height / it.width >= LONG_DETAIL_RATIO;
+      const scale = mode === 'width'
+        ? (isLong ? 0.58 : 1)
+        : mode === 'height'
+          ? (isLong ? 0.38 : 0.72)
+          : (isLong ? 0.5 : 0.86);
+      return {
+        ...it,
+        x: 0,
+        y: 0,
+        scale,
+        stretchX: 1,
+        stretchY: 1,
+        rotation: 0,
+        skewX: 0,
+        skewY: 0,
+      };
+    }));
   }, []);
   const removeMockupItem = useCallback((id: string) => {
     setMockupItems((prev) => {
@@ -321,6 +353,26 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
       patch('selectedMockupId', mockupAssets[0].id);
     }
   }, [activeMode, mockupAssets, patch, selectedMockup]);
+
+  const lastImageFlowId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!image || image.id === lastImageFlowId.current) return;
+    lastImageFlowId.current = image.id;
+    setMockupItems([]);
+    setSelectedMockupItemId(null);
+    patch('activeMode', 'inspect');
+    patch('inspectSource', 'image');
+    setSaveToast(isLongDetailImage(image)
+      ? '긴 상세페이지 이미지로 감지했어요. Inspect에서 먼저 확인하세요.'
+      : '이미지를 업로드했어요. Inspect에서 먼저 확인하세요.');
+  }, [image, patch]);
+
+  useEffect(() => {
+    if (!image || !isLongDetailImage(image) || mockupAssets.length === 0) return;
+    const recommended = mockupAssets.find((asset) => asset.id === LONG_DETAIL_MOCKUP_ID)
+      ?? mockupAssets.find((asset) => asset.id.includes('detail') || asset.category?.includes('상세페이지'));
+    if (recommended) patch('selectedMockupId', recommended.id);
+  }, [image, mockupAssets, patch]);
 
   // Keyboard: 1–4 switch modes (ignored while typing in inputs)
   useEffect(() => {
@@ -553,6 +605,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
           onRemoveMockupItem={removeMockupItem}
           onDuplicateMockupItem={duplicateMockupItem}
           onReorderMockupItem={reorderMockupItem}
+          onFitMockupItem={fitMockupItem}
         />
       </div>
 

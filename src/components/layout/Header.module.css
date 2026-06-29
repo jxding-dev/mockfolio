@@ -74,6 +74,10 @@
   background: var(--accent-subtle);
 }
 
+.navAuthLink {
+  display: none;
+}
+
 /* ── Actions ──────────────────────────── */
 .actions {
   display: flex;
@@ -126,6 +130,7 @@
   }
   .navOpen { display: flex; }
   .navLink { padding: var(--space-3); }
+  .navAuthLink { display: block; }
   .loginButton { display: none; }
   .menuButton {
     width: 34px;

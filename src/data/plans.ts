@@ -27,9 +27,9 @@ export const PLANS: Plan[] = [
     description: '상업용 목업 제작과 고급 Export를 위한 운영형 플랜',
     available: false,
     highlighted: true,
-    badge: '결제 준비 중',
-    cta: 'Upgrade 준비 보기',
-    note: '현재는 결제 UI와 구조만 준비되어 있으며 실제 과금은 발생하지 않습니다.',
+    badge: '출시 준비 중',
+    cta: 'Pro 미리보기',
+    note: '현재는 플랜 미리보기 단계이며 실제 과금은 발생하지 않습니다.',
     features: [
       '모든 목업',
       'Before / After GIF',

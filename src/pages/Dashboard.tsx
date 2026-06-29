@@ -25,17 +25,17 @@ export function Dashboard() {
   }, []);
 
   const visibleProjects = projects.length ? projects : [
-    { id: 'demo-1', name: 'SaaS landing mockup', updatedAt: 'Supabase DB 연결 전 예시' },
-    { id: 'demo-2', name: 'Mobile app showcase', updatedAt: 'Local ProjectService fallback' },
+    { id: 'demo-1', name: 'SaaS landing mockup', updatedAt: '예시 프로젝트' },
+    { id: 'demo-2', name: 'Mobile app showcase', updatedAt: '예시 프로젝트' },
   ];
 
   return (
     <main className={styles.dashboard}>
       <aside className={styles.sidebar}>
         <div>
-          <Badge variant="accent">Mock workspace</Badge>
-          <h1>Dashboard</h1>
-          <p>로그인 이후 화면을 가정한 운영형 구조입니다.</p>
+          <Badge variant="accent">Preview</Badge>
+          <h1>Dashboard Preview</h1>
+          <p>정식 계정 기능을 연결하기 전 미리 보는 작업 공간입니다.</p>
         </div>
         <nav>
           {sidebarItems.map((item) => (
@@ -49,7 +49,7 @@ export function Dashboard() {
           <div>
             <span className={styles.eyebrow}>Projects</span>
             <h2>최근 작업</h2>
-            <p>현재는 LocalStorage 기반 ProjectService를 사용하며, Supabase DB 구현체로 교체할 수 있습니다.</p>
+            <p>지금은 예시 프로젝트만 표시됩니다. 실제 저장과 동기화는 정식 계정 기능에서 제공됩니다.</p>
           </div>
           <Button variant="primary" onClick={() => window.location.assign('#/editor')}>새 프로젝트</Button>
         </div>
@@ -82,14 +82,14 @@ export function Dashboard() {
           <section id="billing" className={styles.panel}>
             <span className={styles.eyebrow}>Billing</span>
             <h3>구독 관리</h3>
-            <p>결제 내역과 구독 상태는 Toss Payments와 서버 검증 연결 후 표시합니다.</p>
+            <p>정식 출시 후 결제 내역과 구독 상태를 이곳에서 확인할 수 있습니다.</p>
             <Link to="/billing">Billing 페이지로 이동</Link>
           </section>
 
           <section id="settings" className={styles.panel}>
             <span className={styles.eyebrow}>Settings</span>
             <h3>Workspace settings</h3>
-            <p>계정, 워크스페이스, 플랜 값은 향후 Supabase user profile과 연결합니다.</p>
+            <p>계정, 워크스페이스, 플랜 설정을 관리할 자리입니다.</p>
           </section>
         </div>
       </section>

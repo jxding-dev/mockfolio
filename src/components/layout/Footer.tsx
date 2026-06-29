@@ -17,7 +17,7 @@ export function Footer() {
         <div className={styles.right}>
           <Link to="/pricing">Pricing</Link>
           <Link to="/billing">Billing</Link>
-          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/dashboard">Dashboard Preview</Link>
         </div>
       </div>
     </footer>

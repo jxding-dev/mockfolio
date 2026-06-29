@@ -37,6 +37,7 @@ interface Props {
   onRemoveMockupItem: (id: string) => void;
   onDuplicateMockupItem: (id: string) => void;
   onReorderMockupItem: (id: string, direction: 'forward' | 'backward') => void;
+  onFitMockupItem: (id: string, mode: 'contain' | 'width' | 'height') => void;
 }
 
 export function EditorRightPanel(props: Props) {
@@ -134,7 +135,7 @@ function MockupProps({
   settings: s, patch, exportLoading, exportMessage, mockupAssets, mockupsLoading,
   onCompositeExport, onCompositeReset,
   mockupItems, selectedMockupItemId, onAddMockupImages, onSelectMockupItem, onUpdateMockupItem, onRemoveMockupItem,
-  onDuplicateMockupItem, onReorderMockupItem,
+  onDuplicateMockupItem, onReorderMockupItem, onFitMockupItem,
 }: Props) {
   const addRef = useRef<HTMLInputElement>(null);
   const selected = mockupItems.find((it) => it.id === selectedMockupItemId) ?? null;
@@ -149,6 +150,9 @@ function MockupProps({
   return (
     <>
       <RSection title="실사 목업 선택">
+        {mockupItems.some((item) => item.height / item.width >= 1.75) && (
+          <p className={styles.infoHint}>긴 상세페이지 이미지로 보입니다. 상세페이지 목업과 아래 자동 맞춤 버튼을 먼저 사용해보세요.</p>
+        )}
         {mockupsLoading ? <p className={styles.hint}>목업 목록을 불러오는 중입니다.</p> : mockupAssets.length ? (
           <div className={styles.mockupCategoryList}>
             {Object.entries(groupedMockups).map(([category, assets]) => (
@@ -215,7 +219,11 @@ function MockupProps({
               <button className={styles.layerActionBtn} onClick={() => onDuplicateMockupItem(selected.id)}>복제</button>
               <button className={styles.layerActionBtn} onClick={() => onReorderMockupItem(selected.id, 'forward')}>앞으로</button>
               <button className={styles.layerActionBtn} onClick={() => onReorderMockupItem(selected.id, 'backward')}>뒤로</button>
+              <button className={styles.layerActionBtn} onClick={() => onFitMockupItem(selected.id, 'contain')}>전체 맞춤</button>
+              <button className={styles.layerActionBtn} onClick={() => onFitMockupItem(selected.id, 'width')}>폭 맞춤</button>
+              <button className={styles.layerActionBtn} onClick={() => onFitMockupItem(selected.id, 'height')}>높이 맞춤</button>
             </div>
+            <p className={styles.hint}>긴 상세페이지는 폭 맞춤이나 전체 맞춤으로 시작하면 잘림을 줄일 수 있습니다.</p>
           </RSection>
 
           <RSection title="선택 레이어 조정">

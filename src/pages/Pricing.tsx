@@ -17,8 +17,8 @@ export function Pricing() {
         <Badge variant="accent">Pricing</Badge>
         <h1>Free로 시작하고, Pro 월 9,900원으로 확장</h1>
         <p>
-          현재는 실제 결제를 연결하지 않습니다. 가격, 권한, Upgrade 흐름을 먼저 분리해두고
-          나중에 Toss Payments와 서버 검증을 붙일 수 있게 설계했습니다.
+          기본 검수와 목업 제작은 무료로 시작하세요. Pro는 더 많은 목업과 고화질 저장을 위한
+          정식 구독 플랜으로 준비 중이며, 현재 페이지에서는 실제 결제가 발생하지 않습니다.
         </p>
       </section>
 
@@ -30,9 +30,9 @@ export function Pricing() {
         <div className={styles.compareHead}>
           <div>
             <span className={styles.eyebrow}>Feature matrix</span>
-            <h2>기능 권한은 Free / Pro 두 단계로만 관리합니다</h2>
+            <h2>Free와 Pro의 차이를 한눈에 확인하세요</h2>
           </div>
-          <Button variant="secondary" onClick={() => navigate('/billing')}>Billing 구조 보기</Button>
+          <Button variant="secondary" onClick={() => navigate('/billing')}>결제 화면 미리보기</Button>
         </div>
 
         <div className={styles.table}>
@@ -55,16 +55,16 @@ export function Pricing() {
         <FeatureLock
           feature={FeatureKey.CustomPngMockups}
           currentPlan={PlanTier.Free}
-          title="커스텀 PNG 목업은 Pro로 분리"
-          description="사용자에게 과하게 막지 않고, 필요한 순간에만 Upgrade 이유와 비교표를 보여줍니다."
+          title="커스텀 PNG 목업은 Pro에서 제공 예정"
+          description="상업용 상세페이지, 광고, 디바이스 목업을 더 폭넓게 쓰고 싶을 때 업그레이드할 수 있습니다."
         />
       </section>
 
       <section className={styles.notice}>
-        <h3>결제/로그인 구현 범위</h3>
+        <h3>현재 결제 상태</h3>
         <p>
-          Login, Sign up, Billing, Subscription, Invoice, Payment result 페이지는 준비되어 있지만,
-          실제 인증·결제·구독 변경·DB 쓰기는 수행하지 않습니다.
+          지금은 가격과 플랜을 미리 보여주는 단계입니다. 버튼을 눌러도 실제 과금, 구독 변경,
+          계정 저장은 발생하지 않습니다.
         </p>
       </section>
     </main>

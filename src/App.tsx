@@ -30,7 +30,10 @@ const ROUTE_TITLES: Record<string, string> = {
 function RouteEffects() {
   const { pathname } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.requestAnimationFrame(() => window.scrollTo(0, 0));
     document.title = ROUTE_TITLES[pathname] ?? DEFAULT_TITLE;
   }, [pathname]);
   return null;

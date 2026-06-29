@@ -483,6 +483,17 @@
   padding: var(--space-1) 0;
 }
 
+.infoHint {
+  margin: 0;
+  padding: var(--space-2);
+  border: 1px solid var(--accent-muted);
+  border-radius: var(--radius-md);
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+}
+
 @media (max-width: 768px) {
   .panel {
     width: 100%;

@@ -50,6 +50,9 @@
 }
 
 .right a {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
   font-size: var(--text-xs);
   color: var(--text-tertiary);
 }
