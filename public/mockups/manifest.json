@@ -127,18 +127,6 @@
       "src": "mockups/overlays/ecommerce/product-page-card-gallery.png"
     },
     {
-      "id": "subway-lightbox-poster",
-      "label": "지하철 라이트박스",
-      "category": "포스터 목업",
-      "src": "mockups/overlays/poster/subway-lightbox-poster.png"
-    },
-    {
-      "id": "gallery-wall-poster-duo",
-      "label": "갤러리 포스터 2종",
-      "category": "포스터 목업",
-      "src": "mockups/overlays/poster/gallery-wall-poster-duo.png"
-    },
-    {
       "id": "street-billboard-wide",
       "label": "거리 와이드 광고판",
       "category": "배너/광고 목업",
