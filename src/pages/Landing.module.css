@@ -225,39 +225,52 @@
   display: grid;
   grid-template-rows: repeat(2, 1fr);
   gap: var(--space-3);
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
 }
 
 .realShowcaseThumb {
   min-height: 0;
   border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  transition: transform var(--ease-base), box-shadow var(--ease-base);
+}
+
+.realShowcaseThumb:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-2xl);
 }
 
 .realShowcaseThumb figcaption {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-3);
   padding: var(--space-2) var(--space-3);
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  background: linear-gradient(to top, rgba(10,15,30,0.82) 0%, transparent 100%);
+  gap: 2px;
+  background: rgba(8, 12, 28, 0.82);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-lg);
   color: #fff;
   pointer-events: none;
+  backdrop-filter: blur(14px);
 }
 
 .realShowcaseThumb figcaption span {
   font-size: 9px;
-  font-weight: var(--weight-semibold);
-  letter-spacing: 0.1em;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  opacity: 0.65;
+  color: var(--accent-muted);
 }
 
 .realShowcaseThumb figcaption strong {
   font-size: 11px;
   font-weight: var(--weight-semibold);
   line-height: 1.3;
+  color: #fff;
 }
 
 /* ══════════════════════════════════════════════════════
