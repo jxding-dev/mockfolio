@@ -80,12 +80,14 @@
   align-items: center;
   gap: var(--space-2);
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .userArea {
   display: flex;
   align-items: center;
   gap: var(--space-1);
+  min-width: 0;
 }
 
 .userLabel {
@@ -99,6 +101,20 @@
 }
 
 .menuButton { display: none; }
+
+.authError {
+  position: absolute;
+  right: var(--space-6);
+  top: calc(100% + 6px);
+  max-width: min(360px, calc(100vw - 32px));
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--error);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  color: var(--error);
+  font-size: var(--text-xs);
+  box-shadow: var(--shadow-md);
+}
 
 /* ── Coming Soon Body ─────────────────── */
 .comingSoonBody {
@@ -125,6 +141,7 @@
 @media (max-width: 640px) {
   .inner { position: relative; padding: 0 var(--space-4); gap: var(--space-3); }
   .logoText { display: none; }
+  .actions { gap: var(--space-1); }
   .nav {
     display: none;
     position: absolute;
@@ -160,5 +177,9 @@
     height: 2px;
     border-radius: 2px;
     background: var(--text-secondary);
+  }
+  .authError {
+    left: var(--space-4);
+    right: var(--space-4);
   }
 }

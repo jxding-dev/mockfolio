@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+﻿import { useState, useRef, useCallback, useEffect } from 'react';
 import type { UploadedImage, MockupItem } from '../types';
 import { DEFAULT_EDITOR_SETTINGS, normalizeEditorSettings, type EditorSettings } from '../data/editorSettings';
 import { DEVICE_PRESETS } from '../data/devices';
@@ -31,10 +31,10 @@ function recommendMockupId(image: UploadedImage, assets: MockupAsset[]): string 
   const portrait = image.height / image.width; // taller-than-wide ratio
   const landscape = image.width / image.height;
   let keywords: string[];
-  if (portrait >= LONG_DETAIL_RATIO) keywords = ['상세'];                 // very long page
-  else if (portrait >= 1.3) keywords = ['앱', 'app', '모바일', '스마트폰']; // phone/portrait screen
-  else if (landscape > 1.3) keywords = ['웹', '데스크', '노트북', 'laptop', 'desktop'];
-  else keywords = ['소셜', '포스터', '광고'];
+  if (portrait >= LONG_DETAIL_RATIO) keywords = ['detail', 'page', 'panel'];
+  else if (portrait >= 1.3) keywords = ['phone', 'mobile', 'app', 'ios', 'android'];
+  else if (landscape > 1.3) keywords = ['desktop', 'laptop', 'monitor', 'browser', 'dashboard'];
+  else keywords = ['square', 'card', 'poster', 'gallery'];
   for (const key of keywords) {
     const hit = assets.find((a) =>
       (a.category ?? '').toLowerCase().includes(key.toLowerCase())
@@ -49,7 +49,7 @@ const clampScale = (value: number) => Math.max(0.1, Math.min(3, value));
 
 /**
  * Scale that keeps the layer fully inside the mockup stage (contain).
- * mockupRatio = mockup height / width; layer height(px) ∝ scale * (h/w).
+ * mockupRatio = mockup height / width; layer height(px) ??scale * (h/w).
  * Pass mockupRatio = 1 before the mockup's real ratio is known.
  */
 function containScale(itemW: number, itemH: number, mockupRatio: number): number {
@@ -121,7 +121,7 @@ async function loadSampleImage(): Promise<UploadedImage> {
   const dataUrl = canvas.toDataURL('image/png');
   return {
     id: `sample_${Date.now()}`,
-    name: '샘플 프로젝트.png',
+    name: 'sample-project.png',
     dataUrl,
     width,
     height,
@@ -130,7 +130,7 @@ async function loadSampleImage(): Promise<UploadedImage> {
   };
 }
 
-/* ─── Upload Zone ────────────────────────────────────── */
+/* ??? Upload Zone ?????????????????????????????????????? */
 function UploadZone({ onUpload, onUseSample, error, onError, onClearError, onStartWithUrl }: {
   onUpload: (img: UploadedImage) => void;
   onUseSample: () => Promise<void>;
@@ -145,7 +145,6 @@ function UploadZone({ onUpload, onUseSample, error, onError, onClearError, onSta
   const dragDepth = useRef(0);
   const { handleFiles, handleInputChange } = useImageUpload({ onSuccess: onUpload, onError });
 
-  // Use a depth counter so dragging child elements doesn't flicker the highlight.
   const onDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     dragDepth.current += 1;
@@ -164,7 +163,6 @@ function UploadZone({ onUpload, onUseSample, error, onError, onClearError, onSta
     handleFiles(e.dataTransfer.files);
   }, [handleFiles]);
 
-  // Paste an image straight from the clipboard (screenshot → Ctrl/Cmd+V).
   useEffect(() => {
     const onPaste = (e: ClipboardEvent) => {
       const file = Array.from(e.clipboardData?.files ?? []).find((f) => f.type.startsWith('image/'));
@@ -200,9 +198,13 @@ function UploadZone({ onUpload, onUseSample, error, onError, onClearError, onSta
 
         <div
           className={`${styles.dropzone} ${dragging ? styles.dropzoneDragging : ''}`}
-          onDragEnter={onDragEnter} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
+          onDragEnter={onDragEnter}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
           onClick={() => inputRef.current?.click()}
-          role="button" tabIndex={0}
+          role="button"
+          tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
@@ -211,37 +213,38 @@ function UploadZone({ onUpload, onUseSample, error, onError, onClearError, onSta
           }}
           aria-label="이미지 업로드"
         >
-          <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp"
-            className={styles.hiddenInput} onChange={handleInputChange} />
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/jpg,image/webp"
+            className={styles.hiddenInput}
+            onChange={handleInputChange}
+            aria-label="이미지 파일 선택"
+          />
 
-          <div className={styles.dropzoneIcon}>
+          <div className={styles.dropzoneIcon} aria-hidden>
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-              <path d="M12 16V8M12 8L9 11M12 8L15 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 16.5V18.75C3 19.9926 4.00736 21 5.25 21H18.75C19.9926 21 21 19.9926 21 18.75V16.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              <path d="M3 8.25C3 7.00736 4.00736 6 5.25 6H7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.4"/>
-              <path d="M16.5 6H18.75C19.9926 6 21 7.00736 21 8.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.4"/>
+              <path d="M12 16V8M12 8L9 11M12 8L15 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M3 16.5V18.75C3 19.9926 4.00736 21 5.25 21H18.75C19.9926 21 21 19.9926 21 18.75V16.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M3 8.25C3 7.00736 4.00736 6 5.25 6H7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
+              <path d="M16.5 6H18.75C19.9926 6 21 7.00736 21 8.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
             </svg>
           </div>
 
           <div className={styles.dropzoneText}>
-            <strong>{dragging ? '여기에 놓으세요!' : '화면 캡처 이미지를 여기에 끌어다 놓으세요'}</strong>
-            <span>클릭해서 파일 선택 · 스크린샷은 <kbd className={styles.shortcutKey}>Ctrl/⌘ + V</kbd>로 바로 붙여넣기</span>
+            <strong>{dragging ? '여기에 놓으세요' : '화면 캡처 이미지를 여기에 끌어오세요'}</strong>
+            <span>클릭해서 파일 선택 또는 스크린샷을 <kbd className={styles.shortcutKey}>Ctrl/Cmd + V</kbd>로 붙여넣기</span>
           </div>
 
           <div className={styles.dropzoneMeta}>PNG · JPG · WebP · 최대 20MB</div>
         </div>
 
         <div className={styles.startActions}>
-          <button
-            className={styles.sampleButton}
-            type="button"
-            onClick={handleSample}
-            disabled={sampleLoading}
-          >
+          <button className={styles.sampleButton} type="button" onClick={handleSample} disabled={sampleLoading}>
             {sampleLoading ? (
-              <><span className={styles.sampleSpinner} aria-hidden />샘플 불러오는 중…</>
+              <><span className={styles.sampleSpinner} aria-hidden />샘플 불러오는 중...</>
             ) : (
-              <>✨ 샘플 프로젝트로 둘러보기</>
+              <>샘플 프로젝트로 둘러보기</>
             )}
           </button>
           <button className={styles.urlStartButton} type="button" onClick={onStartWithUrl}>
@@ -251,26 +254,25 @@ function UploadZone({ onUpload, onUseSample, error, onError, onClearError, onSta
 
         {error && (
           <div className={styles.errorBanner} role="alert">
-            <span>⚠️ {error}</span>
-            <button onClick={onClearError} aria-label="닫기">✕</button>
+          <span>{error}</span>
+            <button type="button" onClick={onClearError} aria-label="닫기">닫기</button>
           </div>
         )}
 
         <div className={styles.uploadTips}>
-          <div className={styles.tip}><span className={styles.tipIcon}>📐</span><span>이미지 또는 <strong>URL 링크</strong>로 반응형 레이아웃을 확인하세요</span></div>
-          <div className={styles.tip}><span className={styles.tipIcon}>🖼</span><span>목업 모드에서 <strong>실사 목업과 레이어</strong>를 합성하세요</span></div>
-          <div className={styles.tip}><span className={styles.tipIcon}>💾</span><span><strong>PNG 2×</strong> 고해상도로 바로 다운로드</span></div>
+          <div className={styles.tip}><span className={styles.tipIcon}>1</span><span>이미지 또는 <strong>URL 링크</strong>로 반응형 레이아웃을 확인하세요.</span></div>
+          <div className={styles.tip}><span className={styles.tipIcon}>2</span><span>목업 모드에서 <strong>실사 목업과 레이어</strong>를 합성하세요.</span></div>
+          <div className={styles.tip}><span className={styles.tipIcon}>3</span><span><strong>PNG 2x</strong> 고해상도로 바로 다운로드할 수 있어요.</span></div>
         </div>
 
         <div className={styles.uploadPrivacy}>
-          🔒 이미지는 브라우저에서만 처리됩니다. 서버로 전송되지 않습니다.
+          이미지는 브라우저에서만 처리됩니다. 서버로 전송하지 않습니다.
         </div>
       </div>
     </div>
   );
 }
-
-/* ─── Workspace (3-panel editor) ─────────────────────── */
+/* ??? Workspace (3-panel editor) ??????????????????????? */
 function Workspace({ image, onImageRemove, onImageChange, initialInspectSource = 'image' }: {
   image: UploadedImage | null;
   onImageRemove: () => void;
@@ -315,7 +317,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   const [initialSourceApplied, setInitialSourceApplied] = useState(false);
   const { assets: mockupAssets, loading: mockupsLoading } = useMockupAssets();
 
-  // ── Multi-image mockup scene (transient: holds dataUrls) ──
+  // ?? Multi-image mockup scene (transient: holds dataUrls) ??
   const [mockupItems, setMockupItems] = useState<MockupItem[]>([]);
   const [selectedMockupItemId, setSelectedMockupItemId] = useState<string | null>(null);
 
@@ -370,9 +372,9 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   const fitMockupItem = useCallback((id: string, mode: 'contain' | 'width' | 'height') => {
     setMockupItems((prev) => prev.map((it) => {
       if (it.id !== id) return it;
-      // width fit → layer spans the mockup width (scale 1).
-      // height fit → layer height matches the mockup height (scale = ratio·w/h).
-      // contain → the smaller of the two so nothing is clipped.
+      // width fit ??layer spans the mockup width (scale 1).
+      // height fit ??layer height matches the mockup height (scale = ratio쨌w/h).
+      // contain ??the smaller of the two so nothing is clipped.
       const heightScale = clampScale((mockupRatioRef.current * it.width) / it.height);
       const scale = mode === 'width'
         ? 1
@@ -393,6 +395,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     }));
   }, []);
   const removeMockupItem = useCallback((id: string) => {
+    if (!window.confirm('정말 삭제할까요? 삭제한 레이어는 되돌릴 수 없어요.')) return;
     setMockupItems((prev) => {
       const next = prev.filter((it) => it.id !== id);
       setSelectedMockupItemId((sel) => (sel === id ? (next[next.length - 1]?.id ?? null) : sel));
@@ -459,12 +462,12 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     patch('activeMode', 'inspect');
     patch('inspectSource', 'image');
     setSaveToast(isLongDetailImage(image)
-      ? '긴 상세페이지 이미지로 감지했어요. Inspect에서 먼저 확인하세요.'
+      ? '긴 상세페이지 이미지로 감지했어요. Inspect에서 먼저 전체를 확인하세요.'
       : '이미지를 업로드했어요. Inspect에서 먼저 확인하세요.');
   }, [image, patch]);
 
   // Recommend a mockup that fits each newly uploaded image's aspect ratio, once
-  // per image — so a previous (e.g. long detail-page) mockup never carries over
+  // per image ??so a previous (e.g. long detail-page) mockup never carries over
   // to a mismatched new image. The user's later manual choice is preserved.
   const lastRecommendedImageId = useRef<string | null>(null);
   useEffect(() => {
@@ -475,7 +478,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     if (recommended) patch('selectedMockupId', recommended);
   }, [image, mockupAssets, patch]);
 
-  // Keyboard: 1–4 switch modes (ignored while typing in inputs)
+  // Keyboard: 1?? switch modes (ignored while typing in inputs)
   useEffect(() => {
     const modes: EditorSettings['activeMode'][] = ['inspect', 'mockup', 'compare', 'export'];
     const onKey = (e: KeyboardEvent) => {
@@ -490,7 +493,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   }, [patch]);
 
   // Auto-pick a device preset matching the uploaded image's aspect ratio
-  // (desktop screenshot → desktop preset, portrait → mobile, ~square → tablet).
+  // (desktop screenshot ??desktop preset, portrait ??mobile, ~square ??tablet).
   const lastSizedImageId = useRef<string | null>(null);
   useEffect(() => {
     if (!image || image.id === lastSizedImageId.current) return;
@@ -510,10 +513,20 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
     setInitialSourceApplied(true);
   }, [activeMode, initialInspectSource, initialSourceApplied, inspectSource, patch]);
 
+  useEffect(() => {
+    if (!image && mockupItems.length === 0 && !beforeImage && !afterImage) return;
+    const handler = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [afterImage, beforeImage, image, mockupItems.length]);
+
   const handlePreviewUrl = useCallback(() => {
     const normalized = normalizePreviewUrl(urlInput);
     if (!normalized) {
-      setError('올바른 사이트 주소를 입력해주세요. (예: https://example.com)');
+      setError('올바른 사이트 주소를 입력해 주세요. 예: https://example.com');
       return;
     }
     patch('previewUrl', normalized);
@@ -547,24 +560,24 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   }, [saveToast]);
 
   const handleCompositeExport = useCallback(async () => {
+    if (exportLoading) return;
     if (!selectedMockup) return;
     if (!mockupItems.some((item) => item.visible)) {
-      setExportMessage('보이는 이미지 레이어가 있어야 PNG를 저장할 수 있습니다.');
+      setExportMessage('보이는 이미지 레이어가 없어요. 레이어를 켠 뒤 다시 저장해 주세요.');
       return;
     }
     setExportLoading(true);
     setExportMessage(null);
     try {
       await exportMockupComposite(mockupItems, selectedMockup.src, projectName);
-      setExportMessage('합성된 PNG 파일을 저장했습니다.');
+      setExportMessage('합성 PNG 파일을 저장했어요.');
       setSaveToast('합성 PNG를 저장했어요');
     } catch {
-      setExportMessage('목업 PNG를 저장하지 못했습니다. 목업 파일을 확인해주세요.');
+      setExportMessage('목업 PNG를 저장하지 못했어요. 목업 이미지가 로드됐는지 확인하고 다시 시도해 주세요.');
     } finally {
       setExportLoading(false);
     }
-  }, [mockupItems, projectName, selectedMockup]);
-
+  }, [exportLoading, mockupItems, projectName, selectedMockup]);
   const handleCompositeReset = useCallback(() => {
     if (!selectedMockupItemId) return;
     updateMockupItem(selectedMockupItemId, {
@@ -581,39 +594,45 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   }, [selectedMockupItemId, updateMockupItem]);
 
   const handleGifExport = useCallback(async () => {
-    if (!beforeImage || !afterImage) return;
+    if (gifLoading) return;
+    if (!beforeImage || !afterImage) {
+      setGifMessage('Before와 After 이미지를 모두 넣어야 GIF를 저장할 수 있어요.');
+      return;
+    }
     setGifLoading(true);
     setGifMessage(null);
     try {
       await exportComparisonGif(beforeImage.dataUrl, afterImage.dataUrl, projectName, compareOrientation);
-      setGifMessage('GIF 파일을 저장했습니다.');
+      setGifMessage('GIF 파일을 저장했어요.');
       setSaveToast('GIF를 저장했어요');
     } catch {
-      setGifMessage('GIF를 생성하지 못했습니다. 이미지를 다시 확인해주세요.');
+      setGifMessage('GIF를 만들지 못했어요. 이미지가 너무 크면 더 작은 파일로 다시 시도해 주세요.');
     } finally {
       setGifLoading(false);
     }
-  }, [afterImage, beforeImage, compareOrientation, projectName]);
-
+  }, [afterImage, beforeImage, compareOrientation, gifLoading, projectName]);
   const handleExport = useCallback(async () => {
+    if (exportLoading) return;
     if (selectedMockup) {
       await handleCompositeExport();
       return;
     }
-    if (!exportRef.current) return;
+    if (!exportRef.current) {
+      setExportMessage('저장할 화면이 아직 준비되지 않았어요. 잠시 후 다시 시도해 주세요.');
+      return;
+    }
     setExportLoading(true);
     setExportMessage(null);
     try {
       const fileName = await exportPng(exportRef.current, projectName, exportScale);
-      setExportMessage(`${fileName} 파일을 저장했습니다.`);
+      setExportMessage(`${fileName} 파일을 저장했어요.`);
       setSaveToast('PNG를 저장했어요');
     } catch {
-      setExportMessage('PNG를 저장하지 못했습니다. 이미지를 다시 확인한 뒤 재시도하세요.');
+      setExportMessage('PNG를 저장하지 못했어요. 이미지가 로드됐는지 확인하고 다시 시도해 주세요.');
     } finally {
       setExportLoading(false);
     }
-  }, [exportScale, handleCompositeExport, projectName, selectedMockup]);
-
+  }, [exportLoading, exportScale, handleCompositeExport, projectName, selectedMockup]);
   return (
     <div className={styles.workspace}>
       {/* Top bar */}
@@ -628,8 +647,8 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
       {/* Error banner */}
       {error && (
         <div className={styles.errorBannerInline} role="alert">
-          <span>⚠️ {error}</span>
-          <button onClick={() => setError(null)} aria-label="닫기">✕</button>
+          <span>{error}</span>
+          <button type="button" onClick={() => setError(null)} aria-label="닫기">닫기</button>
         </div>
       )}
 
@@ -726,7 +745,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   );
 }
 
-/* ─── Main Editor Page ───────────────────────────────── */
+/* ??? Main Editor Page ????????????????????????????????? */
 export function Editor() {
   const [image, setImage] = useState<UploadedImage | null>(null);
   const [started, setStarted] = useState(false);
@@ -745,7 +764,7 @@ export function Editor() {
             setInitialInspectSource('image');
             setStarted(true);
           } catch {
-            setError('샘플을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+            setError('샘플을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.');
           }
         }}
         error={error}
@@ -759,7 +778,7 @@ export function Editor() {
   return (
     <Workspace
       image={image}
-      onImageRemove={() => setImage(null)}
+      onImageRemove={() => { if (window.confirm('정말 삭제할까요? 삭제한 이미지는 되돌릴 수 없어요.')) setImage(null); }}
       onImageChange={(img) => setImage(img)}
       initialInspectSource={initialInspectSource}
     />

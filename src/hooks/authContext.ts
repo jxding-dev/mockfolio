@@ -10,14 +10,19 @@ export interface AuthUser {
 export interface AuthContextValue {
   /** True only when Supabase env keys are present. */
   configured: boolean;
+  /** Human-readable reason when auth is not configured. */
+  configMessage: string | null;
   /** Resolving the initial session. */
   loading: boolean;
+  /** Session or redirect problem that should be shown in the auth UI. */
+  authNotice: string | null;
   user: AuthUser | null;
   /** Sends a passwordless magic-link to the email. */
   signInWithEmail: (email: string) => Promise<{ error: string | null }>;
   /** Starts the Google OAuth redirect flow. */
   signInWithGoogle: () => Promise<{ error: string | null }>;
-  signOut: () => Promise<void>;
+  signOut: () => Promise<{ error: string | null }>;
+  clearAuthNotice: () => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

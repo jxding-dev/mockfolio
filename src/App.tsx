@@ -10,14 +10,13 @@ import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { ThemeProvider } from './hooks/useTheme';
 import { AuthProvider } from './hooks/AuthProvider';
 
-const DEFAULT_TITLE = 'Mockfolio — Portfolio Mockup Builder';
+const DEFAULT_TITLE = 'Mockfolio - 포트폴리오 목업 빌더';
 const ROUTE_TITLES: Record<string, string> = {
-  '/': 'Mockfolio — 포트폴리오 목업 & 반응형 검수',
-  '/editor': '에디터 · Mockfolio',
-  '/pricing': '요금제 · Mockfolio',
+  '/': 'Mockfolio - 포트폴리오 목업과 반응형 검수',
+  '/editor': '에디터 - Mockfolio',
+  '/pricing': '요금제 - Mockfolio',
 };
 
-/* Resets scroll and updates the document title on every route change. */
 function RouteEffects() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -39,10 +38,10 @@ function AppShell() {
       <RouteEffects />
       {!isEditor && <Header />}
       <Routes>
-        <Route path="/"        element={<Landing />} />
-        <Route path="/editor"  element={<Editor />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/editor" element={<Editor />} />
         <Route path="/pricing" element={<Pricing />} />
-        <Route path="*"        element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {!isEditor && <Footer />}
     </ErrorBoundary>
@@ -53,7 +52,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter><AppShell /></BrowserRouter>
+        <BrowserRouter>
+          <AppShell />
+        </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
   );
