@@ -239,6 +239,326 @@
         "모바일"
       ],
       "src": "mockups/overlays/realistic/devices/real-dual-device-showcase.webp"
+    },
+    {
+      "id": "real-foldable-phone",
+      "label": "폴더블폰 인너 디스플레이",
+      "category": "실사 디바이스 목업",
+      "description": "폴더블 스마트폰 내부 화면, 앱 UI, 멀티태스킹 화면 목업용",
+      "tags": ["폴더블", "스마트폰", "모바일"],
+      "src": "mockups/overlays/realistic/devices/real-foldable-phone.png"
+    },
+    {
+      "id": "real-ecommerce-desktop",
+      "label": "프리미엄 이커머스 데스크탑",
+      "category": "실사 디바이스 목업",
+      "description": "쇼핑몰 상세페이지, 이커머스 UI, 웹 디자인 시안용",
+      "tags": ["이커머스", "데스크탑", "웹"],
+      "src": "mockups/overlays/realistic/devices/real-ecommerce-desktop.png"
+    },
+    {
+      "id": "real-airport-mobile-app",
+      "label": "공항 라운지 모바일 앱",
+      "category": "실사 디바이스 목업",
+      "description": "여행·항공 앱, 모바일 서비스 UI 프레젠테이션용",
+      "tags": ["공항", "모바일", "앱"],
+      "src": "mockups/overlays/realistic/devices/real-airport-mobile-app.png"
+    },
+    {
+      "id": "real-ev-dashboard",
+      "label": "EV 대시보드 인포테인먼트",
+      "category": "실사 디바이스 목업",
+      "description": "전기차 센터 스크린, 차량 HMI·내비 UI 시안용",
+      "tags": ["EV", "자동차", "대시보드"],
+      "src": "mockups/overlays/realistic/devices/real-ev-dashboard.png"
+    },
+    {
+      "id": "real-livestream-studio",
+      "label": "라이브 쇼핑 스튜디오",
+      "category": "실사 디바이스 목업",
+      "description": "라이브 커머스, 방송 화면 레이아웃, 스트리밍 UI 시안용",
+      "tags": ["라이브", "스튜디오", "쇼핑"],
+      "src": "mockups/overlays/realistic/devices/real-livestream-studio.png"
+    },
+    {
+      "id": "real-multi-device",
+      "label": "반응형 멀티디바이스 목업",
+      "category": "실사 디바이스 목업",
+      "description": "데스크탑·태블릿·모바일 반응형 동시 확인용",
+      "tags": ["반응형", "멀티디바이스", "웹"],
+      "src": "mockups/overlays/realistic/devices/real-multi-device.png"
+    },
+    {
+      "id": "real-ar-glasses-app",
+      "label": "AR 안경 컴패니언 앱",
+      "category": "실사 디바이스 목업",
+      "description": "XR·AR 기기 연동 앱, 웨어러블 UI 시안용",
+      "tags": ["AR", "안경", "웨어러블"],
+      "src": "mockups/overlays/realistic/devices/real-ar-glasses-app.png"
+    },
+    {
+      "id": "real-smart-home-panel",
+      "label": "스마트홈 벽면 컨트롤 패널",
+      "category": "실사 디바이스 목업",
+      "description": "홈 IoT 대시보드, 스마트홈 컨트롤 앱 UI 시안용",
+      "tags": ["스마트홈", "IoT", "패널"],
+      "src": "mockups/overlays/realistic/devices/real-smart-home-panel.png"
+    },
+    {
+      "id": "real-shortform-laptop",
+      "label": "숏폼 영상 편집 노트북",
+      "category": "실사 디바이스 목업",
+      "description": "영상 편집 툴, 크리에이터 SaaS, 미디어 앱 UI 시안용",
+      "tags": ["영상편집", "노트북", "크리에이터"],
+      "src": "mockups/overlays/realistic/devices/real-shortform-laptop.png"
+    },
+    {
+      "id": "real-marble-cafe-tablet",
+      "label": "마블 카페 태블릿 앱",
+      "category": "실사 디바이스 목업",
+      "description": "카페 분위기 태블릿 앱, 생활·라이프스타일 UI 시안용",
+      "tags": ["태블릿", "카페", "앱"],
+      "src": "mockups/overlays/realistic/devices/real-marble-cafe-tablet.png"
+    },
+    {
+      "id": "real-pos-checkout-tablet",
+      "label": "리테일 POS 계산대 태블릿",
+      "category": "실사 디바이스 목업",
+      "description": "매장 POS 시스템, 결제 앱, 계산대 UI 시안용",
+      "tags": ["POS", "리테일", "태블릿"],
+      "src": "mockups/overlays/realistic/devices/real-pos-checkout-tablet.png"
+    },
+    {
+      "id": "real-eink-planner",
+      "label": "이잉크 태블릿 플래너",
+      "category": "실사 디바이스 목업",
+      "description": "이잉크 디스플레이, 전자 노트·플래너 앱 시안용",
+      "tags": ["이잉크", "태블릿", "플래너"],
+      "src": "mockups/overlays/realistic/devices/real-eink-planner.png"
+    },
+    {
+      "id": "real-smartwatch-app",
+      "label": "스마트워치 앱 화면",
+      "category": "실사 디바이스 목업",
+      "description": "워치 앱 UI, 헬스케어·피트니스 앱 시안용",
+      "tags": ["스마트워치", "앱", "웨어러블"],
+      "src": "mockups/overlays/realistic/devices/real-smartwatch-app.png"
+    },
+    {
+      "id": "real-ai-desktop",
+      "label": "AI 어시스턴트 데스크탑",
+      "category": "실사 디바이스 목업",
+      "description": "AI·챗봇 서비스, 스마트 허브 UI 포트폴리오용",
+      "tags": ["AI", "데스크탑", "허브"],
+      "src": "mockups/overlays/realistic/devices/real-ai-desktop.png"
+    },
+    {
+      "id": "real-anamorphic-billboard",
+      "label": "애나모픽 코너 LED 광고판",
+      "category": "실사 광고판 목업",
+      "description": "코너형 3D LED 광고, 도심 미디어파사드 시안용",
+      "tags": ["애나모픽", "LED", "광고판"],
+      "src": "mockups/overlays/realistic/ads/real-anamorphic-billboard.png"
+    },
+    {
+      "id": "real-subway-media-panel",
+      "label": "지하철 플랫폼 미디어 패널",
+      "category": "실사 광고판 목업",
+      "description": "지하철 스크린도어·플랫폼 광고, 교통 미디어 시안용",
+      "tags": ["지하철", "미디어", "광고"],
+      "src": "mockups/overlays/realistic/ads/real-subway-media-panel.png"
+    },
+    {
+      "id": "real-bus-shelter-rainy",
+      "label": "우중 버스 쉘터 라이트박스",
+      "category": "실사 광고판 목업",
+      "description": "버스정류장 야외 광고, 포스터·캠페인 시안용",
+      "tags": ["버스쉘터", "라이트박스", "야외"],
+      "src": "mockups/overlays/realistic/ads/real-bus-shelter-rainy.png"
+    },
+    {
+      "id": "real-airport-video-wall",
+      "label": "공항 파노라마 비디오 월",
+      "category": "실사 광고판 목업",
+      "description": "공항 대형 비디오월, 브랜드 캠페인 시안용",
+      "tags": ["공항", "비디오월", "대형"],
+      "src": "mockups/overlays/realistic/ads/real-airport-video-wall.png"
+    },
+    {
+      "id": "real-drone-preview-wall",
+      "label": "드론쇼 프리뷰 월",
+      "category": "실사 광고판 목업",
+      "description": "드론 LED 공연, 이벤트 미디어 프레젠테이션용",
+      "tags": ["드론", "이벤트", "LED"],
+      "src": "mockups/overlays/realistic/ads/real-drone-preview-wall.png"
+    },
+    {
+      "id": "real-mobile-ad-phone",
+      "label": "모바일 광고 카드",
+      "category": "실사 광고판 목업",
+      "description": "앱 인앱 광고, 모바일 배너·카드 시안용",
+      "tags": ["모바일", "광고", "카드"],
+      "src": "mockups/overlays/realistic/ads/real-mobile-ad-phone.png"
+    },
+    {
+      "id": "real-ev-charging-ad",
+      "label": "EV 충전소 광고 스크린",
+      "category": "실사 광고판 목업",
+      "description": "전기차 충전소 디지털 사이니지, 광고 화면 시안용",
+      "tags": ["EV", "충전소", "광고"],
+      "src": "mockups/overlays/realistic/ads/real-ev-charging-ad.png"
+    },
+    {
+      "id": "real-highway-mega-billboard",
+      "label": "고속도로 메가 빌보드",
+      "category": "실사 광고판 목업",
+      "description": "고속도로 초대형 광고판, 브랜드 캠페인 시안용",
+      "tags": ["고속도로", "빌보드", "대형"],
+      "src": "mockups/overlays/realistic/ads/real-highway-mega-billboard.png"
+    },
+    {
+      "id": "real-luxury-retail-directory",
+      "label": "럭셔리 리테일 디렉토리",
+      "category": "실사 간판 목업",
+      "description": "백화점·프리미엄 매장 안내 디스플레이 시안용",
+      "tags": ["럭셔리", "리테일", "안내판"],
+      "src": "mockups/overlays/realistic/signage/real-luxury-retail-directory.png"
+    },
+    {
+      "id": "real-rooftop-signboard",
+      "label": "빌딩 루프탑 사인보드",
+      "category": "실사 간판 목업",
+      "description": "빌딩 옥상 간판, 브랜드·기업 사인 시안용",
+      "tags": ["빌딩", "옥상", "간판"],
+      "src": "mockups/overlays/realistic/signage/real-rooftop-signboard.png"
+    },
+    {
+      "id": "real-self-order-kiosk",
+      "label": "레스토랑 셀프오더 키오스크",
+      "category": "실사 간판 목업",
+      "description": "음식점 무인 주문 키오스크, 메뉴 UI 시안용",
+      "tags": ["키오스크", "레스토랑", "무인"],
+      "src": "mockups/overlays/realistic/signage/real-self-order-kiosk.png"
+    },
+    {
+      "id": "real-boutique-facade-sign",
+      "label": "부티크 원형 파사드 간판",
+      "category": "실사 간판 목업",
+      "description": "편집샵·부티크 원형 로고 간판, 파사드 사인 시안용",
+      "tags": ["부티크", "원형", "파사드"],
+      "src": "mockups/overlays/realistic/signage/real-boutique-facade-sign.png"
+    },
+    {
+      "id": "real-shelf-edge-display",
+      "label": "리테일 선반 엣지 디스플레이",
+      "category": "실사 간판 목업",
+      "description": "마트·편의점 선반 디지털 가격표, POP 광고 시안용",
+      "tags": ["선반", "리테일", "디스플레이"],
+      "src": "mockups/overlays/realistic/signage/real-shelf-edge-display.png"
+    },
+    {
+      "id": "real-transparent-oled-window",
+      "label": "투명 OLED 리테일 윈도우",
+      "category": "실사 간판 목업",
+      "description": "매장 쇼윈도우 투명 OLED 디스플레이 시안용",
+      "tags": ["투명OLED", "쇼윈도", "리테일"],
+      "src": "mockups/overlays/realistic/signage/real-transparent-oled-window.png"
+    },
+    {
+      "id": "real-cafe-menu-boards",
+      "label": "카페 메뉴 디스플레이 보드",
+      "category": "실사 간판 목업",
+      "description": "카페 벽면 메뉴판, 디지털 메뉴보드 레이아웃 시안용",
+      "tags": ["카페", "메뉴판", "보드"],
+      "src": "mockups/overlays/realistic/signage/real-cafe-menu-boards.png"
+    },
+    {
+      "id": "real-elevator-lobby-screen",
+      "label": "럭셔리 엘리베이터 로비 스크린",
+      "category": "실사 간판 목업",
+      "description": "호텔·빌딩 엘리베이터 로비 디지털 사이니지 시안용",
+      "tags": ["엘리베이터", "로비", "사이니지"],
+      "src": "mockups/overlays/realistic/signage/real-elevator-lobby-screen.png"
+    },
+    {
+      "id": "real-smart-vending-panel",
+      "label": "스마트 자판기 광고 패널",
+      "category": "실사 간판 목업",
+      "description": "디지털 자판기 화면, 스마트 리테일 UI 시안용",
+      "tags": ["자판기", "스마트", "광고"],
+      "src": "mockups/overlays/realistic/signage/real-smart-vending-panel.png"
+    },
+    {
+      "id": "real-smart-city-kiosk",
+      "label": "스마트시티 키오스크",
+      "category": "실사 간판 목업",
+      "description": "도시 공공 키오스크, 스마트 안내 시스템 UI 시안용",
+      "tags": ["스마트시티", "키오스크", "공공"],
+      "src": "mockups/overlays/realistic/signage/real-smart-city-kiosk.png"
+    },
+    {
+      "id": "real-beauty-ar-mirror",
+      "label": "뷰티 AR 스마트 미러",
+      "category": "실사 간판 목업",
+      "description": "뷰티·패션 AR 가상 피팅 미러, 인터랙티브 사이니지 시안용",
+      "tags": ["뷰티", "AR", "미러"],
+      "src": "mockups/overlays/realistic/signage/real-beauty-ar-mirror.png"
+    },
+    {
+      "id": "real-cylindrical-mall-sign",
+      "label": "원통형 쇼핑몰 사인",
+      "category": "실사 간판 목업",
+      "description": "쇼핑몰 원통형 360° 디지털 사인, 브랜드 로고 시안용",
+      "tags": ["원통형", "쇼핑몰", "사인"],
+      "src": "mockups/overlays/realistic/signage/real-cylindrical-mall-sign.png"
+    },
+    {
+      "id": "real-trade-show-booth",
+      "label": "무역 박람회 부스 히어로 월",
+      "category": "실사 배너 목업",
+      "description": "전시회·박람회 부스 백월, 브랜드 대형 배너 시안용",
+      "tags": ["박람회", "부스", "대형"],
+      "src": "mockups/overlays/realistic/banner/real-trade-show-booth.png"
+    },
+    {
+      "id": "real-popup-led-arch",
+      "label": "팝업스토어 LED 아치",
+      "category": "실사 배너 목업",
+      "description": "팝업 이벤트, 입구 아치형 LED 배너·로고 시안용",
+      "tags": ["팝업", "LED", "아치"],
+      "src": "mockups/overlays/realistic/banner/real-popup-led-arch.png"
+    },
+    {
+      "id": "real-projection-facade",
+      "label": "프로젝션 맵핑 건물 파사드",
+      "category": "실사 배너 목업",
+      "description": "건물 외벽 프로젝션 맵핑, 미디어아트 이벤트 시안용",
+      "tags": ["프로젝션", "파사드", "이벤트"],
+      "src": "mockups/overlays/realistic/banner/real-projection-facade.png"
+    },
+    {
+      "id": "real-gallery-poster",
+      "label": "미니멀 갤러리 포스터 프레임",
+      "category": "실사 포스터 목업",
+      "description": "갤러리·전시 포스터, 미니멀 아트 프레임 시안용",
+      "tags": ["갤러리", "포스터", "미니멀"],
+      "src": "mockups/overlays/realistic/poster/real-gallery-poster.png"
+    },
+    {
+      "id": "real-food-hall-menu",
+      "label": "푸드홀 디지털 메뉴 큐브",
+      "category": "실사 포스터 목업",
+      "description": "푸드코트·푸드홀 메뉴 큐브 디스플레이 시안용",
+      "tags": ["푸드홀", "메뉴", "큐브"],
+      "src": "mockups/overlays/realistic/poster/real-food-hall-menu.png"
+    },
+    {
+      "id": "real-magazine-ad",
+      "label": "매거진 전면 광고",
+      "category": "실사 포스터 목업",
+      "description": "잡지 전면 광고, 인쇄물 레이아웃 시안용",
+      "tags": ["매거진", "인쇄", "광고"],
+      "src": "mockups/overlays/realistic/poster/real-magazine-ad.png"
     }
   ]
 }
