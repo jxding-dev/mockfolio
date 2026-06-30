@@ -132,8 +132,8 @@ function CheckItem({ label, checked, onChange }: { label: string; checked: boole
 }
 
 function MockupProps({
-  settings: s, patch, exportLoading, exportMessage, mockupAssets, mockupsLoading,
-  onCompositeExport, onCompositeReset,
+  settings: s, patch, mockupAssets, mockupsLoading,
+  onCompositeReset,
   mockupItems, selectedMockupItemId, onAddMockupImages, onSelectMockupItem, onUpdateMockupItem, onRemoveMockupItem,
   onDuplicateMockupItem, onReorderMockupItem, onFitMockupItem,
 }: Props) {
@@ -146,7 +146,6 @@ function MockupProps({
   const [showCatalog, setShowCatalog] = useState(false);
   const selected = mockupItems.find((it) => it.id === selectedMockupItemId) ?? null;
   const selectedMockupAsset = mockupAssets.find((asset) => asset.id === s.selectedMockupId) ?? null;
-  const visibleLayerCount = mockupItems.filter((item) => item.visible).length;
   const catalogOpen = showCatalog || !selectedMockupAsset;
   const hasLongLayer = mockupItems.some((item) => item.height / item.width >= 1.75);
   const query = mockupQuery.trim().toLowerCase();
@@ -295,15 +294,9 @@ function MockupProps({
       )}
 
       <div className={styles.exportFooter}>
-        <Button variant="primary" size="lg" fullWidth loading={exportLoading} disabled={!selectedMockupAsset || visibleLayerCount === 0} onClick={onCompositeExport}>합성 PNG 저장</Button>
         <p className={styles.exportNote}>
-          {!selectedMockupAsset
-            ? '목업을 먼저 선택하세요.'
-            : visibleLayerCount > 0
-              ? '보이는 이미지 레이어와 목업 PNG가 합성되어 저장됩니다.'
-              : '먼저 이미지를 추가하거나 숨김을 해제해야 저장할 수 있습니다.'}
+          저장은 Export 탭에서만 가능합니다. 목업과 레이어를 맞춘 뒤 Export에서 PNG로 저장해 주세요.
         </p>
-        {exportMessage && <p className={styles.exportMessage} role="status">{exportMessage}</p>}
       </div>
     </>
   );
