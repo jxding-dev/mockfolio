@@ -457,12 +457,11 @@ export function MockupComposer({
     if (mode === 'corners') {
       onTransformChange(item.id, {
         transformMode: 'corners',
-        corners: initCorners(item, sw, sh),
+        corners: item.corners ?? initCorners(item, sw, sh),
       });
     } else if (mode === 'warp') {
-      const grid = item.transformMode === 'corners' && item.corners
-        ? initWarpFromCorners(item.corners)
-        : initWarpGrid(item, sw, sh);
+      const grid = item.warpGrid
+        ?? (item.corners ? initWarpFromCorners(item.corners) : initWarpGrid(item, sw, sh));
       onTransformChange(item.id, { transformMode: 'warp', warpGrid: grid });
     } else {
       onTransformChange(item.id, { transformMode: 'scale' });
