@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useAuth } from '../../hooks/authContext';
@@ -16,10 +16,10 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
     setErrorMsg('');
   }, [open]);
 
-  function closeModal() {
+  const closeModal = useCallback(() => {
     clearAuthNotice();
     onClose();
-  }
+  }, [clearAuthNotice, onClose]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
