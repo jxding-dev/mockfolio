@@ -418,26 +418,6 @@ export function Landing() {
           </ol>
         </Reveal>
 
-        {/* 사용 예시 이미지 — 결과 미리보기 */}
-        <Reveal delay={120}>
-          <div className={styles.workflowExample}>
-            <div className={styles.workflowExampleHead}>
-              <span className={styles.sectionLabelCenter}>결과 예시</span>
-              <h3>이 흐름을 거치면 이렇게 완성됩니다</h3>
-            </div>
-            <div className={styles.workflowExampleGrid}>
-              {WORKFLOW_EXAMPLES.map((ex) => (
-                <figure className={styles.workflowExampleItem} key={ex.src}>
-                  <img src={publicMockupSrc(ex.src)} alt={ex.title} loading="lazy" decoding="async" />
-                  <figcaption>
-                    <span>{ex.cat}</span>
-                    <strong>{ex.title}</strong>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
-        </Reveal>
 
         {/* 무료 → Pro 자연스러운 연결 */}
         <Reveal delay={160}>
