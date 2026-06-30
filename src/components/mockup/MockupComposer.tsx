@@ -348,13 +348,12 @@ export function MockupComposer({
     if (wd) {
       const dx = (clientX - wd.startX) / rect.width * 100;
       const dy = (clientY - wd.startY) / rect.height * 100;
-      const sigma = 1.8; // grid-unit radius of influence
       const newGrid = wd.baseGrid.map((row, r) =>
-        row.map((pt, c) => {
-          const dist2 = (r - wd.row) ** 2 + (c - wd.col) ** 2;
-          const w = Math.exp(-dist2 / (2 * sigma * sigma));
-          return [pt[0] + dx * w, pt[1] + dy * w] as [number, number];
-        })
+        row.map((pt, c) =>
+          r === wd.row && c === wd.col
+            ? [pt[0] + dx, pt[1] + dy] as [number, number]
+            : [...pt] as [number, number]
+        )
       );
       onTransformChange(wd.id, { warpGrid: newGrid });
       return;
