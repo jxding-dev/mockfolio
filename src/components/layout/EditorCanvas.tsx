@@ -30,6 +30,7 @@ interface Props {
   onMockupItemSelect?: (id: string | null) => void;
   onMockupItemMove?: (id: string, x: number, y: number) => void;
   onMockupItemTransform?: (id: string, patch: Partial<MockupItem>) => void;
+  onMockupBeforeChange?: () => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -50,6 +51,7 @@ export function EditorCanvas({
   onMockupItemSelect,
   onMockupItemMove,
   onMockupItemTransform,
+  onMockupBeforeChange,
 }: Props) {
   const {
     activeMode, selectedDeviceId, fitMode, inspectOrientation,
@@ -149,6 +151,7 @@ export function EditorCanvas({
               onSelect={(id) => onMockupItemSelect?.(id)}
               onPositionChange={onMockupItemMove ?? (() => {})}
               onTransformChange={onMockupItemTransform ?? (() => {})}
+              onBeforeChange={onMockupBeforeChange}
             />
           </div>
         ) : (activeMode === 'mockup' || activeMode === 'export') && !selectedMockup ? (

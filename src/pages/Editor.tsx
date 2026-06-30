@@ -321,6 +321,45 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   const [mockupItems, setMockupItems] = useState<MockupItem[]>([]);
   const [selectedMockupItemId, setSelectedMockupItemId] = useState<string | null>(null);
 
+
+  // Undo / Redo history (in-memory, max 50 snapshots)
+  const history = useRef<{ past: MockupItem[][], future: MockupItem[][] }>({ past: [], future: [] });
+
+  const pushHistory = useCallback(() => {
+    setMockupItems((current) => {
+      history.current.past.push(current.map((it) => ({ ...it })));
+      if (history.current.past.length > 50) history.current.past.shift();
+      history.current.future = [];
+      return current;
+    });
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        setMockupItems((current) => {
+          const { past, future } = history.current;
+          if (past.length === 0) return current;
+          future.push(current.map((it) => ({ ...it })));
+          return past.pop()!;
+        });
+      } else if (e.key === 'z' && e.shiftKey) {
+        e.preventDefault();
+        setMockupItems((current) => {
+          const { past, future } = history.current;
+          if (future.length === 0) return current;
+          past.push(current.map((it) => ({ ...it })));
+          return future.pop()!;
+        });
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   // Natural aspect ratio (height / width) of the selected mockup, used by the
   // "fit" actions. Defaults to 1 until the mockup image has loaded.
   const mockupRatioRef = useRef(1);
@@ -698,6 +737,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
           onMockupItemSelect={(id) => setSelectedMockupItemId(id || null)}
           onMockupItemMove={moveMockupItem}
           onMockupItemTransform={updateMockupItem}
+          onMockupBeforeChange={pushHistory}
         />
 
         <EditorRightPanel

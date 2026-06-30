@@ -11,6 +11,8 @@ interface Props {
   onSelect: (id: string | null) => void;
   onPositionChange: (id: string, x: number, y: number) => void;
   onTransformChange: (id: string, patch: Partial<MockupItem>) => void;
+  /** Called right before any drag or mode-switch starts — for undo history */
+  onBeforeChange?: () => void;
 }
 
 type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w';
@@ -22,7 +24,8 @@ const HANDLE_DIRECTIONS: Record<ResizeHandle, { x: -1 | 0 | 1; y: -1 | 0 | 1 }> 
   sw: { x: -1, y: 1 }, w: { x: -1, y: 0 },
 };
 
-const WARP_SUBDIV = 10;
+const WARP_SUBDIV = 5;   // per-cell subdivision (5×5 grid = 16 cells × 5×5×2 = 800 triangles)
+const WARP_N = 4;        // 5×5 grid (N+1 × N+1 points, N×N cells)
 const CORNERS_SRC_W = 800;
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -50,21 +53,28 @@ function initWarpGrid(item: MockupItem, sw: number, sh: number): [number, number
   const hw = item.scale * item.stretchX * 50;
   const hhPx = sw * item.scale * (item.height / item.width) * item.stretchY * 0.5;
   const hh = (hhPx / sh) * 100;
-  return [
-    [[cx - hw, cy - hh], [cx, cy - hh], [cx + hw, cy - hh]],
-    [[cx - hw, cy], [cx, cy], [cx + hw, cy]],
-    [[cx - hw, cy + hh], [cx, cy + hh], [cx + hw, cy + hh]],
-  ];
+  const grid: [number, number][][] = [];
+  for (let r = 0; r <= WARP_N; r++) {
+    const row: [number, number][] = [];
+    for (let c = 0; c <= WARP_N; c++) {
+      row.push([cx - hw + (c / WARP_N) * hw * 2, cy - hh + (r / WARP_N) * hh * 2]);
+    }
+    grid.push(row);
+  }
+  return grid;
 }
 
-function initWarpFromCorners(c: NonNullable<MockupItem['corners']>): [number, number][][] {
-  const { tl, tr, bl, br } = c;
-  const mt: [number, number] = [(tl[0] + tr[0]) / 2, (tl[1] + tr[1]) / 2];
-  const mb: [number, number] = [(bl[0] + br[0]) / 2, (bl[1] + br[1]) / 2];
-  const ml: [number, number] = [(tl[0] + bl[0]) / 2, (tl[1] + bl[1]) / 2];
-  const mr: [number, number] = [(tr[0] + br[0]) / 2, (tr[1] + br[1]) / 2];
-  const mc: [number, number] = [(tl[0] + tr[0] + bl[0] + br[0]) / 4, (tl[1] + tr[1] + bl[1] + br[1]) / 4];
-  return [[tl, mt, tr], [ml, mc, mr], [bl, mb, br]];
+function initWarpFromCorners(corners: NonNullable<MockupItem['corners']>): [number, number][][] {
+  const { tl, tr, bl, br } = corners;
+  const grid: [number, number][][] = [];
+  for (let r = 0; r <= WARP_N; r++) {
+    const row: [number, number][] = [];
+    for (let c = 0; c <= WARP_N; c++) {
+      row.push(bilinear(tl, tr, bl, br, c / WARP_N, r / WARP_N));
+    }
+    grid.push(row);
+  }
+  return grid;
 }
 
 // ── canvas warp drawing ───────────────────────────────────────────────────────
@@ -98,11 +108,13 @@ function drawWarpItem(
   if (!item.warpGrid || !img.complete) return;
   ctx.globalAlpha = item.opacity;
   const grid = item.warpGrid;
+  const nRows = grid.length - 1;
+  const nCols = grid[0].length - 1;
   const iw = img.naturalWidth;
   const ih = img.naturalHeight;
 
-  for (let row = 0; row < 2; row++) {
-    for (let col = 0; col < 2; col++) {
+  for (let row = 0; row < nRows; row++) {
+    for (let col = 0; col < nCols; col++) {
       const cellTL = [grid[row][col][0] * sw / 100, grid[row][col][1] * sh / 100] as [number, number];
       const cellTR = [grid[row][col + 1][0] * sw / 100, grid[row][col + 1][1] * sh / 100] as [number, number];
       const cellBL = [grid[row + 1][col][0] * sw / 100, grid[row + 1][col][1] * sh / 100] as [number, number];
@@ -116,8 +128,8 @@ function drawWarpItem(
           const d10 = bilinear(cellTL, cellTR, cellBL, cellBR, u1, v0);
           const d01 = bilinear(cellTL, cellTR, cellBL, cellBR, u0, v1);
           const d11 = bilinear(cellTL, cellTR, cellBL, cellBR, u1, v1);
-          const sx0 = (col + u0) / 2 * iw, sx1 = (col + u1) / 2 * iw;
-          const sy0 = (row + v0) / 2 * ih, sy1 = (row + v1) / 2 * ih;
+          const sx0 = (col + u0) / nCols * iw, sx1 = (col + u1) / nCols * iw;
+          const sy0 = (row + v0) / nRows * ih, sy1 = (row + v1) / nRows * ih;
           const s00: [number, number] = [sx0, sy0];
           const s10: [number, number] = [sx1, sy0];
           const s01: [number, number] = [sx0, sy1];
@@ -140,13 +152,13 @@ export function MockupComposer({
   onSelect,
   onPositionChange,
   onTransformChange,
+  onBeforeChange,
 }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState({ w: 0, h: 0 });
   const canvasRefs = useRef<Map<string, HTMLCanvasElement>>(new Map());
   const imgCache = useRef<Map<string, HTMLImageElement>>(new Map());
 
-  // track stage dimensions
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
@@ -158,7 +170,6 @@ export function MockupComposer({
     return () => ro.disconnect();
   }, []);
 
-  // redraw warp canvases
   useEffect(() => {
     if (stageSize.w === 0) return;
     items.forEach((item) => {
@@ -169,7 +180,6 @@ export function MockupComposer({
       canvas.height = stageSize.h;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
-
       let img = imgCache.current.get(item.id);
       if (!img || img.getAttribute('data-src') !== item.dataUrl) {
         img = new Image();
@@ -238,10 +248,8 @@ export function MockupComposer({
     ];
     return {
       position: 'absolute',
-      left: 0,
-      top: 0,
-      width: CORNERS_SRC_W,
-      height: srcH,
+      left: 0, top: 0,
+      width: CORNERS_SRC_W, height: srcH,
       transformOrigin: '0 0',
       transform: quadToMatrix3d(CORNERS_SRC_W, srcH, dst),
       opacity: item.opacity,
@@ -254,6 +262,7 @@ export function MockupComposer({
     event.stopPropagation();
     (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
     onSelect(item.id);
+    onBeforeChange?.();
     const mode = item.transformMode ?? 'scale';
     drag.current = {
       id: item.id, startX: event.clientX, startY: event.clientY,
@@ -271,6 +280,7 @@ export function MockupComposer({
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
     onSelect(item.id);
+    onBeforeChange?.();
     resize.current = {
       id: item.id, handle,
       startX: event.clientX, startY: event.clientY,
@@ -291,6 +301,7 @@ export function MockupComposer({
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
     onSelect(item.id);
+    onBeforeChange?.();
     const centerX = rect.left + rect.width * (0.5 + item.x / 100);
     const centerY = rect.top + rect.height * (0.5 + item.y / 100);
     rotate.current = {
@@ -305,6 +316,7 @@ export function MockupComposer({
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
+    onBeforeChange?.();
     cornerDrag.current = {
       id: item.id, corner,
       startX: event.clientX, startY: event.clientY,
@@ -322,6 +334,7 @@ export function MockupComposer({
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
+    onBeforeChange?.();
     warpDrag.current = {
       id: item.id, row, col,
       startX: event.clientX, startY: event.clientY,
@@ -333,7 +346,6 @@ export function MockupComposer({
     const rect = stageRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    // warp grid point drag
     const wd = warpDrag.current;
     if (wd) {
       const dx = (clientX - wd.startX) / rect.width * 100;
@@ -344,7 +356,6 @@ export function MockupComposer({
       return;
     }
 
-    // corner handle drag
     const cd = cornerDrag.current;
     if (cd) {
       const dx = (clientX - cd.startX) / rect.width * 100;
@@ -360,7 +371,6 @@ export function MockupComposer({
       return;
     }
 
-    // scale resize drag
     const rs = resize.current;
     if (rs) {
       const dir = HANDLE_DIRECTIONS[rs.handle];
@@ -373,12 +383,10 @@ export function MockupComposer({
       let nw = rs.baseWidthPx, nh = rs.baseHeightPx;
       if (dir.x) nw += localDx * dir.x * mult;
       if (dir.y) nh += localDy * dir.y * mult;
-      nw = Math.max(24, nw);
-      nh = Math.max(24, nh);
+      nw = Math.max(24, nw); nh = Math.max(24, nh);
       if (shiftKey && dir.x && dir.y) {
         const ratio = Math.max(nw / rs.baseWidthPx, nh / rs.baseHeightPx);
-        nw = rs.baseWidthPx * ratio;
-        nh = rs.baseHeightPx * ratio;
+        nw = rs.baseWidthPx * ratio; nh = rs.baseHeightPx * ratio;
       }
       const wr = nw / rs.baseWidthPx, hr = nh / rs.baseHeightPx;
       const slx = altKey ? 0 : ((nw - rs.baseWidthPx) * dir.x) / 2;
@@ -395,7 +403,6 @@ export function MockupComposer({
       return;
     }
 
-    // rotate
     const rot = rotate.current;
     if (rot) {
       const angle = Math.atan2(clientY - rot.centerY, clientX - rot.centerX) * 180 / Math.PI;
@@ -405,7 +412,6 @@ export function MockupComposer({
       return;
     }
 
-    // body drag
     const d = drag.current;
     if (!d) return;
     const dxPct = ((clientX - d.startX) / rect.width) * 100;
@@ -432,7 +438,10 @@ export function MockupComposer({
   };
 
   const onPointerMove = (event: React.PointerEvent) => handleClientMove(event.clientX, event.clientY, event.shiftKey, event.altKey);
-  const onPointerUp = () => { drag.current = null; resize.current = null; rotate.current = null; cornerDrag.current = null; warpDrag.current = null; };
+  const onPointerUp = () => {
+    drag.current = null; resize.current = null; rotate.current = null;
+    cornerDrag.current = null; warpDrag.current = null;
+  };
 
   useEffect(() => {
     const move = (e: PointerEvent) => handleClientMove(e.clientX, e.clientY, e.shiftKey, e.altKey);
@@ -453,6 +462,7 @@ export function MockupComposer({
   const switchMode = (item: MockupItem, mode: 'scale' | 'corners' | 'warp') => {
     const sw = stageSize.w || stageRef.current?.getBoundingClientRect().width || 600;
     const sh = stageSize.h || stageRef.current?.getBoundingClientRect().height || 400;
+    onBeforeChange?.();
     if (mode === 'corners') {
       onTransformChange(item.id, {
         transformMode: 'corners',
@@ -478,6 +488,7 @@ export function MockupComposer({
         <span><kbd>드래그</kbd> 이동</span>
         <span><kbd>Shift</kbd> 비율 유지</span>
         <span><kbd>Alt</kbd> 중심 기준</span>
+        <span><kbd>Ctrl Z</kbd> 되돌리기</span>
         {selectedItem && (
           <span className={styles.modeSwitcher}>
             {(['scale', 'corners', 'warp'] as const).map((m) => (
@@ -534,7 +545,6 @@ export function MockupComposer({
             );
           }
 
-          // scale mode
           return (
             <div
               key={item.id}
@@ -556,17 +566,15 @@ export function MockupComposer({
           onContextMenu={(e) => e.preventDefault()}
         />
 
-        {/* Transform overlay */}
         {selectedItem && !selectedItem.locked && (() => {
           const mode = selMode;
 
-          // corners mode: 4 vertex handles + outline box
           if (mode === 'corners' && selectedItem.corners && stageSize.w > 0) {
             const { tl, tr, bl, br } = selectedItem.corners;
             const sw = stageSize.w, sh = stageSize.h;
             return (
               <>
-                <svg className={styles.cornerOutline} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1090 }}>
+                <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1090 }}>
                   <polygon
                     points={`${tl[0] * sw / 100},${tl[1] * sh / 100} ${tr[0] * sw / 100},${tr[1] * sh / 100} ${br[0] * sw / 100},${br[1] * sh / 100} ${bl[0] * sw / 100},${bl[1] * sh / 100}`}
                     fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="4 3"
@@ -593,31 +601,38 @@ export function MockupComposer({
             );
           }
 
-          // warp mode: 9 grid point handles + grid lines
           if (mode === 'warp' && selectedItem.warpGrid && stageSize.w > 0) {
             const grid = selectedItem.warpGrid;
+            const nR = grid.length;
+            const nC = grid[0].length;
             const sw = stageSize.w, sh = stageSize.h;
-            const pts = (r: number, c: number) => `${grid[r][c][0] * sw / 100},${grid[r][c][1] * sh / 100}`;
+            const ptStr = (r: number, c: number) => `${grid[r][c][0] * sw / 100},${grid[r][c][1] * sh / 100}`;
             return (
               <>
-                <svg className={styles.warpOutline} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1090 }}>
-                  {/* grid lines */}
-                  {[0, 1, 2].map((r) => (
-                    <polyline key={`row${r}`} points={[0, 1, 2].map((c) => pts(r, c)).join(' ')} fill="none" stroke="var(--accent)" strokeWidth="1" strokeDasharray="3 3" opacity="0.7" />
+                <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1090 }}>
+                  {Array.from({ length: nR }, (_, r) => (
+                    <polyline key={`row${r}`} points={Array.from({ length: nC }, (__, c) => ptStr(r, c)).join(' ')} fill="none" stroke="var(--accent)" strokeWidth="0.8" strokeDasharray="3 3" opacity="0.6" />
                   ))}
-                  {[0, 1, 2].map((c) => (
-                    <polyline key={`col${c}`} points={[0, 1, 2].map((r) => pts(r, c)).join(' ')} fill="none" stroke="var(--accent)" strokeWidth="1" strokeDasharray="3 3" opacity="0.7" />
+                  {Array.from({ length: nC }, (_, c) => (
+                    <polyline key={`col${c}`} points={Array.from({ length: nR }, (__, r) => ptStr(r, c)).join(' ')} fill="none" stroke="var(--accent)" strokeWidth="0.8" strokeDasharray="3 3" opacity="0.6" />
                   ))}
                 </svg>
-                {[0, 1, 2].map((r) => [0, 1, 2].map((c) => {
+                {Array.from({ length: nR }, (_, r) => Array.from({ length: nC }, (__, c) => {
                   const pt = grid[r][c];
-                  const isCorner = (r === 0 || r === 2) && (c === 0 || c === 2);
+                  const isCorner = (r === 0 || r === nR - 1) && (c === 0 || c === nC - 1);
+                  const isMid = r % 2 === 1 && c % 2 === 1; // center points
                   return (
                     <button
                       key={`${r}-${c}`}
                       type="button"
                       className={`${styles.resizeHandle} ${isCorner ? styles.handleCorner : styles.handleEdge} ${styles.cornerVertex}`}
-                      style={{ left: `${pt[0] * sw / 100 / sw * 100}%`, top: `${pt[1] * sh / 100 / sh * 100}%`, zIndex: 1100 }}
+                      style={{
+                        left: `${pt[0] * sw / 100 / sw * 100}%`,
+                        top: `${pt[1] * sh / 100 / sh * 100}%`,
+                        zIndex: 1100,
+                        width: isCorner ? 18 : isMid ? 12 : 10,
+                        height: isCorner ? 18 : isMid ? 12 : 10,
+                      }}
                       onPointerDown={(e) => onWarpHandlePointerDown(e, selectedItem, r, c)}
                       onPointerMove={onPointerMove}
                       onPointerUp={onPointerUp}
@@ -631,7 +646,6 @@ export function MockupComposer({
             );
           }
 
-          // scale mode: normal transform box
           const layerStyle = scaleLayerStyle(selectedItem);
           return (
             <div
@@ -675,7 +689,7 @@ export function MockupComposer({
       </div>
 
       <p className={styles.hint}>
-        레이어 선택 후 상단에서 모드를 선택하세요. <strong>꼭짓점</strong>: 각 꼭짓점을 독립적으로 늘리기 &nbsp;|&nbsp; <strong>왜곡</strong>: 9개 그리드로 포토샵처럼 자유 변형
+        레이어 선택 후 상단에서 모드를 선택하세요. <strong>꼭짓점</strong>: 각 꼭짓점을 독립적으로 늘리기 &nbsp;|&nbsp; <strong>왜곡</strong>: 25개 그리드로 포토샵처럼 자유 변형
       </p>
     </div>
   );
