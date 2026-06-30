@@ -3,14 +3,19 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { LoginModal } from '../auth/LoginModal';
+import { useAuth } from '../../hooks/authContext';
 import styles from './Header.module.css';
 
 export function Header() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const { user, loading, signOut } = useAuth();
 
   return (
+    <>
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link to="/" className={styles.logo}>
@@ -34,6 +39,16 @@ export function Header() {
 
         <div className={styles.actions}>
           <ThemeToggle />
+          {!loading && (user ? (
+            <div className={styles.userArea}>
+              <span className={styles.userLabel} title={user.email ?? undefined}>{user.name ?? user.email}</span>
+              <Button variant="ghost" size="sm" onClick={() => signOut()}>로그아웃</Button>
+            </div>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={() => setLoginOpen(true)}>
+              로그인
+            </Button>
+          ))}
           <Button variant="primary" size="sm" onClick={() => navigate('/editor')}>
             무료로 시작
           </Button>
@@ -52,5 +67,7 @@ export function Header() {
         </div>
       </div>
     </header>
+    <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+    </>
   );
 }

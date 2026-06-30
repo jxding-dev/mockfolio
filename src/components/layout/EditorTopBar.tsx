@@ -4,6 +4,8 @@ import type { AppMode } from '../../types';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { LoginModal } from '../auth/LoginModal';
+import { useAuth } from '../../hooks/authContext';
 import styles from './EditorTopBar.module.css';
 
 interface Props {
@@ -36,6 +38,8 @@ export function EditorTopBar({
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(projectName);
   const [showLogin, setShowLogin] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   const commitName = () => {
     onProjectNameChange(nameValue.trim() || '내 프로젝트');
@@ -91,25 +95,29 @@ export function EditorTopBar({
           ))}
         </nav>
 
-        {/* Right: login */}
+        {/* Right: auth + upgrade */}
         <div className={styles.right}>
           <ThemeToggle />
-          <Button variant="ghost" size="sm" onClick={() => setShowLogin(true)}>
-            로그인
-          </Button>
+          {user ? (
+            <Button variant="ghost" size="sm" onClick={() => signOut()}>로그아웃</Button>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={() => setLoginOpen(true)}>로그인</Button>
+          )}
           <Button variant="primary" size="sm" onClick={() => setShowLogin(true)}>
             업그레이드
           </Button>
         </div>
       </header>
 
-      <Modal open={showLogin} onClose={() => setShowLogin(false)} title="준비 중입니다">
+      <Modal open={showLogin} onClose={() => setShowLogin(false)} title="Pro는 곧 출시됩니다">
         <div className={styles.loginModal}>
           <div className={styles.lmEmoji}>🚀</div>
-          <p>계정 기능은 현재 개발 중입니다.<br />지금은 <strong>로그인 없이 무료</strong>로 모든 기능을 사용하세요.</p>
+          <p>Pro 결제는 준비 중입니다.<br />지금은 <strong>모든 기능을 무료</strong>로 사용할 수 있어요.</p>
           <Button variant="primary" fullWidth onClick={() => setShowLogin(false)}>확인</Button>
         </div>
       </Modal>
+
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );
 }

@@ -8,6 +8,7 @@ import { Pricing } from './pages/Pricing';
 import { NotFound } from './pages/NotFound';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { ThemeProvider } from './hooks/useTheme';
+import { AuthProvider } from './hooks/AuthProvider';
 
 const DEFAULT_TITLE = 'Mockfolio — Portfolio Mockup Builder';
 const ROUTE_TITLES: Record<string, string> = {
@@ -51,7 +52,9 @@ function AppShell() {
 export default function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter><AppShell /></BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter><AppShell /></BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
