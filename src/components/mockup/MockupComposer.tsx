@@ -11,8 +11,6 @@ interface Props {
   onSelect: (id: string | null) => void;
   onPositionChange: (id: string, x: number, y: number) => void;
   onTransformChange: (id: string, patch: Partial<MockupItem>) => void;
-  /** Called right before any drag or mode-switch starts — for undo history */
-  onBeforeChange?: () => void;
 }
 
 type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w';
@@ -152,7 +150,6 @@ export function MockupComposer({
   onSelect,
   onPositionChange,
   onTransformChange,
-  onBeforeChange,
 }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState({ w: 0, h: 0 });
@@ -262,7 +259,6 @@ export function MockupComposer({
     event.stopPropagation();
     (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
     onSelect(item.id);
-    onBeforeChange?.();
     const mode = item.transformMode ?? 'scale';
     drag.current = {
       id: item.id, startX: event.clientX, startY: event.clientY,
@@ -280,7 +276,6 @@ export function MockupComposer({
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
     onSelect(item.id);
-    onBeforeChange?.();
     resize.current = {
       id: item.id, handle,
       startX: event.clientX, startY: event.clientY,
@@ -301,7 +296,6 @@ export function MockupComposer({
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
     onSelect(item.id);
-    onBeforeChange?.();
     const centerX = rect.left + rect.width * (0.5 + item.x / 100);
     const centerY = rect.top + rect.height * (0.5 + item.y / 100);
     rotate.current = {
@@ -316,7 +310,6 @@ export function MockupComposer({
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
-    onBeforeChange?.();
     cornerDrag.current = {
       id: item.id, corner,
       startX: event.clientX, startY: event.clientY,
@@ -334,7 +327,6 @@ export function MockupComposer({
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
-    onBeforeChange?.();
     warpDrag.current = {
       id: item.id, row, col,
       startX: event.clientX, startY: event.clientY,
@@ -462,7 +454,6 @@ export function MockupComposer({
   const switchMode = (item: MockupItem, mode: 'scale' | 'corners' | 'warp') => {
     const sw = stageSize.w || stageRef.current?.getBoundingClientRect().width || 600;
     const sh = stageSize.h || stageRef.current?.getBoundingClientRect().height || 400;
-    onBeforeChange?.();
     if (mode === 'corners') {
       onTransformChange(item.id, {
         transformMode: 'corners',
@@ -488,8 +479,7 @@ export function MockupComposer({
         <span><kbd>드래그</kbd> 이동</span>
         <span><kbd>Shift</kbd> 비율 유지</span>
         <span><kbd>Alt</kbd> 중심 기준</span>
-        <span><kbd>Ctrl Z</kbd> 되돌리기</span>
-        {selectedItem && (
+{selectedItem && (
           <span className={styles.modeSwitcher}>
             {(['scale', 'corners', 'warp'] as const).map((m) => (
               <button
