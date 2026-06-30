@@ -455,17 +455,34 @@ export function MockupComposer({
     const sw = stageSize.w || stageRef.current?.getBoundingClientRect().width || 600;
     const sh = stageSize.h || stageRef.current?.getBoundingClientRect().height || 400;
     if (mode === 'corners') {
-      onTransformChange(item.id, {
-        transformMode: 'corners',
-        corners: item.corners ?? initCorners(item, sw, sh),
-      });
+      let corners: NonNullable<MockupItem['corners']>;
+      if (item.transformMode === 'warp' && item.warpGrid) {
+        const g = item.warpGrid;
+        const lr = g.length - 1, lc = g[0].length - 1;
+        corners = {
+          tl: [g[0][0][0], g[0][0][1]],
+          tr: [g[0][lc][0], g[0][lc][1]],
+          bl: [g[lr][0][0], g[lr][0][1]],
+          br: [g[lr][lc][0], g[lr][lc][1]],
+        };
+      } else {
+        corners = item.corners ?? initCorners(item, sw, sh);
+      }
+      onTransformChange(item.id, { transformMode: 'corners', corners });
     } else if (mode === 'warp') {
-      const grid = item.warpGrid
-        ?? (item.corners ? initWarpFromCorners(item.corners) : initWarpGrid(item, sw, sh));
+      const grid = item.transformMode === 'corners' && item.corners
+        ? initWarpFromCorners(item.corners)
+        : item.warpGrid ?? initWarpGrid(item, sw, sh);
       onTransformChange(item.id, { transformMode: 'warp', warpGrid: grid });
     } else {
       onTransformChange(item.id, { transformMode: 'scale' });
     }
+  };
+
+  const resetWarp = (item: MockupItem) => {
+    const sw = stageSize.w || stageRef.current?.getBoundingClientRect().width || 600;
+    const sh = stageSize.h || stageRef.current?.getBoundingClientRect().height || 400;
+    onTransformChange(item.id, { warpGrid: initWarpGrid(item, sw, sh) });
   };
 
   const selectedItem = items.find((item) => item.id === selectedId && item.visible) ?? null;
@@ -491,6 +508,11 @@ export function MockupComposer({
               </button>
             ))}
           </span>
+        )}
+        {selectedItem && selMode === 'warp' && (
+          <button type="button" className={styles.resetBtn} onClick={() => resetWarp(selectedItem)}>
+            왜곡 초기화
+          </button>
         )}
       </div>
 
