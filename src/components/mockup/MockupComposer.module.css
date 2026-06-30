@@ -197,6 +197,56 @@
   border-radius: 50%;
 }
 
+.warpCanvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  touch-action: none;
+  cursor: grab;
+}
+
+.modeSwitcher {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  padding: 2px;
+  background: var(--bg-subtle);
+}
+
+.modeBtn {
+  padding: 2px 10px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.modeBtn:hover {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+}
+
+.modeBtnActive {
+  background: var(--accent);
+  color: #fff;
+}
+
+.modeBtnActive:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Corner/warp vertex handle: positioned from stage top-left using left%/top% */
+.cornerVertex {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
 .hint {
   color: var(--text-tertiary);
   font-size: var(--text-xs);

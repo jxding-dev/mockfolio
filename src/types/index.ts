@@ -48,6 +48,17 @@ export interface MockupItem {
   opacity: number;
   visible: boolean;
   locked: boolean;
+  /** 'scale' = default CSS scale mode, 'corners' = free 4-corner homography, 'warp' = 9-point grid warp */
+  transformMode?: 'scale' | 'corners' | 'warp';
+  /** 4 corner positions as [x%, y%] of stage dimensions (corners mode) */
+  corners?: {
+    tl: [number, number];
+    tr: [number, number];
+    bl: [number, number];
+    br: [number, number];
+  };
+  /** 3×3 control point grid, each point as [x%, y%] of stage dimensions (warp mode) */
+  warpGrid?: [number, number][][];
 }
 
 // ── Mockup ───────────────────────────────────────────────────
