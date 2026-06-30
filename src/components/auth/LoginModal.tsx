@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/authContext';
 import styles from './LoginModal.module.css';
 
 export function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { configured, signInWithEmail, signInWithGoogle } = useAuth();
+  const { configured, signInWithEmail } = useAuth();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -59,10 +59,6 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
           {status === 'error' && <p className={styles.error}>{errorMsg}</p>}
           <Button type="submit" variant="primary" fullWidth loading={status === 'sending'}>
             로그인 링크 받기
-          </Button>
-          <div className={styles.divider}><span>또는</span></div>
-          <Button type="button" variant="secondary" fullWidth onClick={() => signInWithGoogle()}>
-            Google로 계속하기
           </Button>
           <p className={styles.privacy}>로그인 정보는 인증에만 쓰이며, 작업 이미지는 여전히 브라우저에서만 처리됩니다.</p>
         </form>
