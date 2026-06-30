@@ -13,6 +13,7 @@ import { EditorTopBar } from '../components/layout/EditorTopBar';
 import { EditorLeftPanel } from '../components/layout/EditorLeftPanel';
 import { EditorRightPanel } from '../components/layout/EditorRightPanel';
 import { EditorCanvas } from '../components/layout/EditorCanvas';
+import { ReviewModal } from '../components/feedback/ReviewModal';
 import styles from './Editor.module.css';
 
 const LONG_DETAIL_RATIO = 2.3;
@@ -314,6 +315,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
   const [gifLoading, setGifLoading] = useState(false);
   const [gifMessage, setGifMessage] = useState<string | null>(null);
   const [saveToast, setSaveToast] = useState<string | null>(null);
+  const [reviewExportType, setReviewExportType] = useState<string | null>(null);
   const [initialSourceApplied, setInitialSourceApplied] = useState(false);
   const { assets: mockupAssets, loading: mockupsLoading } = useMockupAssets();
 
@@ -573,6 +575,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
       await exportMockupComposite(mockupItems, selectedMockup.src, projectName);
       setExportMessage('합성 PNG 파일을 저장했어요.');
       setSaveToast('합성 PNG를 저장했어요');
+      setReviewExportType('합성 PNG');
     } catch {
       setExportMessage('목업 PNG를 저장하지 못했어요. 목업 이미지가 로드됐는지 확인하고 다시 시도해 주세요.');
     } finally {
@@ -606,6 +609,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
       await exportComparisonGif(beforeImage.dataUrl, afterImage.dataUrl, projectName, compareOrientation);
       setGifMessage('GIF 파일을 저장했어요.');
       setSaveToast('GIF를 저장했어요');
+      setReviewExportType('GIF');
     } catch {
       setGifMessage('GIF를 만들지 못했어요. 이미지가 너무 크면 더 작은 파일로 다시 시도해 주세요.');
     } finally {
@@ -628,6 +632,7 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
       const fileName = await exportPng(exportRef.current, projectName, exportScale);
       setExportMessage(`${fileName} 파일을 저장했어요.`);
       setSaveToast('PNG를 저장했어요');
+      setReviewExportType('PNG');
     } catch {
       setExportMessage('PNG를 저장하지 못했어요. 이미지가 로드됐는지 확인하고 다시 시도해 주세요.');
     } finally {
@@ -742,6 +747,13 @@ function Workspace({ image, onImageRemove, onImageChange, initialInspectSource =
           {saveToast}
         </div>
       )}
+
+      <ReviewModal
+        open={Boolean(reviewExportType)}
+        exportType={reviewExportType}
+        projectName={projectName}
+        onClose={() => setReviewExportType(null)}
+      />
     </div>
   );
 }
