@@ -22,8 +22,14 @@ const HANDLE_DIRECTIONS: Record<ResizeHandle, { x: -1 | 0 | 1; y: -1 | 0 | 1 }> 
   sw: { x: -1, y: 1 }, w: { x: -1, y: 0 },
 };
 
-const WARP_SUBDIV = 5;   // per-cell subdivision (5×5 grid = 16 cells × 5×5×2 = 800 triangles)
-const WARP_N = 4;        // 5×5 grid (N+1 × N+1 points, N×N cells)
+const WARP_SUBDIV = 5;
+const WARP_N_DEFAULT = 4;
+const WARP_SIZES: { n: number; label: string }[] = [
+  { n: 2, label: '3×3' },
+  { n: 4, label: '5×5' },
+  { n: 6, label: '7×7' },
+  { n: 8, label: '9×9' },
+];
 const CORNERS_SRC_W = 800;
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -45,30 +51,30 @@ function initCorners(item: MockupItem, sw: number, sh: number): NonNullable<Mock
   };
 }
 
-function initWarpGrid(item: MockupItem, sw: number, sh: number): [number, number][][] {
+function initWarpGrid(item: MockupItem, sw: number, sh: number, n = WARP_N_DEFAULT): [number, number][][] {
   const cx = 50 + item.x;
   const cy = 50 + item.y;
   const hw = item.scale * item.stretchX * 50;
   const hhPx = sw * item.scale * (item.height / item.width) * item.stretchY * 0.5;
   const hh = (hhPx / sh) * 100;
   const grid: [number, number][][] = [];
-  for (let r = 0; r <= WARP_N; r++) {
+  for (let r = 0; r <= n; r++) {
     const row: [number, number][] = [];
-    for (let c = 0; c <= WARP_N; c++) {
-      row.push([cx - hw + (c / WARP_N) * hw * 2, cy - hh + (r / WARP_N) * hh * 2]);
+    for (let c = 0; c <= n; c++) {
+      row.push([cx - hw + (c / n) * hw * 2, cy - hh + (r / n) * hh * 2]);
     }
     grid.push(row);
   }
   return grid;
 }
 
-function initWarpFromCorners(corners: NonNullable<MockupItem['corners']>): [number, number][][] {
+function initWarpFromCorners(corners: NonNullable<MockupItem['corners']>, n = WARP_N_DEFAULT): [number, number][][] {
   const { tl, tr, bl, br } = corners;
   const grid: [number, number][][] = [];
-  for (let r = 0; r <= WARP_N; r++) {
+  for (let r = 0; r <= n; r++) {
     const row: [number, number][] = [];
-    for (let c = 0; c <= WARP_N; c++) {
-      row.push(bilinear(tl, tr, bl, br, c / WARP_N, r / WARP_N));
+    for (let c = 0; c <= n; c++) {
+      row.push(bilinear(tl, tr, bl, br, c / n, r / n));
     }
     grid.push(row);
   }
@@ -470,19 +476,33 @@ export function MockupComposer({
       }
       onTransformChange(item.id, { transformMode: 'corners', corners });
     } else if (mode === 'warp') {
-      const grid = item.transformMode === 'corners' && item.corners
-        ? initWarpFromCorners(item.corners)
-        : item.warpGrid ?? initWarpGrid(item, sw, sh);
+      const curN = item.warpGrid ? item.warpGrid.length - 1 : WARP_N_DEFAULT;
+      const grid = item.corners
+        ? initWarpFromCorners(item.corners, curN)
+        : initWarpGrid(item, sw, sh, curN);
       onTransformChange(item.id, { transformMode: 'warp', warpGrid: grid });
     } else {
       onTransformChange(item.id, { transformMode: 'scale' });
     }
   };
 
+  const changeGridSize = (item: MockupItem, n: number) => {
+    const sw = stageSize.w || stageRef.current?.getBoundingClientRect().width || 600;
+    const sh = stageSize.h || stageRef.current?.getBoundingClientRect().height || 400;
+    const grid = item.corners
+      ? initWarpFromCorners(item.corners, n)
+      : initWarpGrid(item, sw, sh, n);
+    onTransformChange(item.id, { warpGrid: grid });
+  };
+
   const resetWarp = (item: MockupItem) => {
     const sw = stageSize.w || stageRef.current?.getBoundingClientRect().width || 600;
     const sh = stageSize.h || stageRef.current?.getBoundingClientRect().height || 400;
-    onTransformChange(item.id, { warpGrid: initWarpGrid(item, sw, sh) });
+    const curN = item.warpGrid ? item.warpGrid.length - 1 : WARP_N_DEFAULT;
+    const grid = item.corners
+      ? initWarpFromCorners(item.corners, curN)
+      : initWarpGrid(item, sw, sh, curN);
+    onTransformChange(item.id, { warpGrid: grid });
   };
 
   const selectedItem = items.find((item) => item.id === selectedId && item.visible) ?? null;
@@ -509,11 +529,28 @@ export function MockupComposer({
             ))}
           </span>
         )}
-        {selectedItem && selMode === 'warp' && (
-          <button type="button" className={styles.resetBtn} onClick={() => resetWarp(selectedItem)}>
-            왜곡 초기화
-          </button>
-        )}
+        {selectedItem && selMode === 'warp' && (() => {
+          const curN = selectedItem.warpGrid ? selectedItem.warpGrid.length - 1 : WARP_N_DEFAULT;
+          return (
+            <>
+              <span className={styles.modeSwitcher}>
+                {WARP_SIZES.map(({ n, label }) => (
+                  <button
+                    key={n}
+                    type="button"
+                    className={`${styles.modeBtn} ${curN === n ? styles.modeBtnActive : ''}`}
+                    onClick={() => changeGridSize(selectedItem, n)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </span>
+              <button type="button" className={styles.resetBtn} onClick={() => resetWarp(selectedItem)}>
+                초기화
+              </button>
+            </>
+          );
+        })()}
       </div>
 
       <div
