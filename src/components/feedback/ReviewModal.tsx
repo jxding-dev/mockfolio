@@ -3,8 +3,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import styles from './ReviewModal.module.css';
 
-const REVIEW_EMAIL = 'vlsptm1130@naver.com';
-const REVIEW_ENDPOINT = `https://formsubmit.co/ajax/${REVIEW_EMAIL}`;
+const REVIEW_ENDPOINT = '/api/review';
 
 interface Props {
   open: boolean;
@@ -56,11 +55,19 @@ export function ReviewModal({ open, exportType, projectName, onClose }: Props) {
         },
         body: JSON.stringify(payload),
       });
-      if (!response.ok) throw new Error('review-submit-failed');
+      const result = await response.json().catch(() => null) as { message?: string } | null;
+      if (!response.ok) {
+        throw new Error(result?.message ?? 'review-submit-failed');
+      }
       setStatus('sent');
-    } catch {
+    } catch (submitError) {
       setStatus('error');
-      setError('리뷰를 보내지 못했어요. 네트워크 상태를 확인한 뒤 다시 제출해 주세요.');
+      const message = submitError instanceof Error ? submitError.message : '';
+      if (window.location.hostname.includes('github.io')) {
+        setError('메일 전송은 Vercel 배포 주소에서만 동작해요. GitHub Pages 주소에서는 서버 API가 없어 보낼 수 없습니다.');
+      } else {
+        setError(message || '리뷰를 보내지 못했어요. 네트워크 상태와 메일 서버 설정을 확인한 뒤 다시 제출해 주세요.');
+      }
     }
   }
 
