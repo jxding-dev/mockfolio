@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, type CSSProperties } from 'react';
 import type { UploadedImage, DevicePreset, MockupItem } from '../../types';
 import type { EditorSettings } from '../../data/editorSettings';
 import { DEVICE_PRESETS } from '../../data/devices';
@@ -110,6 +110,15 @@ export function EditorCanvas({
     : showingUrlPreview ? Boolean(previewUrl)
     : isComposite ? true
     : !!image;
+  const zoomedSceneStyle: CSSProperties = {
+    transform: `scale(${zoom})`,
+    transformOrigin: 'center center',
+  };
+  const compositeSceneStyle = {
+    ...zoomedSceneStyle,
+    '--dock-scale': String(1 / zoom),
+    '--dock-offset-y': `${10 / zoom}px`,
+  } as CSSProperties;
 
   // Keep first paint and mode changes framed inside the available canvas.
   useEffect(() => {
@@ -127,7 +136,7 @@ export function EditorCanvas({
         onWheel={handleWheel}
       >
         {isCompare ? (
-          <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
+          <div className={styles.sceneOuter} style={zoomedSceneStyle}>
             <div ref={exportRef as React.RefObject<HTMLDivElement>}>
               <CompareSlider before={beforeImage} after={afterImage} orientation={compareOrientation} autoSlide={autoSlide} />
             </div>
@@ -141,7 +150,7 @@ export function EditorCanvas({
             )}
           </div>
         ) : isComposite ? (
-          <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
+          <div className={styles.sceneOuter} style={compositeSceneStyle}>
             <MockupComposer
               items={mockupItems}
               selectedId={selectedMockupItemId}
@@ -154,7 +163,7 @@ export function EditorCanvas({
         ) : (activeMode === 'mockup' || activeMode === 'export') && !selectedMockup ? (
           <MockupEmptyState />
         ) : activeMode === 'inspect' && image ? (
-          <div className={styles.sceneOuter} style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
+          <div className={styles.sceneOuter} style={zoomedSceneStyle}>
             <InspectView image={image} device={device} fitMode={fitMode} orientation={inspectOrientation} guides={guides} />
           </div>
         ) : (
