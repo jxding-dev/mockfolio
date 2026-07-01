@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useCallback, useState, type FormEvent } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import styles from './ReviewModal.module.css';
@@ -19,6 +19,15 @@ export function ReviewModal({ open, exportType, projectName, onClose }: Props) {
   const [wish, setWish] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [error, setError] = useState('');
+
+  const closeAndReset = useCallback(() => {
+    setStatus('idle');
+    setError('');
+    setPainPoint('');
+    setWish('');
+    setQuality('좋았어요');
+    onClose();
+  }, [onClose]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -53,15 +62,6 @@ export function ReviewModal({ open, exportType, projectName, onClose }: Props) {
       setStatus('error');
       setError('리뷰를 보내지 못했어요. 네트워크 상태를 확인한 뒤 다시 제출해 주세요.');
     }
-  }
-
-  function closeAndReset() {
-    setStatus('idle');
-    setError('');
-    setPainPoint('');
-    setWish('');
-    setQuality('좋았어요');
-    onClose();
   }
 
   return (
